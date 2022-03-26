@@ -21,6 +21,9 @@
     <Content Include="Src\NewResistanceOrders\Classes\IRB_AdditionalResistanceOrders_Abilities.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\IRB_AdditionalResistanceOrders_ResCards.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\X2DownloadableContentInfo_NewResistanceOrders.uc">
       <SubType>Content</SubType>
     </Content>
