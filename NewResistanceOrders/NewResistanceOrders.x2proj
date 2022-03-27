@@ -9,10 +9,16 @@
     <RootNamespace>ExampleWeapon</RootNamespace>
     <ProjectGuid>{3f350978-33e7-493a-993b-92c1b54bf591}</ProjectGuid>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Content Include="Config\XComEditor.ini" />
     <Content Include="Config\XComEngine.ini" />
     <Content Include="Config\XComGame.ini" />
+    <Content Include="Config\XComGameData.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Content\WP_ModExampleWeapon_CV.upk" />
     <Content Include="Content\ExampleWeapon_ModShaderCache.upk" />
     <Content Include="Localization\XComGame.int" />

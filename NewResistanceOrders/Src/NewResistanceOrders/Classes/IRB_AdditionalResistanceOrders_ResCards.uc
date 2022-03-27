@@ -3,10 +3,11 @@
 class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function array<X2DataTemplate> CreateTemplates()
-	{
+	{		
 		local array<X2DataTemplate> Techs;
-		Techs.AddTemplate(CreateHostileWildernessTemplate());
-		
+
+		`log("Creating resistance cards for IRB_AdditionalResistanceOrders_ResCards");
+		Techs.AddItem(CreateHostileWildernessTemplate());
 		return Techs;
 	}
 
@@ -16,24 +17,39 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_HostileWilderness');
 		Template.Category = "ResistanceCard";
-		Template.GetSummaryTextFn = GetSummaryTextReplaceInt;
-		Template.ModifyTacticalStartStateFn = GrantHostileWildernessBuff;
-		return Template;
+		Template.GetAbilitiesToGrantFn = GrantHostileWildernessBuff;
+		return Template; 
 	}
 
 	static function GrantHostileWildernessBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
-	{
-		PlotDef = `PARCELMGR.GetPlotDefinition(BattleDataState.MapData.PlotMapName);
+	{		
+		local PlotDefinition PlotDef;
+		local XComGameStateHistory History;
+		local XComGameState_BattleData BattleData;
 		local string plotType;
 		
-		plotType = PlotDefinition.strType;
+	
+		History = `XCOMHISTORY;
+		BattleData = XComGameState_BattleData(History.GetSingleGameStateObjectForClass(class'XComGameState_BattleData'));
+		PlotDef = `PARCELMGR.GetPlotDefinition(BattleData.MapData.PlotMapName);
+		plotType =  PlotDef.strType;
+		`log("Checking eligibilities for granting hostile wilderness buff");
 
-		if ((UnitState.GetTeam() == eTeam_XCom) && plotType == 'Wilderness')
+		if (plotType != string('Wilderness')){
+			`log("Plot type is not wilderness.  Ignoring.");
+		}
+
+		if ((UnitState.GetTeam() == eTeam_XCom) && plotType ~= string('Wilderness'))
 		{
+			`log("Hostile wilderness buff added to friendly!");
 			AbilitiesToGrant.AddItem( 'HostileWilderness_Buff' ); // this will apply a debuff to the robot
 		}
 	}
-
+	
+	static function XComGameState_StrategyCard GetCardState(StateObjectReference CardRef)
+	{
+		return XComGameState_StrategyCard(`XCOMHISTORY.GetGameStateForObjectID(CardRef.ObjectID));
+	}
 	//---------------------------------------------------------------------------------------
 	static function string GetSummaryTextReplaceInt(StateObjectReference InRef)
 	{
@@ -230,3 +246,61 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		return false;
 	}
+	
+//#############################################################################################
+//----------------   HELPER FUNCTIONS  --------------------------------------------------------
+//#############################################################################################
+
+static function XComGameState_HeadquartersXCom GetNewXComHQState(XComGameState NewGameState)
+{
+	local XComGameState_HeadquartersXCom NewXComHQ;
+
+	foreach NewGameState.IterateByClassType(class'XComGameState_HeadquartersXCom', NewXComHQ)
+	{
+		break;
+	}
+
+	if (NewXComHQ == none)
+	{
+		NewXComHQ = XComGameState_HeadquartersXCom(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
+		NewXComHQ = XComGameState_HeadquartersXCom(NewGameState.ModifyStateObject(class'XComGameState_HeadquartersXCom', NewXComHQ.ObjectID));
+	}
+
+	return NewXComHQ;
+}
+
+static function XComGameState_HeadquartersResistance GetNewResHQState(XComGameState NewGameState)
+{
+	local XComGameState_HeadquartersResistance NewResHQ;
+
+	foreach NewGameState.IterateByClassType(class'XComGameState_HeadquartersResistance', NewResHQ)
+	{
+		break;
+	}
+
+	if (NewResHQ == none)
+	{
+		NewResHQ = XComGameState_HeadquartersResistance(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
+		NewResHQ = XComGameState_HeadquartersResistance(NewGameState.ModifyStateObject(class'XComGameState_HeadquartersResistance', NewResHQ.ObjectID));
+	}
+
+	return NewResHQ;
+}
+
+static function XComGameState_BlackMarket GetNewBlackMarketState(XComGameState NewGameState)
+{ 
+	local XComGameState_BlackMarket NewBlackMarket; 
+
+	foreach NewGameState.IterateByClassType(class'XComGameState_BlackMarket', NewBlackMarket)
+	{
+		break;
+	}
+
+	if (NewBlackMarket == none)
+	{
+		NewBlackMarket = XComGameState_BlackMarket(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_BlackMarket'));
+		NewBlackMarket = XComGameState_BlackMarket(NewGameState.ModifyStateObject(class'XComGameState_BlackMarket', NewBlackMarket.ObjectID));
+	}
+
+	return NewBlackMarket;
+}
