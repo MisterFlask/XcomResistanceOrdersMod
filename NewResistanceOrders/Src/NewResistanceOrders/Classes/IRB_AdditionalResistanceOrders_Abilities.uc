@@ -16,13 +16,13 @@ static function array<X2DataTemplate> CreateTemplates()
 { 
 	local array<X2DataTemplate> Templates;
 
-	Templates.AddItem( AddHostileWildernessPhantomBuff() );
+	Templates.AddItem( GetHostileWildernessPhantomBuff() );
 
 	return Templates;
 }
 
 
-static function X2AbilityTemplate AddHostileWildernessPhantomBuff()
+static function X2AbilityTemplate GetHostileWildernessPhantomBuff()
 {
 	local X2AbilityTemplate						Template;
 	local X2AbilityTargetStyle                  TargetStyle;

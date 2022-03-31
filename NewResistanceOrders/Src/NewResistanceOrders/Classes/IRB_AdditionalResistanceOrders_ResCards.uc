@@ -23,33 +23,14 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantHostileWildernessBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
-		local PlotDefinition PlotDef;
-		local XComGameStateHistory History;
-		local XComGameState_BattleData BattleData;
-		local string plotType;
-		
-	
-		History = `XCOMHISTORY;
-		BattleData = XComGameState_BattleData(History.GetSingleGameStateObjectForClass(class'XComGameState_BattleData'));
-		PlotDef = `PARCELMGR.GetPlotDefinition(BattleData.MapData.PlotMapName);
-		plotType =  PlotDef.strType;
-		`log("Checking eligibilities for granting hostile wilderness buff");
-
-		if (plotType != string('Wilderness')){
-			`log("Plot type is not wilderness.  Ignoring.");
-		}
-
-		if ((UnitState.GetTeam() == eTeam_XCom) && plotType ~= string('Wilderness'))
-		{
-			`log("Hostile wilderness buff added to friendly!");
-			AbilitiesToGrant.AddItem( 'HostileWilderness_Buff' ); // this will apply a debuff to the robot
-		}
+		AbilitiesToGrant.AddItem( 'HostileWilderness_Buff' ); // this will apply a debuff to the robot
 	}
-	
+
 	static function XComGameState_StrategyCard GetCardState(StateObjectReference CardRef)
 	{
 		return XComGameState_StrategyCard(`XCOMHISTORY.GetGameStateForObjectID(CardRef.ObjectID));
 	}
+
 	//---------------------------------------------------------------------------------------
 	static function string GetSummaryTextReplaceInt(StateObjectReference InRef)
 	{
