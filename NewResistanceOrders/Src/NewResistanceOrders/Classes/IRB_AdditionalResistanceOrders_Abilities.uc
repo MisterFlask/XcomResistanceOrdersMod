@@ -16,20 +16,20 @@ static function array<X2DataTemplate> CreateTemplates()
 { 
 	local array<X2DataTemplate> Templates;
 
-	Templates.AddItem( GetHostileWildernessPhantomBuff() );
+	Templates.AddItem( GetTunnelRatsPhantomBuff() );
 
 	return Templates;
 }
 
 
-static function X2AbilityTemplate GetHostileWildernessPhantomBuff()
+static function X2AbilityTemplate GetTunnelRatsPhantomBuff()
 {
 	local X2AbilityTemplate						Template;
 	local X2AbilityTargetStyle                  TargetStyle;
 	local X2AbilityTrigger						Trigger;
 	local X2Effect_Persistent					Effect;
 
-	`CREATE_X2ABILITY_TEMPLATE(Template, 'HostileWilderness_Buff');
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'TunnelRats_Buff');
 
 	Template.AbilitySourceName = 'eAbilitySource_Perk';
 	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;

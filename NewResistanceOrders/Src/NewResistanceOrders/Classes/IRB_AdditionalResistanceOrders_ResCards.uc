@@ -7,23 +7,139 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		local array<X2DataTemplate> Techs;
 
 		`log("Creating resistance cards for IRB_AdditionalResistanceOrders_ResCards");
-		Techs.AddItem(CreateHostileWildernessTemplate());
+		Techs.AddItem(CreateTunnelRatsTemplate());
 		return Techs;
 	}
-
-	static function X2DataTemplate CreateHostileWildernessTemplate()
+	
+	//////// START TUNNEL RATS
+	static function X2DataTemplate CreateTunnelRatsTemplate()
 	{
 		local X2StrategyCardTemplate Template;
 
-		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_HostileWilderness');
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_TunnelRats');
 		Template.Category = "ResistanceCard";
-		Template.GetAbilitiesToGrantFn = GrantHostileWildernessBuff;
+		Template.GetAbilitiesToGrantFn = GrantTunnelRatsBuff;
 		return Template; 
 	}
 
-	static function GrantHostileWildernessBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	static function GrantTunnelRatsBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
-		AbilitiesToGrant.AddItem( 'HostileWilderness_Buff' ); // this will apply a debuff to the robot
+		if (IsPlotType("Tunnels_Sewer") || IsPlotType("Tunnels_Subway"))
+		{	
+			AbilitiesToGrant.AddItem( 'Phantom' ); 
+		}
+	}
+
+	//////// END TUNNEL RATS
+
+	//////// START FLASHBANGER
+	static function X2DataTemplate CreateFlashpointForGrenadiersTemplate()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_FlashpointForGrenadiers');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantFlashpointBuff;
+		return Template; 
+	}
+
+	static function GrantFlashpointBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{	
+		if (DoesSoldierHaveItem(UnitState, 'GrenadeLauncher')){
+			AbilitiesToGrant.AddItem( 'GrimyFlashpoint' ); 
+		}
+	}
+	
+	//GrimyHexHunter buff
+	
+
+	static function GrantNeedlepointBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		AbilitiesToGrant.AddItem( 'GrimyNeedlePointPassive' ); 
+	}
+
+	//////// END TUNNEL RATS
+
+	/// UTILITY
+	// TODO:  static function IsSoldierASpark(XComGameState_Unit UnitState){
+
+	static function DoesSoldierHaveGremlin(XComGameState_Unit UnitState){
+		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'gremlin');
+	}
+
+	static function DoesSoldierHaveSword(XComGameState_Unit UnitState){
+		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sword') || DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'combatknife');
+	}
+
+	static function DoesSoldierHaveMindShield(XComGameState_Unit UnitState){
+		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'psidefense');
+	}
+
+	static function DoesSoldierHaveNanoscaleVest(XComGameState_Unit UnitState){
+		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'psidefense');
+	}
+
+	static function DoesSoldierHaveSpecificItem(XComGameState_Unit UnitState, name Classification)
+	{	
+		local XComGameStateHistory History;
+		local XComGameState_Unit UnitState;
+		local StateObjectReference ItemRef;
+		local XComGameState_Item ItemState;
+		local name ItemCat;
+		UnitState = XComGameState_Unit(InTrack.StateObject_NewState);
+		`assert(UnitState != none);
+
+		History = `XCOMHISTORY;
+		foreach UnitState.InventoryItems(ItemRef)
+		{
+			ItemState = XComGameState_Item(History.GetGameStateForObjectID(ItemRef.ObjectID));
+			if(ItemState != none)
+			{
+				// check item's type
+				ItemCat =  ItemState.GetMyTemplate().DataName;
+				if (ItemCat == Classification){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	static function DoesSoldierHaveItemOfWeaponOrItemClass(XComGameState_Unit UnitState, name Classification)
+	{	
+		local XComGameStateHistory History;
+		local XComGameState_Unit UnitState;
+		local StateObjectReference ItemRef;
+		local XComGameState_Item ItemState;
+		local name WeaponCat;
+		local name ItemCat;
+		UnitState = XComGameState_Unit(InTrack.StateObject_NewState);
+		`assert(UnitState != none);
+
+		History = `XCOMHISTORY;
+		foreach UnitState.InventoryItems(ItemRef)
+		{
+			ItemState = XComGameState_Item(History.GetGameStateForObjectID(ItemRef.ObjectID));
+			if(ItemState != none)
+			{
+				WeaponCat=ItemState.GetWeaponCategory();
+				// check item's type
+				if (WeaponCat == Classification){
+					return true;
+				}
+
+				ItemCat = ItemState.GetMyTemplate().ItemCat;
+				if (ItemCat == Classification){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	static function DoesSoldierHaveItem(XComGameState_Unit UnitState, name ItemName)
+	{
+		return UnitState.HasItemOfTemplateType(ItemName);
 	}
 
 	static function XComGameState_StrategyCard GetCardState(StateObjectReference CardRef)
@@ -32,6 +148,30 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	}
 
 	//---------------------------------------------------------------------------------------
+
+
+	static function bool IsPlotType(string plotTypeDesired){
+	    local PlotDefinition PlotDef;
+        local XComGameStateHistory History;
+        local XComGameState_BattleData BattleData;
+        local string plotType;
+
+
+        History = `XCOMHISTORY;
+        BattleData = XComGameState_BattleData(History.GetSingleGameStateObjectForClass(class'XComGameState_BattleData'));
+        PlotDef = `PARCELMGR.GetPlotDefinition(BattleData.MapData.PlotMapName);
+        plotType =  PlotDef.strType;
+
+        if (plotType != plotTypeDesired){
+                `log("Plot type is not " $ plotTypeDesired $ " but is instead" $ plotType);
+				return false;
+        }else{
+            `log("Plot type is " $ plotTypeDesired );
+			return true;
+		}
+	}
+
+
 	static function string GetSummaryTextReplaceInt(StateObjectReference InRef)
 	{
 		local XComGameState_StrategyCard CardState;
