@@ -8,6 +8,16 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		`log("Creating resistance cards for IRB_AdditionalResistanceOrders_ResCards");
 		Techs.AddItem(CreateTunnelRatsTemplate());
+		Techs.AddItem(CreateFlashpointForGrenadiersTemplate());
+		Techs.AddItem(CreateHexhunterForMindshieldsTemplate());
+		Techs.AddItem(CreateNeedlepointBuffForPistolTemplate());
+		Techs.AddItem(CreateAntimimeticScalesForVestsTemplate());
+		Techs.AddItem(CreateMultitaskingForGremlinsTemplate());
+		Techs.AddItem(CreateSmokerForLaunchersTemplate());
+		Techs.AddItem(CreateCombatDrugsForMedikitTemplate());
+		Techs.AddItem(CreatePocketFlamerForCannonsTemplate());
+		Techs.AddItem(CreateBattleSpaceForBattleScannersTemplate());
+		Techs.AddItem(CreatePistolGrantsEntrenchAbility());
 		return Techs;
 	}
 	
@@ -24,12 +34,17 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantTunnelRatsBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
+
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
 		if (IsPlotType("Tunnels_Sewer") || IsPlotType("Tunnels_Subway"))
 		{	
 			AbilitiesToGrant.AddItem( 'Phantom' ); 
 		}
 	}
-	//////// FLASHPOINTS
+	//////// FLASHPOINT for grenadiers
 	static function X2DataTemplate CreateFlashpointForGrenadiersTemplate()
 	{
 		local X2StrategyCardTemplate Template;
@@ -42,7 +57,10 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantFlashpointBuffIfLauncher(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
-		if (DoesSoldierHaveItem(UnitState, 'GrenadeLauncher')){
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'grenade_launcher')){
 			AbilitiesToGrant.AddItem( 'GrimyFlashpoint' ); 
 		}
 	}
@@ -61,6 +79,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantHexhunterIfMindshield(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
 		if(DoesSoldierHaveMindShield(UnitState))
 		{
 			AbilitiesToGrant.AddItem( 'GrimyHexHunter' ); 
@@ -80,6 +101,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantNeedlepointBuffIfPistol(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
 		if (SoldierHasPistol(UnitState))
 		{
 			AbilitiesToGrant.AddItem( 'GrimyNeedlePointPassive' ); 
@@ -91,7 +115,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	{
 		local X2StrategyCardTemplate Template;
 
-		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_AntimimeticScalesForVests);
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_AntimimeticScalesForVests');
 		Template.Category = "ResistanceCard";
 		Template.GetAbilitiesToGrantFn = GrantAntimemeticBuffsIfVest;
 		return Template; 
@@ -99,7 +123,10 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantAntimemeticBuffsIfVest(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
-		if (DoesSoldierHaveNanoscaleVest(UnitState))
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		if (DoesSoldierHaveDefensiveVest(UnitState))
 		{
 			AbilitiesToGrant.AddItem( 'Phantom' );
 			AbilitiesToGrant.AddItem( 'Shadowstep' ); 
@@ -119,6 +146,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function  GrantMultitaskingIfGremlin(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'gremlin'))
 		{
 			AbilitiesToGrant.AddItem( 'Multitasking' );
@@ -138,6 +168,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantSmokerIfLauncher(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'grenade_launcher'))
 		{
 			AbilitiesToGrant.AddItem( 'ShadowOps_SmokeAndMirrors_LW2' );
@@ -154,30 +187,13 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Template.GetAbilitiesToGrantFn = GrantCombatDrugsIfMedikit;
 		return Template; 
 	}
-	// pistol grants ShadowOps_Entrench
 
 	static function GrantCombatDrugsIfMedikit(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
-		if(DoesSoldierHaveSpecificItem('Medikit'))
-		{
-			AbilitiesToGrant.AddItem( 'ShadowOps_CombatDrugs' );
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
 		}
-	}
-
-	// combat drugs
-	static function X2DataTemplate CreateCombatDrugsForMedikitTemplate()
-	{
-		local X2StrategyCardTemplate Template;
-
-		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_CombatDrugsForMedikit');
-		Template.Category = "ResistanceCard";
-		Template.GetAbilitiesToGrantFn = GrantCombatDrugsIfMedikit;
-		return Template; 
-	}
-
-	static function GrantCombatDrugsIfMedikit(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
-	{	
-		if(DoesSoldierHaveSpecificItem('Medikit'))
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'heal'))
 		{
 			AbilitiesToGrant.AddItem( 'ShadowOps_CombatDrugs' );
 		}
@@ -196,6 +212,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantPocketFlamerIfCannon(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon')){
 			AbilitiesToGrant.AddItem( 'PocketFlamer' );
 		}
@@ -214,18 +233,42 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantBattleSpaceIfBattleScanner(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
-		if(DoesSoldierHaveSpecificItem('Battlescanner'))
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		if(DoesSoldierHaveSpecificItem(UnitState, 'Battlescanner'))
 		{
 			AbilitiesToGrant.AddItem( 'Battlespace' );
 		}
 	}
 
-	//Lacerate for swords/knives
+	// pistol grants ShadowOps_Entrench
+	static function X2DataTemplate CreatePistolGrantsEntrenchAbility()
+	{
+		local X2StrategyCardTemplate Template;
 
-	// gain rocketeer if you're wearing heavy armor
-	//ShadowOps_Rocketeer
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_PistolForEntrench');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantPistolForEntrench;
+		return Template; 
+	}
+
+	static function GrantPistolForEntrench(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'pistol') || DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'autopistol'))
+		{
+			AbilitiesToGrant.AddItem( 'ShadowOps_Entrench' );
+		}
+	}
+	
+	// Lacerate for swords/knives
+	// gain ShadowOps_Rocketeer if you're wearing heavy armor
 	// Take Under for swords/knivese
-	// sniper rifles gain Bullfighter
+	// vests grant Bullfighter
 	// sniper/vektor rifles gain Anatomy
 	// skulljacks gain Interrogator
 	// pistols gain Entrench
@@ -242,42 +285,41 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	// Convert supplies + time in proving grounds into Elereum Cores
 	// Convert supplies + time in proving grounds into Elereum Shards
 	
-	static function DoesSoldierHaveRocketLauncher(XComGameState_Unit UnitState){
+	static function bool DoesSoldierHaveRocketLauncher(XComGameState_Unit UnitState){
 		return DoesSoldierHaveSpecificItem(UnitState, 'RocketLauncher');
 	}
 
-	static function DoesSoldierHaveGremlin(XComGameState_Unit UnitState){
+	static function bool DoesSoldierHaveGremlin(XComGameState_Unit UnitState){
 		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'gremlin');
 	}
 
-	static function DoesSoldierHaveSword(XComGameState_Unit UnitState){
+	static function bool DoesSoldierHaveSword(XComGameState_Unit UnitState){
 		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sword') || DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'combatknife');
 	}
 
-	static function DoesSoldierHaveMindShield(XComGameState_Unit UnitState){
-		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'psidefense');
-	}
-
-	static function DoesSoldierHaveNanoscaleVest(XComGameState_Unit UnitState){
-		return DoesSoldierHaveSpecificItem(UnitState, 'NanofiberVest');
-	}
-
-	static function DoesSoldierHaveShield(XComGameState_Unit UnitState){
-		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'shield');
-	}
-	
-	static function DoesSoldierHavePistol(XComGameState_Unit UnitState){
+	static function bool DoesSoldierHavePistol(XComGameState_Unit UnitState){
 		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'pistol');
 	}
 
-	static function DoesSoldierHaveSpecificItem(XComGameState_Unit UnitState, name Classification)
+	static function bool DoesSoldierHaveMindShield(XComGameState_Unit UnitState){
+		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'psidefense');
+	}
+
+	static function bool DoesSoldierHaveDefensiveVest(XComGameState_Unit UnitState){
+		return DoesSoldierHaveSpecificItem(UnitState, 'defense');
+	}
+
+	static function bool DoesSoldierHaveShield(XComGameState_Unit UnitState){
+		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'shield');
+	}
+	
+
+	static function bool DoesSoldierHaveSpecificItem(XComGameState_Unit UnitState, name Classification)
 	{	
 		local XComGameStateHistory History;
-		local XComGameState_Unit UnitState;
 		local StateObjectReference ItemRef;
 		local XComGameState_Item ItemState;
 		local name ItemCat;
-		UnitState = XComGameState_Unit(InTrack.StateObject_NewState);
 		`assert(UnitState != none);
 
 		History = `XCOMHISTORY;
@@ -296,15 +338,42 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		return false;
 	}
 
-	static function DoesSoldierHaveItemOfWeaponOrItemClass(XComGameState_Unit UnitState, name Classification)
+	static function bool DoesSoldierHaveArmorOfClass(XComGameState_Unit UnitState, name Classification){
+	
+		local XComGameStateHistory History;
+		local StateObjectReference ItemRef;
+		local XComGameState_Item ItemState;
+		local X2ArmorTemplate Armor;
+		local name WeaponCat;
+		local name ItemCat;
+		`assert(UnitState != none);
+
+		History = `XCOMHISTORY;
+		foreach UnitState.InventoryItems(ItemRef)
+		{
+			ItemState = XComGameState_Item(History.GetGameStateForObjectID(ItemRef.ObjectID));
+			if(ItemState != none)
+			{
+
+				Armor = X2ArmorTemplate(ItemState.GetMyTemplate());
+				if (Armor == none){
+					continue;
+				}
+				if (Armor.ArmorClass == Classification){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	static function bool DoesSoldierHaveItemOfWeaponOrItemClass(XComGameState_Unit UnitState, name Classification)
 	{	
 		local XComGameStateHistory History;
-		local XComGameState_Unit UnitState;
 		local StateObjectReference ItemRef;
 		local XComGameState_Item ItemState;
 		local name WeaponCat;
 		local name ItemCat;
-		UnitState = XComGameState_Unit(InTrack.StateObject_NewState);
 		`assert(UnitState != none);
 
 		History = `XCOMHISTORY;
@@ -328,9 +397,8 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		return false;
 	}
 
-	static function DoesSoldierHaveItem(XComGameState_Unit UnitState, name ItemName)
-	{
-		return UnitState.HasItemOfTemplateType(ItemName);
+	static function bool SoldierHasPistol(XComGameState_Unit Unit){
+		return DoesSoldierHaveItemOfWeaponOrItemClass(Unit, 'pistol');
 	}
 
 	static function XComGameState_StrategyCard GetCardState(StateObjectReference CardRef)
