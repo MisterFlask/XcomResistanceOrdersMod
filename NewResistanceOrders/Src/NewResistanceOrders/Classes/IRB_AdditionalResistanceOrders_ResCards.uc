@@ -1,12 +1,19 @@
-// This is an Unreal Script
+
+// source perk packs are:
+//[extended perk pack wotc]https://docs.google.com/spreadsheets/d/1wZfTRMWsLDzrJAKO7otuto6o0t0PuzYF6Tv704AkZj0/edit#gid=0
+// wotc abb perk pack
+// mitzuri's perk pack
+// (MAYBE stukov's war perk pack at some point) https://steamcommunity.com/workshop/filedetails/discussion/2728208078/3189112650405981173/
+// NOT USING SHADOW OPS PERK PACK, due to undesired class changes
 
 class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
-
 	static function array<X2DataTemplate> CreateTemplates()
 	{		
 		local array<X2DataTemplate> Techs;
 
-		`log("Creating resistance cards for IRB_AdditionalResistanceOrders_ResCards");
+		`log("Creating resistance cards for IRB_AdditionalResistanceOrders_ResCards v2");
+		
+		// Templates of the form "if condition X, grant soldier perk Y"
 		Techs.AddItem(CreateTunnelRatsTemplate());
 		Techs.AddItem(CreateFlashpointForGrenadiersTemplate());
 		Techs.AddItem(CreateHexhunterForMindshieldsTemplate());
@@ -18,9 +25,32 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreatePocketFlamerForCannonsTemplate());
 		Techs.AddItem(CreateBattleSpaceForBattleScannersTemplate());
 		Techs.AddItem(CreatePistolGrantsEntrenchAbility());
+
+		Techs.AddItem(CreateSwordsAndKnivesGrantShellbustAbility());
+		Techs.AddItem(CreateGrantFirepowerForSparksTemplate());
+		Techs.AddItem(CreateGrenadeLauncherGrantsWatchThemRunTemplate());
+		//Techs.AddItem(CreateNoisemakerTemplate()); // will re-add after replacing the Shadow ops perk pack.
+
+		// There are event listeners attached to the names of these next ones, so they don't intrinsically do anything.
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_HaasBioroidContacts'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GlobalsecContacts'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GlobalsecContactsII'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GrndlContacts'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GrndlContactsII'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ArgusSecurityContacts'));
 		return Techs;
 	}
 	
+	static function X2DataTemplate CreateBlankResistanceOrder(name OrderName)
+	{
+		local X2StrategyCardTemplate Template;
+		
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, OrderName);
+		Template.Category = "ResistanceCard";
+		`log("Created blank resistance order: " $ string(OrderName));
+		return Template; 
+	}
+
 	//////// TUNNEL RATS
 	static function X2DataTemplate CreateTunnelRatsTemplate()
 	{
@@ -129,7 +159,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		if (DoesSoldierHaveDefensiveVest(UnitState))
 		{
 			AbilitiesToGrant.AddItem( 'Phantom' );
-			AbilitiesToGrant.AddItem( 'Shadowstep' ); 
+			AbilitiesToGrant.AddItem( 'Shadowstep' ); //todo: split into its own thing
 		}
 	}
 
@@ -173,7 +203,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		}
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'grenade_launcher'))
 		{
-			AbilitiesToGrant.AddItem( 'ShadowOps_SmokeAndMirrors_LW2' );
+			AbilitiesToGrant.AddItem( 'MZFogWall' );
 		}
 	}
 	
@@ -185,6 +215,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_CombatDrugsForMedikit');
 		Template.Category = "ResistanceCard";
 		Template.GetAbilitiesToGrantFn = GrantCombatDrugsIfMedikit;
+
 		return Template; 
 	}
 
@@ -195,7 +226,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		}
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'heal'))
 		{
-			AbilitiesToGrant.AddItem( 'ShadowOps_CombatDrugs' );
+			AbilitiesToGrant.AddItem( 'F_CombatDrugs' ); //https://docs.google.com/spreadsheets/d/1wZfTRMWsLDzrJAKO7otuto6o0t0PuzYF6Tv704AkZj0/edit#gid=0
 		}
 	}
 
@@ -242,7 +273,6 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		}
 	}
 
-	// pistol grants ShadowOps_Entrench
 	static function X2DataTemplate CreatePistolGrantsEntrenchAbility()
 	{
 		local X2StrategyCardTemplate Template;
@@ -261,30 +291,174 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'pistol') || DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'autopistol'))
 		{
-			AbilitiesToGrant.AddItem( 'ShadowOps_Entrench' );
+			AbilitiesToGrant.AddItem( 'Entrench' );//https://docs.google.com/spreadsheets/d/11nKVN8Rd4MoIOtBbkmzLkwq7NWb0ZI8Q2VNAD16mFTE/edit#gid=0
 		}
 	}
 	
-	// Lacerate for swords/knives
-	// gain ShadowOps_Rocketeer if you're wearing heavy armor
-	// Take Under for swords/knivese
-	// vests grant Bullfighter
-	// sniper/vektor rifles gain Anatomy
-	// skulljacks gain Interrogator
-	// pistols gain Entrench
-	//ShadowOps_NoiseMaker granted to GREMLINs.
-	// ShadowOps_Tracking granted to Battle Scanners.
-	// wraith/spider suits grant Surprise.
-	// grenade launcher grants F_WatchThemRun
-	// cannons grant F_Havoc
-	// TODO:  static function IsSoldierASpark(XComGameState_Unit UnitState){
-	// TODO:  TargetUnit must be Robotic
-	// !TargetUnit.IsRobotic()
-	// TODO:  Add check for xcom soldier
-	// Create spark with time and supplies, no other resources (Weyland-Yutani contacts)
-	// Convert supplies + time in proving grounds into Elereum Cores
-	// Convert supplies + time in proving grounds into Elereum Shards
+
+	// MZShellbustStab for swords/knives
+	static function X2DataTemplate CreateSwordsAndKnivesGrantShellbustAbility()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_BladesGrantShellbust');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantShellbustIfSword;
+		return Template; 
+	}
+
+	static function GrantShellbustIfSword(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveSword(UnitState))
+		{
+			AbilitiesToGrant.AddItem( 'MZShellbustStab' );
+		}
+	}
 	
+	// Grenade launcher grants Watch Them Run
+	static function X2DataTemplate CreateGrenadeLauncherGrantsWatchThemRunTemplate()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_GrenadeLauncherGrantsWatchThemRun');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantWatchThemRunIfGrenadeLauncher;
+		return Template; 
+	}
+
+	static function GrantWatchThemRunIfGrenadeLauncher(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveSword(UnitState))
+		{
+			AbilitiesToGrant.AddItem( 'WatchThemRun' );//todo: verify
+		}
+	}
+
+	// grants sparks (mechanical units) Walk Fire and ABB_Cannonade.
+	static function  X2DataTemplate CreateGrantFirepowerForSparksTemplate()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_FirepowerForSparks');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantHeavyWeaponUseAndWalkFireIfSpark;
+		return Template; 
+	}
+
+	static function GrantHeavyWeaponUseAndWalkFireIfSpark(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(UnitState.IsRobotic())
+		{
+			AbilitiesToGrant.AddItem( 'ABB_Cannonade' );
+			AbilitiesToGrant.AddItem( 'WalkFire' );
+		}
+	}
+
+	//ShadowOps_NoiseMaker granted to GREMLINs.  TODO: Shadow Ops Perk Pack is a no go because it changes the classes.
+	static function X2DataTemplate CreateNoisemakerTemplate()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_FirepowerForSparks');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantHeavyWeaponUseAndWalkFireIfSpark;
+		return Template; 
+	}
+
+	static function GrantNoisemakerIfGremlin(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveGremlin(UnitState) )
+		{
+			AbilitiesToGrant.AddItem( 'ShadowOps_NoiseMaker' );// todo: replace
+		}
+	}
+	
+	//ShadowOps_NoiseMaker granted to GREMLINs.  TODO: Shadow Ops Perk Pack is a no go because it changes the classes.
+	static function X2DataTemplate CreateMedikitQuickpatchTemplate()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_QuickpatchForMedikit');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantQuickpatchIfMedikit;
+		return Template; 
+	}
+
+	static function GrantQuickpatchIfMedikit(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'heal') )
+		{
+			AbilitiesToGrant.AddItem( 'F_QuickPatch' );
+		}
+	}
+	
+	//ShadowOps_NoiseMaker granted to GREMLINs.  TODO: Shadow Ops Perk Pack is a no go because it changes the classes.
+	static function X2DataTemplate CreateSurpriseIfSpiderSuitOrWraithSuit()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_SurpriseForSpiderOrWraithSuit');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantSurpriseIfArmor;
+		return Template; 
+	}
+
+	static function GrantSurpriseIfArmor(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveSpecificItem(UnitState, 'SpiderSuit') || DoesSoldierHaveSpecificItem(UnitState, 'WraithSuit') )
+		{
+			AbilitiesToGrant.AddItem( 'F_FirstStrike' );
+			AbilitiesToGrant.AddItem( 'F_QuickFeet' );
+		}
+	}
+
+    //SKV_Shield_5HP for mechanical units (or alternatively SKV_AlloyCarbidePlating ) (Adaptive armor?)
+	// wraith/spider suits grant Surprise. (F_FirstStrike) 
+	// cannons grant F_Havoc
+	// EXO and WAR suits grant armor and decrease mobility. (SKV_ExtraPlating)
+	// Skulljacks grant +2 melee damage.
+	// gremlins grant F_Recharge (killing enemy grants -1 to all cooldowns)
+	// EXO and WAR suits grant Riot Control
+	// Wraith/Spider suits grant F_QuickFeet and F_Preservation
+	// Medikits grant F_QuickPatch [no action cost]
+	// research breakthroughs also yield an Elereum Core (research-sharing agreements)
+	// Labs(Workshops) grant 1 free Resistance Contact
+	// Labs(Workshops) grant 3 additional Power
+	// NBN Corporate Contacts:  Grants 25 supply and 25 intel each time you kill a Chosen or an ADVENT Field Commander.  ("Someone is always watching" --unofficial NBN corporate motto)
+	// City Center: Gain phantom. [Secret Identities] [As you can see from our paperwork, we're a rock band, which explains our large amount of equipment in otherwise-suspicious opaque cases. --Cpl. Jane Kelly]
+	// City Center: Gain Tracking as per perk.  [Guess who got admin access to the municipal security network?]
+	// bBreakthrough researches grant 50 intel on completion (Jinteki Corporate Contacts)
+	// Melange Mining Corp Contacts:  On excavating machinery, gain 2 free Turret Wrecks and MEC Wrecks.  SPARKs gain 3 shield at mission start.
+	// Melange Mining Corp Contacts II:  On excavating machinery, gain 4 free Turret Wrecks and MEC Wrecks.  SPARKs gain 5 shield at mission start.
+	// Convert supplies + time in proving grounds into Elereum Cores [15 days, 20 supply, grants 1 core]
+	// Convert supplies + time in proving grounds into Elereum Shards [15 days, 20 supply, grants 30 shards]
+	// Refraction Fields grant Evasive.
+	// stukov's war perk pack: is there a shield?
+
 	static function bool DoesSoldierHaveRocketLauncher(XComGameState_Unit UnitState){
 		return DoesSoldierHaveSpecificItem(UnitState, 'RocketLauncher');
 	}
@@ -306,14 +480,15 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	}
 
 	static function bool DoesSoldierHaveDefensiveVest(XComGameState_Unit UnitState){
-		return DoesSoldierHaveSpecificItem(UnitState, 'defense');
+		return DoesSoldierHaveSpecificItem(UnitState, 'NanofiberVest');
 	}
 
 	static function bool DoesSoldierHaveShield(XComGameState_Unit UnitState){
 		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'shield');
 	}
-	
 
+
+	
 	static function bool DoesSoldierHaveSpecificItem(XComGameState_Unit UnitState, name Classification)
 	{	
 		local XComGameStateHistory History;
