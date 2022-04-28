@@ -29,6 +29,8 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateSwordsAndKnivesGrantShellbustAbility());
 		Techs.AddItem(CreateGrantFirepowerForSparksTemplate());
 		Techs.AddItem(CreateGrenadeLauncherGrantsWatchThemRunTemplate());
+		Techs.AddItem(CreateHunterProtocolForAssaultAndBattlescanners());
+		Techs.AddItem(CreateLongwatchForSnipers());
 		//Techs.AddItem(CreateNoisemakerTemplate()); // will re-add after replacing the Shadow ops perk pack.
 
 		// There are event listeners attached to the names of these next ones, so they don't intrinsically do anything.
@@ -457,7 +459,51 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			AbilitiesToGrant.AddItem( 'F_QuickFeet' );
 		}
 	}
+	
+	
+	//ShadowOps_NoiseMaker granted to GREMLINs.  TODO: Shadow Ops Perk Pack is a no go because it changes the classes.
+	static function X2DataTemplate CreateLongwatchForSnipers()
+	{
+		local X2StrategyCardTemplate Template;
 
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_LongwatchForSnipers');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantLongwatchIfSniper;
+		return Template; 
+	}
+
+	static function GrantLongwatchIfSniper(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sniper_rifle') )
+		{
+			AbilitiesToGrant.AddItem( 'LongWatch' );
+		}
+	}
+	static function X2DataTemplate CreateHunterProtocolForAssaultAndBattlescanners()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_LongwatchForSnipers');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantHunterProtocolToAssaultRiflesAndBattlescanners;
+		return Template; 
+	}
+
+	static function GrantHunterProtocolToAssaultRiflesAndBattlescanners(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'assault_rifle') ||  DoesSoldierHaveSpecificItem(UnitState, 'BattleScanner'))
+		{
+			AbilitiesToGrant.AddItem( 'LongWatch' );
+		}
+	}
     //SKV_Shield_5HP for mechanical units (or alternatively SKV_AlloyCarbidePlating ) (Adaptive armor?)
 	// wraith/spider suits grant Surprise. (F_FirstStrike) 
 	// cannons grant F_Havoc

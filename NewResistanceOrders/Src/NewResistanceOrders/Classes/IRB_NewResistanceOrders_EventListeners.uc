@@ -25,6 +25,9 @@ static protected function X2EventListenerTemplate AddListeners()
 	return Template;
 }
 
+static function GenerateSupplyReward(){
+//https://github.com/Lucubration/XCOM2/blob/a24366aafaa50421c8cb2648b563e452c6717902/TestModWotc/TestModWotc/Src/XComGame/Classes/X2StrategyElement_DefaultTechs.uc
+}
 
 /// Doesn't appear to work for ExperimentalAmmo, but DOES work for SpiderSuit?!
 static function EventListenerReturn OnResearchCompleted(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
@@ -85,15 +88,10 @@ public static function HandleHaasBioroidContacts(name TechName, XComGameState_Te
 		return;
 	}
 
-	if (TechName == 'BuildSpark') //TODO: BuildExpSpark is from Mechatronic Warfare
+	if (TechName == 'BuildSpark' || TechName == 'MechanizedWarfare') //TODO: BuildExpSpark is from Mechatronic Warfare; figure out how to integrate without dependency?
 	{
 		`log("Creating additional spark as per resistance order.");
 		class'X2StrategyElement_DLC_Day90Techs'.static.CreateSparkSoldier(GameState, TechData);
-	}
-	else if (TechName == 'MechanizedWarfare')
-	{
-		`log("Creating additional spark as per resistance order.");
-		class'X2StrategyElement_DLC_Day90Techs'.static.CreateSparkSoldier(GameState, TechData); // MW creates spark soldier and equipment, but we don't have to create equipment twice.
 	}
 }
 
