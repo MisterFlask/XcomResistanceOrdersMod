@@ -26,6 +26,7 @@ static protected function X2EventListenerTemplate AddListeners()
 }
 
 
+/// Doesn't appear to work for ExperimentalAmmo, but DOES work for SpiderSuit?!
 static function EventListenerReturn OnResearchCompleted(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {
 	local XComGameStateHistory History;
@@ -34,16 +35,12 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 		
 	`log("On research complete listener HIT for for IRB_AdditionalResistanceOrders_ResCards");
 
-	if (GameState.GetContext().InterruptionStatus == eInterruptionStatus_Interrupt)
-	{
-		return ELR_NoInterrupt;
-	}
-
 	History = `XCOMHISTORY;
 	XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
 	TechState = XComGameState_Tech(EventData); 
 	if (TechState == none)
 	{
+		`log("ERROR: TechState is NONE when tech complete listener is hit.");
 		return ELR_NoInterrupt;
 	}
 
@@ -55,7 +52,6 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 	DuplicateRewardFromProjectIfResOrderEnabled('ExperimentalAmmo', 'ResCard_GlobalsecContactsII', TechState, GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('AdvancedGrenades', 'ResCard_GrndlContacts',  TechState,GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('HeavyWeapons', 'ResCard_ArgusSecurityContacts',  TechState,GameState);
-	// advanced ammo
 	// ADVENT datapad decryption: What should it grant?  Just additional intel?
 
 	HandleHaasBioroidContacts(TechState.GetMyTemplateName(), TechState, GameState);
@@ -65,16 +61,22 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 
 public static function DuplicateRewardFromProjectIfResOrderEnabled(name TechName, name ResistanceOrderName, XComGameState_Tech Tech, XComGameState NewGameState){
 	
-	if (!IsResistanceOrderActive(ResistanceOrderName)){
-		return;
-	}
-
+	`Log("checking techname " $ TechName $ " against " $ Tech.GetMyTemplateName());
 	if (Tech.GetMyTemplateName() != TechName){
 		return;
 	}
-	`log("Tech matches duplicator resistance card, rerunning on tech complete function again");
 
+	`Log("checking techname " $ TechName $ " for res order " $ ResistanceOrderName);
+	if (!IsResistanceOrderActive(ResistanceOrderName)){
+		`Log("Resistance order inactive; bailing.  " $ ResistanceOrderName);
+		return;
+	}
+
+	`log("Tech matches duplicator resistance card, rerunning on tech complete function again");
 	Tech.OnResearchCompleted(NewGameState);
+
+	// IS THIS CORRECT?
+	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
 }
 
 public static function HandleHaasBioroidContacts(name TechName, XComGameState_Tech TechData, XComGameState GameState)
@@ -83,7 +85,7 @@ public static function HandleHaasBioroidContacts(name TechName, XComGameState_Te
 		return;
 	}
 
-	if (TechName == 'BuildSpark' || TechName == 'BuildExpSpark') // BuildExpSpark is from Mechatronic Warfare
+	if (TechName == 'BuildSpark') //TODO: BuildExpSpark is from Mechatronic Warfare
 	{
 		`log("Creating additional spark as per resistance order.");
 		class'X2StrategyElement_DLC_Day90Techs'.static.CreateSparkSoldier(GameState, TechData);
@@ -104,11 +106,35 @@ static function bool IsResistanceOrderActive(name ResistanceOrderName){
 	local XComGameState NewGameState;
 	local array<Name> ExclusionList;
 	local int NumActionsToAdd;
-
+	
+	local XComGameState_HeadquartersResistance ResHQ;
 	History = `XCOMHISTORY;
+	`Log("Checking over every single resistance order to see if it's the one we want; looking for: " $ ResistanceOrderName);
 	// go over each card active for each faction
+	
+	ResHQ = GetResistanceHQ();
+
+	foreach ResHQ.WildCardSlots(CardRef)
+	{
+		if(CardRef.ObjectID != 0)
+		{
+			CardState = XComGameState_StrategyCard(History.GetGameStateForObjectID(CardRef.ObjectID));
+			if (CardState.GetMyTemplateName() == ResistanceOrderName)
+			{
+				`Log("This card IS the card I want: " $ CardState.GetMyTemplateName() );
+				return true;
+			}
+			else
+			{
+				`Log("This faction order is NOT the one I want: " $ FactionState.GetMyTemplateName());
+			}
+		}
+	}
+
 	foreach History.IterateByClassType(class'XComGameState_ResistanceFaction', FactionState)
 	{
+		`Log("Checking over every single order in this faction to see if it's the one we want: " $ FactionState.GetMyTemplateName());
+
 		foreach FactionState.CardSlots(CardRef)
 		{
 			if(CardRef.ObjectID != 0)
@@ -116,11 +142,23 @@ static function bool IsResistanceOrderActive(name ResistanceOrderName){
 				CardState = XComGameState_StrategyCard(History.GetGameStateForObjectID(CardRef.ObjectID));
 				if (CardState.GetMyTemplateName() == ResistanceOrderName)
 				{
+					`Log("This card IS the card I want: " $ CardState.GetMyTemplateName() );
 					return true;
+				}
+				else
+				{
+					`Log("This faction order is NOT the one I want: " $ FactionState.GetMyTemplateName());
+
 				}
 			}
 		}
 	}
 
 	return false;
+}
+
+
+static function XComGameState_HeadquartersResistance GetResistanceHQ()
+{
+	return XComGameState_HeadquartersResistance(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
 }

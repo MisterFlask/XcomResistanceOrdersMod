@@ -158,8 +158,29 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		}
 		if (DoesSoldierHaveDefensiveVest(UnitState))
 		{
-			AbilitiesToGrant.AddItem( 'Phantom' );
 			AbilitiesToGrant.AddItem( 'Shadowstep' ); //todo: split into its own thing
+		}
+	}
+	
+	///antimemetic scales
+	static function X2DataTemplate CreateAntimimeticScalesForVestsIITemplate()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_AntimimeticScalesForVestsII');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantAntimemeticBuffsIfVestII;
+		return Template; 
+	}
+
+	static function GrantAntimemeticBuffsIfVestII(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{	
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		if (DoesSoldierHaveDefensiveVest(UnitState))
+		{
+			AbilitiesToGrant.AddItem( 'Phantom' );
 		}
 	}
 
@@ -201,6 +222,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
+
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'grenade_launcher'))
 		{
 			AbilitiesToGrant.AddItem( 'MZFogWall' );
@@ -336,7 +358,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			return;
 		}
 
-		if(DoesSoldierHaveSword(UnitState))
+		if(DoesSoldierHaveGrenadeLauncher(UnitState))
 		{
 			AbilitiesToGrant.AddItem( 'WatchThemRun' );//todo: verify
 		}
@@ -462,7 +484,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	static function bool DoesSoldierHaveRocketLauncher(XComGameState_Unit UnitState){
 		return DoesSoldierHaveSpecificItem(UnitState, 'RocketLauncher');
 	}
-
+	static function bool DoesSoldierHaveGrenadeLauncher(XComGameState_Unit UnitState){
+		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'grenade_launcher');
+	}
 	static function bool DoesSoldierHaveGremlin(XComGameState_Unit UnitState){
 		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'gremlin');
 	}
@@ -488,7 +512,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	}
 
 
-	
+	//VALIDATED
 	static function bool DoesSoldierHaveSpecificItem(XComGameState_Unit UnitState, name Classification)
 	{	
 		local XComGameStateHistory History;
@@ -542,6 +566,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		return false;
 	}
 
+	///VALIDATED.
 	static function bool DoesSoldierHaveItemOfWeaponOrItemClass(XComGameState_Unit UnitState, name Classification)
 	{	
 		local XComGameStateHistory History;
@@ -552,19 +577,25 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		`assert(UnitState != none);
 
 		History = `XCOMHISTORY;
+		`Log("SEARCHING for item of weapon or item cat: " $ string(Classification));
+
 		foreach UnitState.InventoryItems(ItemRef)
 		{
 			ItemState = XComGameState_Item(History.GetGameStateForObjectID(ItemRef.ObjectID));
 			if(ItemState != none)
 			{
 				WeaponCat=ItemState.GetWeaponCategory();
+				`Log("Soldier has item of weaponcat: " $ WeaponCat);
 				// check item's type
 				if (WeaponCat == Classification){
+					`Log("Soldier DOES have item of DESIRED weaponcat: " $ WeaponCat);
 					return true;
 				}
 
 				ItemCat = ItemState.GetMyTemplate().ItemCat;
+				`Log("Soldier has item of itemcat: " $ ItemCat);
 				if (ItemCat == Classification){
+					`Log("Soldier DOES have item of DESIRED itemcat: " $ ItemCat);
 					return true;
 				}
 			}
