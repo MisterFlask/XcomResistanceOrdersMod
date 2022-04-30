@@ -29,7 +29,24 @@ static function GenerateSupplyReward(){
 //https://github.com/Lucubration/XCOM2/blob/a24366aafaa50421c8cb2648b563e452c6717902/TestModWotc/TestModWotc/Src/XComGame/Classes/X2StrategyElement_DefaultTechs.uc
 }
 
-/// Doesn't appear to work for ExperimentalAmmo, but DOES work for SpiderSuit?!
+
+//EVENT CARDS
+
+// intel for breakthroughs
+// supply for killing chosen
+// elereum cores and shards from killing facilities
+// Alien Collection: knocking out and abducting Sectoids, Sneks gains supply.
+// ADVENT Collection: knocking out and abducting ADVENT gains supply
+// Interrogator feat; also Skulljacks grant +2 melee damage
+
+/////// Covert Infiltration
+// 1-2 new guaranteed ADVENT smash n grab missions per month [LOOTERS]
+// 1 guaranteed new SPARK heist event chain per month (if one is not in progress)
+
+// X2Effect_SpawnGhost 
+
+
+
 static function EventListenerReturn OnResearchCompleted(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {
 	local XComGameStateHistory History;

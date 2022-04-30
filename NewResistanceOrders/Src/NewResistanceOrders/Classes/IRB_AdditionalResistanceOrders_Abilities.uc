@@ -8,7 +8,7 @@
 class IRB_AdditionalResistanceOrders_Abilities extends X2Ability
 	config(GameCore);
 
-	 
+	//UltrasonicLure
 /// <summary>
 /// Creates the set of default abilities every unit should have in X-Com 2
 /// </summary>
@@ -16,41 +16,98 @@ static function array<X2DataTemplate> CreateTemplates()
 { 
 	local array<X2DataTemplate> Templates;
 
-	Templates.AddItem( GetTunnelRatsPhantomBuff() );
+	Templates.AddItem(FreeFragGrenades());
+	Templates.AddItem(FreeUltrasonicLure());
 
 	return Templates;
 }
 
 
-static function X2AbilityTemplate GetTunnelRatsPhantomBuff()
-{
-	local X2AbilityTemplate						Template;
-	local X2AbilityTargetStyle                  TargetStyle;
-	local X2AbilityTrigger						Trigger;
-	local X2Effect_Persistent					Effect;
+	static function X2AbilityTemplate FreeFragGrenades()
+	{
+		local X2AbilityTemplate Template;
+		local XMBEffect_AddUtilityItem ItemEffect;
 
-	`CREATE_X2ABILITY_TEMPLATE(Template, 'TunnelRats_Buff');
+		ItemEffect = new class'XMBEffect_AddUtilityItem';
+		ItemEffect.DataName = 'FragGrenade';
+		ItemEffect.BaseCharges = 2;
+		// Create the template using a helper function
+		Template = Passive('ILB_TwoExtraFrags', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
+
+		return Template;
+	}
+	
+	static function X2AbilityTemplate FreeUltrasonicLure()
+	{
+		local X2AbilityTemplate Template;
+		local XMBEffect_AddUtilityItem ItemEffect;
+
+		ItemEffect = new class'XMBEffect_AddUtilityItem';
+		ItemEffect.DataName = 'UltrasonicLure';
+		ItemEffect.BaseCharges = 1;
+		// Create the template using a helper function
+		Template = Passive('ILB_FreeUltrasonicLure', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
+
+		return Template;
+	}
+
+// Helper method for quickly defining a non-pure passive. Works like PurePassive, except it also 
+// takes an X2Effect_Persistent.
+static function X2AbilityTemplate Passive(name DataName, string IconImage, optional bool bCrossClassEligible = false, optional X2Effect Effect = none)
+{
+	local X2AbilityTemplate Template;
+	local XMBEffect_ConditionalBonus ConditionalBonusEffect;
+	local XMBEffect_ConditionalStatChange ConditionalStatChangeEffect;
+	local X2Effect_Persistent PersistentEffect;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, DataName);
+	Template.IconImage = IconImage;
 
 	Template.AbilitySourceName = 'eAbilitySource_Perk';
 	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
 	Template.Hostility = eHostility_Neutral;
 
 	Template.AbilityToHitCalc = default.DeadEye;
+	Template.AbilityTargetStyle = default.SelfTarget;
+	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 
-	TargetStyle = new class'X2AbilityTarget_Self';
-	Template.AbilityTargetStyle = TargetStyle;
+	PersistentEffect = X2Effect_Persistent(Effect);
+	ConditionalBonusEffect = XMBEffect_ConditionalBonus(Effect);
+	ConditionalStatChangeEffect = XMBEffect_ConditionalStatChange(Effect);
 
-	Trigger = new class'X2AbilityTrigger_UnitPostBeginPlay';
-	Template.AbilityTriggers.AddItem(Trigger);
+	if (ConditionalBonusEffect != none && !AlwaysRelevant(ConditionalBonusEffect))
+	{
+		ConditionalBonusEffect.BuildPersistentEffect(1, true, false, false);
+		ConditionalBonusEffect.SetDisplayInfo(ePerkBuff_Bonus, Template.LocFriendlyName, Template.LocHelpText, Template.IconImage, true,,Template.AbilitySourceName);
+		ConditionalBonusEffect.bHideWhenNotRelevant = true;
 
-	// identical to Phantom buff
-	Effect = new class'X2Effect_StayConcealed';
-	Effect.BuildPersistentEffect(1, true, false);
-	Effect.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage,,,Template.AbilitySourceName);
-	Template.AddTargetEffect(Effect);
-	 
+		PersistentEffect = new class'X2Effect_Persistent';
+		PersistentEffect.EffectName = name(DataName $ "_Passive");
+	}
+	else if (ConditionalStatChangeEffect != none)
+	{
+		ConditionalStatChangeEffect.BuildPersistentEffect(1, true, false, false);
+		ConditionalStatChangeEffect.SetDisplayInfo(ePerkBuff_Bonus, Template.LocFriendlyName, Template.LocHelpText, Template.IconImage, true,,Template.AbilitySourceName);
+
+		PersistentEffect = new class'X2Effect_Persistent';
+		PersistentEffect.EffectName = name(DataName $ "_Passive");
+	}
+	else if (PersistentEffect == none)
+	{
+		PersistentEffect = new class'X2Effect_Persistent';
+	}
+
+	PersistentEffect.BuildPersistentEffect(1, true, false, false);
+	PersistentEffect.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.LocLongDescription, Template.IconImage, true,,Template.AbilitySourceName);
+	Template.AddTargetEffect(PersistentEffect);
+
+	if (Effect != PersistentEffect && Effect != none)
+		Template.AddTargetEffect(Effect);
+
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	//  NOTE: No visualization on purpose!
+
+	Template.bCrossClassEligible = bCrossClassEligible;
 
 	return Template;
 }

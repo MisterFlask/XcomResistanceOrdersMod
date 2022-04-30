@@ -31,17 +31,271 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateGrenadeLauncherGrantsWatchThemRunTemplate());
 		Techs.AddItem(CreateHunterProtocolForAssaultAndBattlescanners());
 		Techs.AddItem(CreateLongwatchForSnipers());
-		//Techs.AddItem(CreateNoisemakerTemplate()); // will re-add after replacing the Shadow ops perk pack.
+
+		Techs.AddItem(CreateBasiliskDoctrine());
+		Techs.AddItem(CreateNoisemakerTemplate()); // will re-add after replacing the Shadow ops perk pack.
 
 		// There are event listeners attached to the names of these next ones, so they don't intrinsically do anything.
+		// The following are for doubling the effects of proving grounds/research projects
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_HaasBioroidContacts'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GlobalsecContacts'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GlobalsecContactsII'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GrndlContacts'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GrndlContactsII'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ArgusSecurityContacts'));
+
+		// Black market techs
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_SafetyFirst'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_CleanupDetail'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_SimulationistGeneral'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_MeatMarket'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_AdventOverstock'));
+
+		// Resistance orders with functions run at beginning of tac combat
+
+		Techs.AddItem( GrantResistanceUnitAtCombatStartIfMoreThanOneNoob());
+		Techs.AddItem( GrantResistanceUnitAtCombatStartIfRetaliation());
+		Techs.AddItem( GrantAdventUnitAtCombatStartIfLessThanFullSquad());
+
 		return Techs;
 	}
+
+static function X2DataTemplate CreateGrantVipsFragGrenades()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_TunnelRats');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantVipsFragGrenades;
+		return Template; 
+	}
+
+	// grant all friendly VIPs and all potential friendly VIPs frag grenades at beginning of combat
+	//FriendlyVIPCivilian
+	//Scientist_VIP
+	//Engineer_VIP
+	// for each unit in battle, check its template name and if it's the appropriate template grant it the item
+
+	static function GrantVipsFragGrenades(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetMyTemplateName() == 'FriendlyVIPCivilian'
+			|| UnitState.GetMyTemplateName() == 'Scientist_VIP'
+			|| UnitState.GetMyTemplateName() == 'Engineer_VIP')
+		{
+			AbilitiesToGrant.AddItem( 'ILB_TwoExtraFrags' ); 
+		}
+	}
+
+	// grant resistance unit if two or more characters selected for combat are squaddies or rookies
+	static function GrantResistanceUnitAtCombatStartIfMoreThanOneNoob(){		
+		local X2StrategyCardTemplate Template;
+		
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_ResUnitIfMoreThanOneNoob');
+		Template.Category = "ResistanceCard";
+		`log("Created blank resistance order: " $ string(OrderName));
+		Template.ModifyTacticalStartStateFn = RunCheckForResUnitIfNoobs;
+
+		return Template; 
+	}
+	
+	// grant resistance unit if two or more characters selected for combat are squaddies or rookies
+	static function GrantResistanceUnitAtCombatStartIfRetaliation(){		
+		local X2StrategyCardTemplate Template;
+		
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_ResUnitIfRetaliation');
+		Template.Category = "ResistanceCard";
+		`log("Created blank resistance order: " $ string(OrderName));
+		Template.ModifyTacticalStartStateFn = RunCheckForResistanceUnitIfRetaliation;
+
+		return Template; 
+	}
+	// grant resistance unit if two or more characters selected for combat are squaddies or rookies
+	static function GranAdventUnitAtCombatStartIfLessThanFullSquad(){		
+		local X2StrategyCardTemplate Template;
+		
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_AdventUnitIfLessThanFullSquad');
+		Template.Category = "ResistanceCard";
+		`log("Created resistance order: " $ string(OrderName));
+		Template.ModifyTacticalStartStateFn = RunCheckForAdvUnitIfFewerThanSix;
+
+		return Template; 
+	}
+
+	static function RunCheckForResUnitIfNoobs(XComGameState StartState)
+	{
+		if (NumRookiesOrSquaddies(StartState) >= 2){
+			GrantResistanceUnitAtCombatStart(StartState);
+		}
+	}
+	
+	static function RunCheckForAdvUnitIfFewerThanSix(XComGameState StartState)
+	{
+		if (NumSoldiersControlledByPlayer(StartState) < 6){
+			GrantAdventUnitAtCombatStart(StartState);
+		}
+	}
+
+	static function RunCheckForResistanceUnitIfRetaliation(){
+		if (IsRetaliationMission(StartState)){
+			GrantResistanceUnitAtCombatStart(StartState);
+		}
+	}
+	
+	static function bool IsRetaliationMission(XComGameState StartState){
+		return GetMissionData().MissionSource == 'MissionSource_Retaliation';
+	}
+
+
+	//missionsource=MissionSource_Retaliation
+	static function XComGameState_MissionSite GetMissionData()
+	{
+		local XComGameState_BattleData BattleData;
+		local XComGameState_MissionSite MissionState;
+		local XComGameStateHistory History;
+
+		History = `XCOMHISTORY;
+		BattleData = XComGameState_BattleData(History.GetSingleGameStateObjectForClass(class'XComGameState_BattleData'));
+		MissionState = GetMission();
+	}
+
+	simulated function XComGameState_MissionSite GetMission()
+	{
+		return XComGameState_MissionSite(`XCOMHISTORY.GetGameStateForObjectID(XComHQ.MissionRef.ObjectID));
+	}
+
+static function GrantAdventUnitAtCombatStart(XComGameState StartState)
+{
+	local XComGameState_BattleData BattleData;
+	local XComGameState_HeadquartersXCom XComHQ;
+	local DoubleAgentData DoubleAgent;
+	local int CurrentForceLevel, Rand;
+	local array<name> PossibleTemplates;
+
+	if (IsSplitMission( StartState ))
+		return;
+
+	foreach StartState.IterateByClassType( class'XComGameState_HeadquartersXCom', XComHQ )
+		break;
+
+	`assert( XComHQ != none );
+
+	if (XComHQ.TacticalGameplayTags.Find( 'NoDoubleAgent' ) != INDEX_NONE)
+		return;
+
+	foreach StartState.IterateByClassType( class'XComGameState_BattleData', BattleData )
+	{
+		break;
+	}
+
+	`assert( BattleData != none );
+
+	CurrentForceLevel = BattleData.GetForceLevel( );
+	foreach default.DoubleAgentCharacterTemplates( DoubleAgent )
+	{
+		if ((CurrentForceLevel < DoubleAgent.MinForceLevel) ||
+			(CurrentForceLevel > DoubleAgent.MaxForceLevel))
+		{
+			continue;
+		}
+
+		PossibleTemplates.AddItem( DoubleAgent.TemplateName );
+	}
+
+
+	if (PossibleTemplates.Length > 0)
+	{
+		Rand = `SYNC_RAND_STATIC( PossibleTemplates.Length );
+		XComTeamSoldierSpawnTacticalStartModifier( PossibleTemplates[ Rand ], StartState );
+	}
+	else
+	{
+		`redscreen("Double Agent Policy unable to find any potential templates for Force Level " @ CurrentForceLevel );
+	}
+}
+
+	static int NumSoldiersControlledByPlayer(XComGameState StartState)
+	{
+		local XComGameStateHistory History;
+		local XComGameState_HeadquartersXCom XComHQ;
+		local XComGameState_Unit UnitState;
+		local XComGameState_ResistanceFaction FactionState;
+		local int idx, NumWounded, NumDead, NumSquad, NumCaptured;
+		local int NumSoldiers;
+		History = `XCOMHISTORY;
+		XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
+		NumSoldiers=0;
+		for(idx = 0; idx < XComHQ.Squad.Length; idx++)
+		{
+			UnitState = XComGameState_Unit(History.GetGameStateForObjectID(XComHQ.Squad[idx].ObjectID));
+
+			if(UnitState != none)
+			{
+				if (Unit.IsPlayerControlled() && Unit.IsSoldier())
+				{
+					NumSoldiers++;
+				}
+			}
+		}
+		return NumSoldiers;
+	}
+
+	static int NumRookiesOrSquaddies(XComGameState StartState)
+	{
+		local XComGameStateHistory History;
+		local XComGameState_HeadquartersXCom XComHQ;
+		local XComGameState_Unit UnitState;
+		local XComGameState_ResistanceFaction FactionState;
+		local int idx, NumWounded, NumDead, NumSquad, NumCaptured;
+		local int NumSoldiers;
+		History = `XCOMHISTORY;
+		XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
+		NumSoldiers=0;
+		for(idx = 0; idx < XComHQ.Squad.Length; idx++)
+		{
+			UnitState = XComGameState_Unit(History.GetGameStateForObjectID(XComHQ.Squad[idx].ObjectID));
+
+			if(UnitState != none)
+			{
+				if (Unit.IsPlayerControlled() && Unit.IsSoldier())
+				{
+					if (Unit.GetSoldierRank() <= 1) // rookies start at 0, squaddies=1
+					{
+						NumSoldiers++;;
+					}
+				}
+			}
+		}
+		return NumSoldiers;
+	}
+
+	static function GrantResistanceUnitAtCombatStart(XComGameState StartState)
+	{
+		local XComGameState_HeadquartersXCom XComHQ;
+		local name VolunteerCharacterTemplate;
+
+		foreach StartState.IterateByClassType( class'XComGameState_HeadquartersXCom', XComHQ )
+			break;
+		`assert( XComHQ != none );
+
+		if (XComHQ.TacticalGameplayTags.Find( 'NoVolunteerArmy' ) != INDEX_NONE)
+			return;
+
+		if (XComHQ.IsTechResearched('PlasmaRifle'))
+		{
+			VolunteerCharacterTemplate = default.VolunteerArmyCharacterTemplateM3;
+		}
+		else if (XComHQ.IsTechResearched('MagnetizedWeapons'))
+		{
+			VolunteerCharacterTemplate = default.VolunteerArmyCharacterTemplateM2;
+		}
+		else
+		{
+			VolunteerCharacterTemplate = default.VolunteerArmyCharacterTemplate;
+		}
+
+		X2StrategyElement_XpackResistanceActions.static.XComTeamSoldierSpawnTacticalStartModifier( VolunteerCharacterTemplate, StartState );
+	}
+
 	
 	static function X2DataTemplate CreateBlankResistanceOrder(name OrderName)
 	{
@@ -49,7 +303,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, OrderName);
 		Template.Category = "ResistanceCard";
-		`log("Created blank resistance order: " $ string(OrderName));
+		`log("Created blank resistance order: "  $ string(OrderName));
 		return Template; 
 	}
 
@@ -395,7 +649,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	{
 		local X2StrategyCardTemplate Template;
 
-		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_FirepowerForSparks');
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_Noisemaker');
 		Template.Category = "ResistanceCard";
 		Template.GetAbilitiesToGrantFn = GrantHeavyWeaponUseAndWalkFireIfSpark;
 		return Template; 
@@ -409,7 +663,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		if(DoesSoldierHaveGremlin(UnitState) )
 		{
-			AbilitiesToGrant.AddItem( 'ShadowOps_NoiseMaker' );// todo: replace
+			AbilitiesToGrant.AddItem( 'ILB_FreeUltrasonicLure' );
 		}
 	}
 	
@@ -504,6 +758,57 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			AbilitiesToGrant.AddItem( 'LongWatch' );
 		}
 	}
+	
+	static function X2DataTemplate CreateBasiliskDoctrine()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_BasiliskDoctrine');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantBasiliskDoctrine;
+		return Template; 
+	}
+
+	static function GrantBasiliskDoctrine(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'bullpup'))
+		{
+			AbilitiesToGrant.AddItem( 'Shredder' );
+		}
+
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'wristblade'))
+		{
+			AbilitiesToGrant.AddItem( 'TakeUnder' );
+		}
+	}
+
+	//TODO: Doesn't work yet
+	static function X2DataTemplate CreateHavanaProtocol()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_BasiliskDoctrine');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantHavanaProtocol;
+		return Template; 
+	}
+
+	static function GrantHavanaProtocol(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'holotargeter'))
+		{
+			//TODO
+		}
+	}
+	
     //SKV_Shield_5HP for mechanical units (or alternatively SKV_AlloyCarbidePlating ) (Adaptive armor?)
 	// wraith/spider suits grant Surprise. (F_FirstStrike) 
 	// cannons grant F_Havoc
