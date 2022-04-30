@@ -18,43 +18,6 @@ class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableConten
 /// </summary>
 static event OnLoadedSavedGame()
 {
-	local XComGameStateHistory History;
-	local XComGameState NewGameState;
-	local XComGameState_HeadquartersXCom OldXComHQState;	
-	local XComGameState_HeadquartersXCom NewXComHQState;
-	local XComGameState_Item ItemState;
-	local X2ItemTemplateManager ItemMgr;
-	local X2ItemTemplate ItemTemplate;
-
-	//In this method, we demonstrate functionality that will add ExampleWeapon to the player's inventory when loading a saved
-	//game. This allows players to enjoy the content of the mod in campaigns that were started without the mod installed.
-	ItemMgr = class'X2ItemTemplateManager'.static.GetItemTemplateManager();
-	History = `XCOMHISTORY;	
-
-	//Create a pending game state change
-	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Adding ExampleWeapon Objects");
-
-	//Get the previous XCom HQ state - we'll need it's ID to create a new state for it
-	OldXComHQState = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
-
-	//Make the new XCom HQ state. This starts out as just a copy of the previous state.
-	NewXComHQState = XComGameState_HeadquartersXCom(NewGameState.CreateStateObject(class'XComGameState_HeadquartersXCom', OldXComHQState.ObjectID));
-	
-	//Make the changes to the HQ state. Here we add items to the HQ's inventory
-	ItemTemplate = ItemMgr.FindItemTemplate('ModWeapon_CV');
-		
-	//Instantiate a new item state object using the template.
-	ItemState = ItemTemplate.CreateInstanceFromTemplate(NewGameState);
-	NewGameState.AddStateObject(ItemState);
-
-	//Add the newly created item to the HQ inventory
-	NewXComHQState.AddItemToHQInventory(ItemState);	
-
-	//Commit the new HQ state object to the state change that we built
-	NewGameState.AddStateObject(NewXComHQState);
-
-	//Commit the state change into the history.
-	History.AddGameStateToHistory(NewGameState);
 }
 
 /// <summary>
@@ -62,5 +25,92 @@ static event OnLoadedSavedGame()
 /// </summary>
 static event InstallNewCampaign(XComGameState StartState)
 {
-	//Don't need to do anything - the weapon should be picked up and placed into the HQ inventory when starting a new campaign.
+}
+
+/// <summary>
+/// Called from XComGameState_Missionsite:SetMissionData
+/// lets mods add SitReps with custom spawn rules to newly generated missions
+/// Advice: Check for present Strategy game if you dont want this to affect TQL/Multiplayer/Main Menu 
+/// Example: If (`HQGAME  != none && `HQPC != None && `HQPRES != none) ...
+/// </summary>
+static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, optional XComGameState_BaseObject SourceObject)
+{
+// todo: look into options for injured soldier sitrep
+	
+	local XComGameState_MissionSite MissionState;
+	local XComGameState_Reward RewardState;
+	local X2RewardTemplate RewardTemplate;
+	local XComGameState_HeadquartersResistance ResHQ;
+	local X2StrategyElementTemplateManager TemplateManager;
+
+	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
+
+	If (`HQGAME  != none && `HQPC != None && `HQPRES != none) // we're in strategy
+	{
+		//All council mission types gains ADVENT loot sitrep: Eye for Value.
+		//All council missions gain Resistance Contacts sitrep : Big Damn Heroes.
+		// Neutralize field commander grants supply; neutralize important ADVENT person decreases Ava counter by 1
+
+		MissionState = XComGameState_MissionSite(SourceObject);
+		
+		if (IRB_NewResistanceOrders_EventListeners.static.IsResistanceOrderActive('ResCard_TheOnesWhoKnock'))
+		{
+			`CI_Trace("ResCard_TheOnesWhoKnock is active; performing reward modification?");
+
+			if (IsMissionFamily(GeneratedMission, 'NeutralizeFieldCommander')
+					|| IsMissionFamily(GeneratedMission, 'Neutralize')){
+				// rewards reference: https://github.com/Lucubration/XCOM2/blob/a24366aafaa50421c8cb2648b563e452c6717902/TestModWotc/TestModWotc/Src/XComGame/Classes/X2StrategyElement_DefaultRewards.uc
+				`CI_Trace("ResCard_TheOnesWhoKnock is active AND NeutralizeFieldCommander or Neutralize is mission type; performing reward modification?");
+
+				AddRewardsToMissionState(MissionState, 'Reward_Supply');
+			}
+			else
+			{
+				`CI_Trace("ResCard_TheOnesWhoKnock is active BUT  NeutralizeFieldCommander or Neutralize is NOT mission type; mission type is "$ GeneratedMissionData.Mission.MissionFamily);
+			}
+		}
+	}
+
+}
+
+
+static function IsMissionFamily(
+GeneratedMissionData MissionStruct, name MissionFamilyId){
+	
+	return MissionStruct.Mission.MissionFamily == MissionFamilyId;
+}
+
+static function GenerateStartState(){
+	History = `XCOMHISTORY;
+
+}
+
+static function AddRewardsToMissionState(XComGameState_MissionSite MissionState, name RewardId)
+{
+	local XComGameState_Reward RewardState;
+	local X2RewardTemplate RewardTemplate;
+	local XComGameState_HeadquartersResistance ResHQ;
+	local X2StrategyElementTemplateManager TemplateManager;
+	local XComGameState AddToGameState;
+
+	AddToGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
+	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
+
+	RewardTemplate = X2RewardTemplate(TemplateManager.FindStrategyElementTemplate(RewardId));
+
+	if (RewardTemplate != none)
+	{		
+		RewardState = RewardTemplate.CreateInstanceFromTemplate(AddToGameState);
+		RewardState.GenerateReward(NewGameState, ResHQ.GetMissionResourceRewardScalar(RewardState)); //ignoring regionref
+		MissionState.Rewards.AddItem(RewardState.GetReference());
+	}
+	else
+	{
+		`Log("Can't find reward template!  " $ RewardId)
+	}
+
+	`XCOMGAME.GameRuleset.SubmitGameState(AddToGameState);
+	//History.CleanupPendingGameState(AddToGameState);
 }

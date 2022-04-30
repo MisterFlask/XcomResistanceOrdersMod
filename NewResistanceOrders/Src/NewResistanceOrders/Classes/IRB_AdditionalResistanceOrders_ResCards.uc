@@ -47,18 +47,88 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		// Black market techs
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_SafetyFirst'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_CleanupDetail'));
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_SimulationistGeneral'));
+		// Techs.AddItem(CreateBlankResistanceOrder('ResCard_SimulationistGeneral'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_MeatMarket'));
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_AdventOverstock'));
+		// Techs.AddItem(CreateBlankResistanceOrder('ResCard_AdventOverstock'));
 
 		// Resistance orders with functions run at beginning of tac combat
-
 		Techs.AddItem( GrantResistanceUnitAtCombatStartIfMoreThanOneNoob());
 		Techs.AddItem( GrantResistanceUnitAtCombatStartIfRetaliation());
 		Techs.AddItem( GrantAdventUnitAtCombatStartIfLessThanFullSquad());
-
+		
+		Techs.AddItem( CreateGrantVipsFragGrenades());
 		return Techs;
 	}
+
+	
+
+	static function bool IsAdventMEC(){
+		return false; //todo
+	}
+	static function bool IsADVENTTurret(){
+		return false;//todo
+	}
+	static function ActivateTitheForSpecificMissionType(name MissionType, int PercentBuff,XComGameState NewGameState, StateObjectReference InRef, optional bool bReactivate = false)
+{
+	local XComGameStateHistory History;
+	local XComGameState_HeadquartersResistance ResHQ;
+	local XComGameState_MissionSite MissionState;
+	local XComGameState_Reward RewardState;
+	local StateObjectReference RewardRef;
+
+	History = `XCOMHISTORY;
+
+	// Set Res HQ value for new missions to use
+	ResHQ = GetNewResHQState(NewGameState);
+	ResHQ.MissionResourceRewardScalar = (1.0f + (float(PercentBuff) / 100.0f));
+
+	// Scale existing mission rewards
+	foreach History.IterateByClassType(class'XComGameState_MissionSite', MissionState)
+	{
+		foreach MissionState.Rewards(RewardRef)
+		{
+			RewardState = XComGameState_Reward(History.GetGameStateForObjectID(RewardRef.ObjectID));
+
+			if(RewardState != none && RewardState.IsResourceReward())
+			{
+				RewardState = XComGameState_Reward(NewGameState.ModifyStateObject(class'XComGameState_Reward', RewardState.ObjectID));
+				RewardState.ScaleRewardQuantity(ResHQ.MissionResourceRewardScalar);
+			}
+		}
+	}
+}
+//---------------------------------------------------------------------------------------
+static function DeactivateTitheForSpecificMissionType(name MissionType, int PercentBuff, XComGameState NewGameState, StateObjectReference InRef)
+{
+	local XComGameStateHistory History;
+	local XComGameState_HeadquartersResistance ResHQ;
+	local XComGameState_MissionSite MissionState;
+	local XComGameState_Reward RewardState;
+	local StateObjectReference RewardRef;
+	local float ScaleFactor;
+
+	History = `XCOMHISTORY;
+
+	// Revert Res HQ value
+	ResHQ = GetNewResHQState(NewGameState);
+	ScaleFactor = (1.0f / ResHQ.MissionResourceRewardScalar);
+	ResHQ.MissionResourceRewardScalar = 0;
+
+	// Revert existing mission rewards
+	foreach History.IterateByClassType(class'XComGameState_MissionSite', MissionState)
+	{
+		foreach MissionState.Rewards(RewardRef)
+		{
+			RewardState = XComGameState_Reward(History.GetGameStateForObjectID(RewardRef.ObjectID));
+
+			if(RewardState != none && RewardState.IsResourceReward())
+			{
+				RewardState = XComGameState_Reward(NewGameState.ModifyStateObject(class'XComGameState_Reward', RewardState.ObjectID));
+				RewardState.ScaleRewardQuantity(ScaleFactor);
+			}
+		}
+	}
+}
 
 static function X2DataTemplate CreateGrantVipsFragGrenades()
 	{
@@ -109,6 +179,7 @@ static function X2DataTemplate CreateGrantVipsFragGrenades()
 
 		return Template; 
 	}
+
 	// grant resistance unit if two or more characters selected for combat are squaddies or rookies
 	static function GranAdventUnitAtCombatStartIfLessThanFullSquad(){		
 		local X2StrategyCardTemplate Template;
@@ -987,7 +1058,6 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 	}
 
-
 	static function string GetSummaryTextReplaceInt(StateObjectReference InRef)
 	{
 		local XComGameState_StrategyCard CardState;
@@ -1088,101 +1158,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		return (BattleData != none) && BattleData.DirectTransferInfo.IsDirectMissionTransfer;
 	}
 
-	static function DeactivateAllCardsNotInPlay(XComGameState NewGameState)
-	{
-		local XComGameStateHistory History;
-		local XComGameState_HeadquartersResistance ResHQ;
-		local XComGameState_ResistanceFaction FactionState;
-		local XComGameState_StrategyCard CardState;
-		local array<StateObjectReference> AllOldCards, AllNewCards;
-		local StateObjectReference CardRef;
-		local int idx;
 
-		History = `XCOMHISTORY;
-		AllOldCards.Length = 0;
-		AllNewCards.Length = 0;
-		ResHQ = XComGameState_HeadquartersResistance(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
-
-		// Grab all old and new cards
-		foreach ResHQ.OldWildCardSlots(CardRef)
-		{
-			if(CardRef.ObjectID != 0 && AllOldCards.Find('ObjectID', CardRef.ObjectID) == INDEX_NONE)
-			{
-				AllOldCards.AddItem(CardRef);
-			}
-		}
-
-		foreach ResHQ.WildCardSlots(CardRef)
-		{
-			if(CardRef.ObjectID != 0 && AllNewCards.Find('ObjectID', CardRef.ObjectID) == INDEX_NONE)
-			{
-				AllNewCards.AddItem(CardRef);
-			}
-		}
-
-		foreach History.IterateByClassType(class'XComGameState_ResistanceFaction', FactionState)
-		{
-			foreach FactionState.OldCardSlots(CardRef)
-			{
-				if(CardRef.ObjectID != 0 && AllOldCards.Find('ObjectID', CardRef.ObjectID) == INDEX_NONE)
-				{
-					AllOldCards.AddItem(CardRef);
-				}
-			}
-
-			foreach FactionState.CardSlots(CardRef)
-			{
-				if(CardRef.ObjectID != 0 && AllNewCards.Find('ObjectID', CardRef.ObjectID) == INDEX_NONE)
-				{
-					AllNewCards.AddItem(CardRef);
-				}
-			}
-		}
-
-		// Find old cards that are not in the new list
-		for(idx = 0; idx < AllOldCards.Length; idx++)
-		{
-			if(AllNewCards.Find('ObjectID', AllOldCards[idx].ObjectID) != INDEX_NONE)
-			{
-				AllOldCards.Remove(idx, 1);
-				idx--;
-			}
-		}
-
-		// Deactivate old cards
-		foreach AllOldCards(CardRef)
-		{
-			CardState = XComGameState_StrategyCard(NewGameState.ModifyStateObject(class'XComGameState_StrategyCard', CardRef.ObjectID));
-			CardState.DeactivateCard(NewGameState);
-		}
-	}
-	
-
-	static function bool IsCardInPlay(XComGameState_StrategyCard CardState)
-	{
-		local XComGameStateHistory History;
-		local XComGameState_HeadquartersResistance ResHQ;
-		local XComGameState_ResistanceFaction FactionState;
-
-		History = `XCOMHISTORY;
-		ResHQ = XComGameState_HeadquartersResistance(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
-
-
-		if(ResHQ.WildCardSlots.Find('ObjectID', CardState.ObjectID) != INDEX_NONE)
-		{
-			return true;
-		}
-
-		foreach History.IterateByClassType(class'XComGameState_ResistanceFaction', FactionState)
-		{
-			if(FactionState.CardSlots.Find('ObjectID', CardState.ObjectID) != INDEX_NONE)
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
 	
 //#############################################################################################
 //----------------   HELPER FUNCTIONS  --------------------------------------------------------
