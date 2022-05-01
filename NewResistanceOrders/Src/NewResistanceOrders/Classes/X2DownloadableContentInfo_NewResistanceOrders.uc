@@ -46,14 +46,24 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
 
+
 	If (`HQGAME  != none && `HQPC != None && `HQPRES != none) // we're in strategy
 	{
-		//All council mission types gains ADVENT loot sitrep: Eye for Value.
-		//All council missions gain Resistance Contacts sitrep : Big Damn Heroes.
-		// Neutralize field commander grants supply; neutralize important ADVENT person decreases Ava counter by 1
-
-		MissionState = XComGameState_MissionSite(SourceObject);
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'ShowOfForce', 'Recover', GeneratedMission);
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'InformationWarSitRep', 'Recover', GeneratedMission);
+	
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Extract', GeneratedMission);
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Rescue', GeneratedMission);
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Neutralize', GeneratedMission);
+	
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_EyeForValue', 'LootChests', 'Extract', GeneratedMission);
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_EyeForValue', 'LootChests', 'Rescue', GeneratedMission);
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_EyeForValue', 'LootChests', 'Neutralize', GeneratedMission);
+	
+		// MissionState = XComGameState_MissionSite(SourceObject);
 		
+		/*
+		//Ugh.
 		if (IRB_NewResistanceOrders_EventListeners.static.IsResistanceOrderActive('ResCard_TheOnesWhoKnock'))
 		{
 			`CI_Trace("ResCard_TheOnesWhoKnock is active; performing reward modification?");
@@ -69,7 +79,7 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 			{
 				`CI_Trace("ResCard_TheOnesWhoKnock is active BUT  NeutralizeFieldCommander or Neutralize is NOT mission type; mission type is "$ GeneratedMissionData.Mission.MissionFamily);
 			}
-		}
+		}*/
 	}
 
 }
@@ -77,13 +87,28 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 
 static function IsMissionFamily(
 GeneratedMissionData MissionStruct, name MissionFamilyId){
-	
 	return MissionStruct.Mission.MissionFamily == MissionFamilyId;
 }
 
-static function GenerateStartState(){
-	History = `XCOMHISTORY;
 
+static function AddSitrepToMissionFamilyIfResistanceCardsActive(name ResCard,
+name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMission)
+{
+	if (GeneratedMission.SitReps.Find(Sitrep) != -1){
+		`LOG("Sitrep already exists on mission, skipping: " $ Sitrep);
+		// Sitrep is already there! TODO: Verify this logic works.
+		return;
+	}
+
+	if (IRB_NewResistanceOrders_EventListeners.static.IsResistanceOrderActive(ResCard))
+	{
+		if (RequiredMissionFamily == GeneratedMission.Mission.MissionFamily)
+		{
+			GeneratedMission.SitReps.AddItem(Sitrep);
+			return;
+		}
+		`LOG("Mission family needed to have been " $ RequiredMissionFamily $ " for " $ ResCard $ " but was " $ GeneratedMission.Mission.MissionFamily);
+	}
 }
 
 static function AddRewardsToMissionState(XComGameState_MissionSite MissionState, name RewardId)
@@ -113,4 +138,6 @@ static function AddRewardsToMissionState(XComGameState_MissionSite MissionState,
 
 	`XCOMGAME.GameRuleset.SubmitGameState(AddToGameState);
 	//History.CleanupPendingGameState(AddToGameState);
+
+
 }
