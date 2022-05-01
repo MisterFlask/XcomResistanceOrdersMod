@@ -34,6 +34,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		Techs.AddItem(CreateBasiliskDoctrine());
 		Techs.AddItem(CreateNoisemakerTemplate()); // will re-add after replacing the Shadow ops perk pack.
+		
+		Techs.AddItem(CreateDawnMachines());
+
 
 		// There are event listeners attached to the names of these next ones, so they don't intrinsically do anything.
 		// The following are for doubling the effects of proving grounds/research projects
@@ -44,91 +47,119 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GrndlContactsII'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ArgusSecurityContacts'));
 
+		// Techs modifying missions generated; see the X2DownloadableContentInfo.
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_EyeForValue'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BigDamnHeroes'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BureaucraticInfighting'));
+
 		// Black market techs
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_SafetyFirst'));
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_CleanupDetail'));
-		// Techs.AddItem(CreateBlankResistanceOrder('ResCard_SimulationistGeneral'));
+		Techs.AddItem(CreateVisceraCleanupDetail());
+		Techs.AddItem(CreateSafetyFirst());
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_MeatMarket'));
-		// Techs.AddItem(CreateBlankResistanceOrder('ResCard_AdventOverstock'));
 
 		// Resistance orders with functions run at beginning of tac combat
 		Techs.AddItem( GrantResistanceUnitAtCombatStartIfMoreThanOneNoob());
 		Techs.AddItem( GrantResistanceUnitAtCombatStartIfRetaliation());
 		Techs.AddItem( GrantAdventUnitAtCombatStartIfLessThanFullSquad());
 		
-		Techs.AddItem( CreateGrantVipsFragGrenades());
+		Techs.AddItem(CreateGrantAdventMecsColdWeatherVulnerability());;
+
+		Techs.AddItem(CreateGrantVipsFragGrenades());
 		return Techs;
 	}
+	
+	//NOTE: This also includes event listeners for the black market parts
+	static function X2DataTemplate CreateVisceraCleanupDetail()
+	{
+		local X2StrategyCardTemplate Template;
 
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_CleanupDetail');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantVisceraCleanupDetail;
+		return Template; 
+	}
+
+	static function GrantVisceraCleanupDetail(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		if (DoesSoldierHaveSpecificItem('HazmatVest'))
+		{
+			AbilitiesToGrant.AddItem( 'ILB_HazmatShielding' ); 
+		}
+	}
+	//NOTE: This also includes event listeners for the black market parts
+	static function X2DataTemplate CreateSafetyFirst()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_SafetyFirst');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantSafetyFirst;
+		return Template; 
+	}
+
+	static function GrantSafetyFirst(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		if (DoesSoldierHaveSpecificItem('PlatedVest'))
+		{
+			AbilitiesToGrant.AddItem( 'ILB_PlatedShielding' ); 
+		}
+	}
+
+	static function X2DataTemplate CreateGrantAdventMecsColdWeatherVulnerability()
+		{
+			local X2StrategyCardTemplate Template;
+
+			`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_MabExploit');
+			Template.Category = "ResistanceCard";
+			Template.GetAbilitiesToGrantFn = GrantMabExploit;
+			return Template; 
+		}
+
+		static function GrantMabExploit(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+		{		
+			if (IsAdventMEC(UnitState) || IsADVENTTurret(UnitState))
+			{
+				AbilitiesToGrant.AddItem( 'ILB_EasyToHackInTundra' ); 
+			}
+		}
+
+	static function X2DataTemplate CreateDawnMachines()
+		{
+			local X2StrategyCardTemplate Template;
+
+			`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_DawnMachines');
+			Template.Category = "ResistanceCard";
+			Template.GetAbilitiesToGrantFn = GrantDawnMachines;
+			return Template; 
+		}
+
+		static function GrantDawnMachines(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+		{		
+
+			if (UnitState.GetTeam() != eTeam_XCom){
+				return;
+			}
+			if (UnitState.IsRobotic())
+			{
+				AbilitiesToGrant.AddItem( 'ILB_DawnMachines' ); 
+			}
+		}
 	
 
-	static function bool IsAdventMEC(){
-		return false; //todo
+	static function bool IsAdventMEC(XComGameState_Unit UnitState){
+		return string(UnitState.GetMyTemplateName()) $= "MEC"; 
 	}
-	static function bool IsADVENTTurret(){
-		return false;//todo
+
+	static function bool IsADVENTTurret(XComGameState_Unit UnitState){
+		return string(UnitState.GetMyTemplateName()) $= "Turret"; 
 	}
-	static function ActivateTitheForSpecificMissionType(name MissionType, int PercentBuff,XComGameState NewGameState, StateObjectReference InRef, optional bool bReactivate = false)
-{
-	local XComGameStateHistory History;
-	local XComGameState_HeadquartersResistance ResHQ;
-	local XComGameState_MissionSite MissionState;
-	local XComGameState_Reward RewardState;
-	local StateObjectReference RewardRef;
 
-	History = `XCOMHISTORY;
-
-	// Set Res HQ value for new missions to use
-	ResHQ = GetNewResHQState(NewGameState);
-	ResHQ.MissionResourceRewardScalar = (1.0f + (float(PercentBuff) / 100.0f));
-
-	// Scale existing mission rewards
-	foreach History.IterateByClassType(class'XComGameState_MissionSite', MissionState)
-	{
-		foreach MissionState.Rewards(RewardRef)
-		{
-			RewardState = XComGameState_Reward(History.GetGameStateForObjectID(RewardRef.ObjectID));
-
-			if(RewardState != none && RewardState.IsResourceReward())
-			{
-				RewardState = XComGameState_Reward(NewGameState.ModifyStateObject(class'XComGameState_Reward', RewardState.ObjectID));
-				RewardState.ScaleRewardQuantity(ResHQ.MissionResourceRewardScalar);
-			}
-		}
-	}
-}
-//---------------------------------------------------------------------------------------
-static function DeactivateTitheForSpecificMissionType(name MissionType, int PercentBuff, XComGameState NewGameState, StateObjectReference InRef)
-{
-	local XComGameStateHistory History;
-	local XComGameState_HeadquartersResistance ResHQ;
-	local XComGameState_MissionSite MissionState;
-	local XComGameState_Reward RewardState;
-	local StateObjectReference RewardRef;
-	local float ScaleFactor;
-
-	History = `XCOMHISTORY;
-
-	// Revert Res HQ value
-	ResHQ = GetNewResHQState(NewGameState);
-	ScaleFactor = (1.0f / ResHQ.MissionResourceRewardScalar);
-	ResHQ.MissionResourceRewardScalar = 0;
-
-	// Revert existing mission rewards
-	foreach History.IterateByClassType(class'XComGameState_MissionSite', MissionState)
-	{
-		foreach MissionState.Rewards(RewardRef)
-		{
-			RewardState = XComGameState_Reward(History.GetGameStateForObjectID(RewardRef.ObjectID));
-
-			if(RewardState != none && RewardState.IsResourceReward())
-			{
-				RewardState = XComGameState_Reward(NewGameState.ModifyStateObject(class'XComGameState_Reward', RewardState.ObjectID));
-				RewardState.ScaleRewardQuantity(ScaleFactor);
-			}
-		}
-	}
-}
 
 static function X2DataTemplate CreateGrantVipsFragGrenades()
 	{
@@ -139,12 +170,6 @@ static function X2DataTemplate CreateGrantVipsFragGrenades()
 		Template.GetAbilitiesToGrantFn = GrantVipsFragGrenades;
 		return Template; 
 	}
-
-	// grant all friendly VIPs and all potential friendly VIPs frag grenades at beginning of combat
-	//FriendlyVIPCivilian
-	//Scientist_VIP
-	//Engineer_VIP
-	// for each unit in battle, check its template name and if it's the appropriate template grant it the item
 
 	static function GrantVipsFragGrenades(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		

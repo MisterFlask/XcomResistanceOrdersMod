@@ -36,6 +36,114 @@
     <Content Include="Src\NewResistanceOrders\Classes\X2DownloadableContentInfo_NewResistanceOrders.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBAbility.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBAbilityTrigger_EventListener.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_AbilityCost.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_AbilityHitResult.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_AbilityName.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_AbilityProperty.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_Concealed.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_CoverType.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_Dead.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_HeightAdvantage.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_MatchingWeapon.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_ReactionFire.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_SourceAbilities.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_WeaponName.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffectUtilities.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AbilityCostRefund.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AddAbility.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AddAbilityCharges.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AddItemCharges.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AddUtilityItem.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_BonusDamageByDamageType.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_BonusRadius.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_ChangeHitResultForAttacker.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_ConditionalBonus.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_ConditionalStatChange.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_DoNotConsumeAllPoints.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_Extended.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_GrantReserveActionPoint.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_PermanentStatChange.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_RevealUnit.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_ToHitModifierByRange.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBTemplateUtilities.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBValue.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBValue_Distance.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBValue_UnitValue.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBValue_Visibility.uc">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Config\" />
@@ -44,6 +152,7 @@
     <Folder Include="Src\" />
     <Folder Include="Src\NewResistanceOrders" />
     <Folder Include="Src\NewResistanceOrders\Classes" />
+    <Folder Include="Src\NewResistanceOrders\Classes\XMB" />
   </ItemGroup>
   <Import Project="$(MSBuildLocalExtensionPath)\XCOM2.targets" />
 </Project>

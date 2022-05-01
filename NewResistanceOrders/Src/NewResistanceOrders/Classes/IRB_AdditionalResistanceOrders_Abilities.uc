@@ -18,9 +18,98 @@ static function array<X2DataTemplate> CreateTemplates()
 
 	Templates.AddItem(FreeFragGrenades());
 	Templates.AddItem(FreeUltrasonicLure());
+	Templates.AddItem(ArcticEasyToHack());
+	Templates.AddItem(DawnMachines());
+	Templates.AddItem(PlatedVestShielding());
+	Templates.AddItem(HazmatShielding());
 
 	return Templates;
 }
+
+static function X2AbilityTemplate HazmatShielding()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_PersistentStatChange Effect;
+	local X2Condition_MapProperty Condition;
+	
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_DawnMachines', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+
+	// Create a persistent stat change effect
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'AridFast';
+
+	// The effect doesn't expire
+	Effect.BuildPersistentEffect(1, true, false, false);
+
+	// The effect gives +10 Defense and +3 Mobility
+	Effect.AddPersistentStatChange(eStat_Mobility, 4);
+
+	// Create a condition that only applies the stat change when in the Tundra biome
+	Condition = new class'X2Condition_MapProperty';
+	Condition.AllowedBiomes.AddItem("Arid");
+
+	// Add the condition to the stat change effect
+	Effect.TargetConditions.AddItem(Condition);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+}
+
+static function X2AbilityTemplate PlatedVestShielding()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_PersistentStatChange Effect;
+	local X2Condition_MapProperty Condition;
+	
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_PlatedVestShielding', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+
+	// Create a persistent stat change effect
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'PlatedVestShielding';
+
+	// The effect doesn't expire
+	Effect.BuildPersistentEffect(1, true, false, false);
+
+	// The effect gives +10 Defense and +3 Mobility
+	Effect.AddPersistentStatChange(eStat_ShieldHP, 1);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+}
+
+static function X2AbilityTemplate AridFastUnit()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_PersistentStatChange Effect;
+	local X2Condition_MapProperty Condition;
+	
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_HazmatShielding', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+
+	// Create a persistent stat change effect
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'HazmatShielding';
+
+	// The effect doesn't expire
+	Effect.BuildPersistentEffect(1, true, false, false);
+
+	Effect.AddPersistentStatChange(eStat_ShieldHP, 1);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+}
+
 
 
 // Perk name:		Mab Exploit

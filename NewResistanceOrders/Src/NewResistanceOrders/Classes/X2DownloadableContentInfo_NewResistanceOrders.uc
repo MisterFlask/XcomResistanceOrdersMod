@@ -35,7 +35,7 @@ static event InstallNewCampaign(XComGameState StartState)
 /// </summary>
 static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, optional XComGameState_BaseObject SourceObject)
 {
-// todo: look into options for injured soldier sitrep
+	// todo: look into options for injured soldier sitrep
 	
 	local XComGameState_MissionSite MissionState;
 	local XComGameState_Reward RewardState;
@@ -110,7 +110,7 @@ name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMissio
 		`LOG("Mission family needed to have been " $ RequiredMissionFamily $ " for " $ ResCard $ " but was " $ GeneratedMission.Mission.MissionFamily);
 	}
 }
-
+/*
 static function AddRewardsToMissionState(XComGameState_MissionSite MissionState, name RewardId)
 {
 	local XComGameState_Reward RewardState;
@@ -141,3 +141,4 @@ static function AddRewardsToMissionState(XComGameState_MissionSite MissionState,
 
 
 }
+*/

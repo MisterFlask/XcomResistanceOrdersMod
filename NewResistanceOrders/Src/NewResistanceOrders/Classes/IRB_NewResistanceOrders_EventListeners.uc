@@ -54,9 +54,7 @@ static function GenerateSupplyReward(){
 // supply for killing chosen
 // elereum cores and shards from killing facilities
 // Alien Collection: knocking out and abducting Sectoids, Sneks gains supply.
-// ADVENT Collection: knocking out and abducting ADVENT gains supply
-// Interrogator feat; also Skulljacks grant +2 melee damage
-
+// ADVENT Collection: knocking out and abducting ADVENT gains suppl
 /////// Covert Infiltration
 // 1-2 new guaranteed ADVENT smash n grab missions per month [LOOTERS]
 // 1 guaranteed new SPARK heist event chain per month (if one is not in progress)
