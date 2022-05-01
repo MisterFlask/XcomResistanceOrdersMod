@@ -85,9 +85,10 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 }
 
 
-static function IsMissionFamily(
-GeneratedMissionData MissionStruct, name MissionFamilyId){
-	return MissionStruct.Mission.MissionFamily == MissionFamilyId;
+static function bool IsMissionFamily(
+GeneratedMissionData MissionStruct, name MissionFamilyId)
+{
+	return MissionStruct.Mission.MissionFamily == string(MissionFamilyId);
 }
 
 
@@ -100,9 +101,9 @@ name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMissio
 		return;
 	}
 
-	if (IRB_NewResistanceOrders_EventListeners.static.IsResistanceOrderActive(ResCard))
+	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
-		if (RequiredMissionFamily == GeneratedMission.Mission.MissionFamily)
+		if (string(RequiredMissionFamily) == GeneratedMission.Mission.MissionFamily)
 		{
 			GeneratedMission.SitReps.AddItem(Sitrep);
 			return;

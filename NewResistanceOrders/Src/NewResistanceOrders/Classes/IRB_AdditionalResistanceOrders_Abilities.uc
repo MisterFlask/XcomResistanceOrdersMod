@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------------------
 //  Copyright (c) 2016 Firaxis Games, Inc. All rights reserved.
 //---------------------------------------------------------------------------------------
-class IRB_AdditionalResistanceOrders_Abilities extends X2Ability
+class IRB_AdditionalResistanceOrders_Abilities extends XMBAbility
 	config(GameCore);
 
 	//UltrasonicLure
@@ -19,7 +19,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(FreeFragGrenades());
 	Templates.AddItem(FreeUltrasonicLure());
 	Templates.AddItem(ArcticEasyToHack());
-	Templates.AddItem(DawnMachines());
+	Templates.AddItem(AridFastUnit());
 	Templates.AddItem(PlatedVestShielding());
 	Templates.AddItem(HazmatShielding());
 
@@ -33,7 +33,7 @@ static function X2AbilityTemplate HazmatShielding()
 	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_DawnMachines', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_HazmatShielding', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
 
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
@@ -66,7 +66,7 @@ static function X2AbilityTemplate PlatedVestShielding()
 	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_PlatedVestShielding', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_PlatedShielding', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
 
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
@@ -92,7 +92,7 @@ static function X2AbilityTemplate AridFastUnit()
 	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_HazmatShielding', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_DawnMachines', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
 
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';

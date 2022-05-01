@@ -1,4 +1,4 @@
-class IRB_NewResistanceOrders_EventListeners extends X2EventListener;
+class IRB_NewResistanceOrders_EventListeners extends X2EventListener ;
 
 var localized string DefaultSpecialGoodsBlackMarketDescription;
 
@@ -98,30 +98,24 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 static function EventListenerReturn BlackMarketResetListener(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {
 	if (IsResistanceOrderActive('ResCard_SafetyFirst')){
-		AddItemToBlackMarket('PlatedVest', 1, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('PlatedVest', 1, 20, EventData, EventSource, GameState, Event, CallbackData);
 	}
 	
 	if (IsResistanceOrderActive('ResCard_CleanupDetail')){
-		AddItemToBlackMarket('HazmatVest', 1, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('HazmatVest', 1, 20, EventData, EventSource, GameState, Event, CallbackData);
 	}
 	
-	if (IsResistanceOrderActive('ResCard_SimulationistGeneral')){
-		
-	}
 	
 	if (IsResistanceOrderActive('ResCard_MeatMarket')){
 		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData);
 		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData);
 		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData);
 	}
-
-	if (IsResistanceOrderActive('ResCard_AdventOverstock')){
-		IRB_AdditionalResistanceOrders_ResCards.static.IsCardInPlay
-	}
+	return ELR_NoInterrupt;
 }
 
 static function AddItemToBlackMarket(
-		name ItemToAdd, int NumToAdd,
+		name ItemToAdd, int NumToAdd, int Price,
 		Object EventData, Object EventSource, XComGameState NewGameState, Name Event, Object CallbackData){
 	local X2StrategyElementTemplateManager StratMgr;
 	local X2ItemTemplateManager ItemTemplateMgr;
@@ -135,7 +129,7 @@ static function AddItemToBlackMarket(
 	MarketState = XComGameState_BlackMarket(EventData);
 	
 	//??
-	if (MarketState == none) return ELR_NoInterrupt;
+	if (MarketState == none) return;
 
 	// Check if we reached the relevant part 
 	// Get the latest pending state
@@ -161,16 +155,17 @@ static function AddItemToBlackMarket(
 
 	// Fill out the commodity (custom)
 	ForSaleItem.Title = ItemTemplate.GetItemFriendlyName(); // Get rid of the "1"
-	ForSaleItem.Desc = DefaultSpecialGoodsBlackMarketDescription;
-	ForSaleItem.Cost = 15;// todo: config
+	ForSaleItem.Desc = default.DefaultSpecialGoodsBlackMarketDescription;
+	ForSaleItem.Cost = GetForSaleItemCost(Price);// todo: config
 
 	// Add to sale
 	MarketState.ForSaleItems.AddItem(ForSaleItem);
 
 	// We are done
-	return ELR_NoInterrupt;
+	return;
 }
 
+	// base game cost is 70
 	static function AddGeneratedSoldierToBlackMarket(
 		Object EventData, Object EventSource, XComGameState NewGameState, Name Event, Object CallbackData){
 		local X2StrategyElementTemplateManager StratMgr;
@@ -182,10 +177,13 @@ static function AddItemToBlackMarket(
 		local X2ItemTemplate ItemTemplate;
 		local Commodity ForSaleItem;
 		local int AdditionalSoldierDiscount;
+		//local XComPhotographer_Strategy Photo;	
+
+		//Photo = `GAME.StrategyPhotographer;
+
 		AdditionalSoldierDiscount = 20;
 		MarketState = XComGameState_BlackMarket(EventData);
 	
-		ForSaleItem = EmptyForSaleItem;
 		RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate('Reward_Soldier'));
 	
 		// Only give the personnel reward if it is available for the player
@@ -194,23 +192,23 @@ static function AddItemToBlackMarket(
 			RewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
 
 			NewGameState.AddStateObject(RewardState);
-			RewardState.GenerateReward(NewGameState, , Region);
+			RewardState.GenerateReward(NewGameState, , );
 			ForSaleItem.RewardRef = RewardState.GetReference();
 
 			ForSaleItem.Title = RewardState.GetRewardString();
-			ForSaleItem.Cost = GetPersonnelForSaleItemCost(PriceReductionScalar);
+			ForSaleItem.Cost = GetForSaleItemCost(70);
 			ForSaleItem.Desc = RewardState.GetBlackMarketString();
 			ForSaleItem.Image = RewardState.GetRewardImage();
-			ForSaleItem.CostScalars = GoodsCostScalars;
-			ForSaleItem.DiscountPercent = GoodsCostPercentDiscount + AdditionalSoldierDiscount;
+			ForSaleItem.CostScalars = class'XComGameState_BlackMarket'.default.GoodsCostScalars;
+			ForSaleItem.DiscountPercent = class'XComGameState_BlackMarket'.default.GoodsCostPercentDiscount;
 
-			if (ForSaleItem.Image == "")
+			/*if (ForSaleItem.Image == "")
 			{
 				if (!Photo.HasPendingHeadshot(RewardState.RewardObjectReference, OnUnitHeadCaptureFinished))
 				{
 					Photo.AddHeadshotRequest(RewardState.RewardObjectReference, 'UIPawnLocation_ArmoryPhoto', 'SoldierPicture_Head_Armory', 512, 512, OnUnitHeadCaptureFinished, class'X2StrategyElement_DefaultSoldierPersonalities'.static.Personality_ByTheBook());
 				}
-			}
+			}*///TODO: fix photo
 
 			MarketState.ForSaleItems.AddItem(ForSaleItem);
 		}
@@ -314,4 +312,15 @@ static function bool IsResistanceOrderActive(name ResistanceOrderName){
 static function XComGameState_HeadquartersResistance GetResistanceHQ()
 {
 	return XComGameState_HeadquartersResistance(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
+}
+static function  StrategyCost GetForSaleItemCost(int IntelAmount)
+{
+	local StrategyCost Cost;
+	local ArtifactCost ResourceCost;
+	
+	ResourceCost.ItemTemplateName = 'Intel';
+	ResourceCost.Quantity = IntelAmount;
+	Cost.ResourceCosts.AddItem(ResourceCost);
+
+	return Cost;
 }

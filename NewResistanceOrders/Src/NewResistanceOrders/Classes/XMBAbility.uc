@@ -273,6 +273,8 @@ static function X2AbilityTemplate Attack(name DataName, string IconImage, option
 
 	Template.AbilityTriggers.AddItem(default.PlayerInputTrigger);
 
+	Template.AddShooterEffectExclusions();
+
 	VisibilityCondition = new class'X2Condition_Visibility';
 	VisibilityCondition.bRequireGameplayVisible = true;
 	VisibilityCondition.bAllowSquadsight = true;
@@ -284,9 +286,6 @@ static function X2AbilityTemplate Attack(name DataName, string IconImage, option
 
 	// Don't allow the ability to be used while the unit is disoriented, burning, unconscious, etc.
 	Template.AddShooterEffectExclusions();
-
-    // Adds Suppression restrictions to the ability, depending on config values
-	HandleSuppressionRestriction(Template);
 
 	Template.AbilityTargetStyle = default.SimpleSingleTarget;
 
@@ -339,33 +338,8 @@ static function X2AbilityTemplate Attack(name DataName, string IconImage, option
 	Template.bDisplayInUITacticalText = false;
 
 	Template.bCrossClassEligible = bCrossClassEligible;
-	
-	Template.SuperConcealmentLoss = class'X2AbilityTemplateManager'.default.SuperConcealmentStandardShotLoss;
-	Template.ChosenActivationIncreasePerUse = class'X2AbilityTemplateManager'.default.StandardShotChosenActivationIncreasePerUse;
-	Template.LostSpawnIncreasePerUse = class'X2AbilityTemplateManager'.default.StandardShotLostSpawnIncreasePerUse;
-
-    Template.AbilityConfirmSound = "TacticalUI_ActivateAbility";
 
 	return Template;	
-}
-
-// Helper function for adding Suppression restrictions to abilities
-static function HandleSuppressionRestriction(X2AbilityTemplate Template)
-{
-    local X2Condition_UnitEffects SuppressedCondition;
-    local name SuppressionEffect;
-
-    if(class'X2DownloadableContentInfo_LongWar2AbilitiesforWotC'.default.SUPPRESSION_PREVENTS_ABILITIES)
-	{   
-        SuppressedCondition = new class'X2Condition_UnitEffects';
-
-        foreach class'X2DownloadableContentInfo_LongWar2AbilitiesforWotC'.default.SUPPRESSION_EFFECTS(SuppressionEffect)
-	    {
-		    SuppressedCondition.AddExcludeEffect(SuppressionEffect, 'AA_UnitIsSuppressed');
-	    }
-
-		Template.AbilityShooterConditions.AddItem(SuppressedCondition);
-	}
 }
 
 static function X2AbilityTemplate MeleeAttack(name DataName, string IconImage, optional bool bCrossClassEligible = false, optional X2Effect Effect = none, optional int ShotHUDPriority = default.AUTO_PRIORITY, optional EActionPointCost Cost = eCost_SingleConsumeAll)
@@ -423,10 +397,6 @@ static function X2AbilityTemplate MeleeAttack(name DataName, string IconImage, o
 	Template.BuildInterruptGameStateFn = TypicalMoveEndAbility_BuildInterruptGameState;
 
 	Template.bCrossClassEligible = bCrossClassEligible;
-
-	Template.SuperConcealmentLoss = class'X2AbilityTemplateManager'.default.SuperConcealmentStandardShotLoss;
-	Template.ChosenActivationIncreasePerUse = class'X2AbilityTemplateManager'.default.StandardShotChosenActivationIncreasePerUse;
-	Template.LostSpawnIncreasePerUse = class'X2AbilityTemplateManager'.default.MeleeLostSpawnIncreasePerUse;
 
 	return Template;
 }
@@ -791,24 +761,21 @@ static function AddIconPassive(X2AbilityTemplate Template)
 	X2Effect_Persistent(IconTemplate.AbilityTargetEffects[0]).FriendlyDescription = Template.LocLongDescription;
 }
 
-// Adds an arbitrary secondary ability to an ability template. By default, this handles copying over the
+// Adds an arbitrary secondary ability to an ability template. This handles copying over the
 // ability's localized name and description to the secondary, so you only have to write one entry
 // for the ability in XComGame.int.
-static function AddSecondaryAbility(X2AbilityTemplate Template, X2AbilityTemplate SecondaryTemplate, bool UseFirstTemplateLocalizationForSecondTemplate = true)
+static function AddSecondaryAbility(X2AbilityTemplate Template, X2AbilityTemplate SecondaryTemplate)
 {
 	local X2Effect Effect;
 	local X2Effect_Persistent PersistentEffect;
 
 	Template.AdditionalAbilities.AddItem(SecondaryTemplate.DataName);
 
-	if(UseFirstTemplateLocalizationForSecondTemplate)
-	{
-		SecondaryTemplate.LocFriendlyName = Template.LocFriendlyName;
-		SecondaryTemplate.LocHelpText = Template.LocHelpText;
-		SecondaryTemplate.LocLongDescription = Template.LocLongDescription;
-		SecondaryTemplate.LocFlyOverText = Template.LocFlyOverText;
-	}
-	
+	SecondaryTemplate.LocFriendlyName = Template.LocFriendlyName;
+	SecondaryTemplate.LocHelpText = Template.LocHelpText;
+	SecondaryTemplate.LocLongDescription = Template.LocLongDescription;
+	SecondaryTemplate.LocFlyOverText = Template.LocFlyOverText;
+
 	foreach SecondaryTemplate.AbilityTargetEffects(Effect)
 	{
 		PersistentEffect = X2EFfect_Persistent(Effect);
