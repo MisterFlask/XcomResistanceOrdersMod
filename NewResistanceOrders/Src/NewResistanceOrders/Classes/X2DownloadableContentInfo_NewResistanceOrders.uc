@@ -20,6 +20,36 @@ static event OnLoadedSavedGame()
 {
 }
 
+exec function VerifyPlayableCards()
+{
+	local XComGameStateHistory History;
+	local XComGameState NewGameState;
+	local XComGameState_ResistanceFaction FactionState;
+	local XComGameState_StrategyCard CardState;
+	local X2StrategyCardTemplate CurrentTemplate;
+	local XComGameState_StrategyCard CurrentCard;
+	History = `XCOMHISTORY;
+
+	`LOG("INFO:Checking all templates for errors.");
+	
+	foreach History.IterateByClassType(class'XComGameState_StrategyCard', CurrentCard)
+	{
+		CurrentTemplate = CurrentCard.GetMyTemplate();
+		`LOG("INFO:Checking Template for errors: " $ CurrentTemplate.DataName);
+
+		if (CurrentTemplate.QuoteText == ""){
+			`LOG("ERROR: QUOTETEXT EMPTY in Template " $ CurrentTemplate.DataName);
+		}
+		if (CurrentTemplate.Strength == 0){
+			`LOG("ERROR: STRENGTH EMPTY in Template " $ CurrentTemplate.DataName);
+		}
+		if (CurrentTemplate.AssociatedEntity == ''){
+			`LOG("ERROR: FACTION EMPTY in Template " $ CurrentTemplate.DataName);
+		}
+	}
+}
+
+
 /// <summary>
 /// Called when the player starts a new campaign while this DLC / Mod is installed
 /// </summary>
@@ -50,7 +80,7 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	If (`HQGAME  != none && `HQPC != None && `HQPRES != none) // we're in strategy
 	{
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'ShowOfForce', 'Recover', GeneratedMission);
-		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'InformationWarSitRep', 'Recover', GeneratedMission);
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'LootChests', 'Recover', GeneratedMission);
 	
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Extract', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Rescue', GeneratedMission);

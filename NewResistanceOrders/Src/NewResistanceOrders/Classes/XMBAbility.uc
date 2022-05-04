@@ -273,8 +273,6 @@ static function X2AbilityTemplate Attack(name DataName, string IconImage, option
 
 	Template.AbilityTriggers.AddItem(default.PlayerInputTrigger);
 
-	Template.AddShooterEffectExclusions();
-
 	VisibilityCondition = new class'X2Condition_Visibility';
 	VisibilityCondition.bRequireGameplayVisible = true;
 	VisibilityCondition.bAllowSquadsight = true;
@@ -338,9 +336,16 @@ static function X2AbilityTemplate Attack(name DataName, string IconImage, option
 	Template.bDisplayInUITacticalText = false;
 
 	Template.bCrossClassEligible = bCrossClassEligible;
+	
+	Template.SuperConcealmentLoss = class'X2AbilityTemplateManager'.default.SuperConcealmentStandardShotLoss;
+	Template.ChosenActivationIncreasePerUse = class'X2AbilityTemplateManager'.default.StandardShotChosenActivationIncreasePerUse;
+	Template.LostSpawnIncreasePerUse = class'X2AbilityTemplateManager'.default.StandardShotLostSpawnIncreasePerUse;
+
+    Template.AbilityConfirmSound = "TacticalUI_ActivateAbility";
 
 	return Template;	
 }
+
 
 static function X2AbilityTemplate MeleeAttack(name DataName, string IconImage, optional bool bCrossClassEligible = false, optional X2Effect Effect = none, optional int ShotHUDPriority = default.AUTO_PRIORITY, optional EActionPointCost Cost = eCost_SingleConsumeAll)
 {
@@ -397,6 +402,10 @@ static function X2AbilityTemplate MeleeAttack(name DataName, string IconImage, o
 	Template.BuildInterruptGameStateFn = TypicalMoveEndAbility_BuildInterruptGameState;
 
 	Template.bCrossClassEligible = bCrossClassEligible;
+
+	Template.SuperConcealmentLoss = class'X2AbilityTemplateManager'.default.SuperConcealmentStandardShotLoss;
+	Template.ChosenActivationIncreasePerUse = class'X2AbilityTemplateManager'.default.StandardShotChosenActivationIncreasePerUse;
+	Template.LostSpawnIncreasePerUse = class'X2AbilityTemplateManager'.default.MeleeLostSpawnIncreasePerUse;
 
 	return Template;
 }
@@ -761,21 +770,24 @@ static function AddIconPassive(X2AbilityTemplate Template)
 	X2Effect_Persistent(IconTemplate.AbilityTargetEffects[0]).FriendlyDescription = Template.LocLongDescription;
 }
 
-// Adds an arbitrary secondary ability to an ability template. This handles copying over the
+// Adds an arbitrary secondary ability to an ability template. By default, this handles copying over the
 // ability's localized name and description to the secondary, so you only have to write one entry
 // for the ability in XComGame.int.
-static function AddSecondaryAbility(X2AbilityTemplate Template, X2AbilityTemplate SecondaryTemplate)
+static function AddSecondaryAbility(X2AbilityTemplate Template, X2AbilityTemplate SecondaryTemplate, bool UseFirstTemplateLocalizationForSecondTemplate = true)
 {
 	local X2Effect Effect;
 	local X2Effect_Persistent PersistentEffect;
 
 	Template.AdditionalAbilities.AddItem(SecondaryTemplate.DataName);
 
-	SecondaryTemplate.LocFriendlyName = Template.LocFriendlyName;
-	SecondaryTemplate.LocHelpText = Template.LocHelpText;
-	SecondaryTemplate.LocLongDescription = Template.LocLongDescription;
-	SecondaryTemplate.LocFlyOverText = Template.LocFlyOverText;
-
+	if(UseFirstTemplateLocalizationForSecondTemplate)
+	{
+		SecondaryTemplate.LocFriendlyName = Template.LocFriendlyName;
+		SecondaryTemplate.LocHelpText = Template.LocHelpText;
+		SecondaryTemplate.LocLongDescription = Template.LocLongDescription;
+		SecondaryTemplate.LocFlyOverText = Template.LocFlyOverText;
+	}
+	
 	foreach SecondaryTemplate.AbilityTargetEffects(Effect)
 	{
 		PersistentEffect = X2EFfect_Persistent(Effect);

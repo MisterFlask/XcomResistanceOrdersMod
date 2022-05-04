@@ -232,14 +232,20 @@ static function X2DataTemplate CreateGrantVipsFragGrenades()
 	}
 
 	static function RunCheckForResistanceUnitIfRetaliation(XComGameState StartState){
+		`LOG("Mission started; mission type is " $ GetMissionData(StartState).GeneratedMission.Mission.MissionFamily);
 		if (IsRetaliationMission(StartState)){
+			`Log("Retaliation mission detected; granting resistance order");
 			GrantResistanceUnitAtCombatStart(StartState);
 		}
 	}
 	
+	/// Why doesn't this work?
 	static function bool IsRetaliationMission(XComGameState StartState){
-		return GetMissionData(StartState).GeneratedMission.Mission.MissionFamily == "ChosenRetaliation"
-		|| GetMissionData(StartState).GeneratedMission.Mission.MissionFamily == "Terror";
+		local GeneratedMissionData Mission;
+		Mission = GetMissionData(StartState).GeneratedMission;
+
+		return Mission.Mission.MissionFamily == "ChosenRetaliation"
+				|| Mission.Mission.MissionFamily == "Terror";
 	}
 
 
@@ -253,6 +259,7 @@ static function X2DataTemplate CreateGrantVipsFragGrenades()
 		History = `XCOMHISTORY;
 		BattleData = XComGameState_BattleData(History.GetSingleGameStateObjectForClass(class'XComGameState_BattleData'));
 		MissionState = GetMission(StartState);
+		return MissionState;
 	}
 
 	simulated static function XComGameState_MissionSite GetMission(XComGameState StartState)
@@ -271,6 +278,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 	local int CurrentForceLevel, Rand;
 	local array<name> PossibleTemplates;
 
+	`LOG("Granting ADVENT unit.");
 	if (IsSplitMission( StartState ))
 		return;
 
@@ -279,8 +287,10 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 	`assert( XComHQ != none );
 
-	if (XComHQ.TacticalGameplayTags.Find( 'NoDoubleAgent' ) != INDEX_NONE)
+	if (XComHQ.TacticalGameplayTags.Find( 'NoDoubleAgent' ) != INDEX_NONE){
+		`LOG("NoDoubleAgent tag found, bailing");
 		return;
+	}
 
 	foreach StartState.IterateByClassType( class'XComGameState_BattleData', BattleData )
 	{
@@ -301,6 +311,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		PossibleTemplates.AddItem( DoubleAgent.TemplateName );
 	}
 
+	`LOG("Attempting to spawn tac start modifier (advent unit)");
 
 	if (PossibleTemplates.Length > 0)
 	{
@@ -336,6 +347,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 				}
 			}
 		}
+		`LOG("Discovered soldiers: " $ NumSoldiers);
 		return NumSoldiers;
 	}
 
@@ -377,9 +389,10 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			break;
 		`assert( XComHQ != none );
 
-		if (XComHQ.TacticalGameplayTags.Find( 'NoVolunteerArmy' ) != INDEX_NONE)
+		if (XComHQ.TacticalGameplayTags.Find( 'NoVolunteerArmy' ) != INDEX_NONE){
+			`LOG("NoVolunteerArmy tag found, bailing");
 			return;
-
+		}
 		if (XComHQ.IsTechResearched('PlasmaRifle'))
 		{
 			VolunteerCharacterTemplate = class'X2StrategyElement_XpackResistanceActions'.default.VolunteerArmyCharacterTemplateM3;
@@ -392,6 +405,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		{
 			VolunteerCharacterTemplate =  class'X2StrategyElement_XpackResistanceActions'.default.VolunteerArmyCharacterTemplate;
 		}
+		`LOG("Attempting to spawn tac start modifier (volunteer)");
 
 		class'X2StrategyElement_XpackResistanceActions'.static.XComTeamSoldierSpawnTacticalStartModifier( VolunteerCharacterTemplate, StartState );
 	}

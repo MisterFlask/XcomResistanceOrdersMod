@@ -27,9 +27,6 @@
     <Content Include="Src\LW_Tuple\Classes\LWTuple.uc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Src\LW_Tuple\LWTuple.uc">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\Examples.uc">
       <SubType>Content</SubType>
     </Content>
@@ -153,111 +150,6 @@
     <Content Include="Src\NewResistanceOrders\Classes\XMBValue_Visibility.uc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBAbilityTrigger_EventListener.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_AbilityCost.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_AbilityHitResult.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_AbilityName.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_AbilityProperty.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_Concealed.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_CoverType.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_Dead.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_HeightAdvantage.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_MatchingWeapon.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_ReactionFire.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_SourceAbilities.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBCondition_WeaponName.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffectUtilities.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AbilityCostRefund.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AddAbility.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AddAbilityCharges.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AddItemCharges.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_AddUtilityItem.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_BonusDamageByDamageType.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_BonusRadius.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_ChangeHitResultForAttacker.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_ConditionalBonus.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_ConditionalStatChange.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_DoNotConsumeAllPoints.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_Extended.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_GrantReserveActionPoint.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_PermanentStatChange.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_RevealUnit.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBEffect_ToHitModifierByRange.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBTemplateUtilities.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBValue.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBValue_Distance.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBValue_UnitValue.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\XMB\XMBValue_Visibility.uc">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Src\XModBase_Core_2_0_1\Classes\XMBAbilityCost_ActionPoints.uc">
       <SubType>Content</SubType>
     </Content>
@@ -279,27 +171,6 @@
     <Content Include="Src\XModBase_Core_2_0_1\Classes\XMBTargetingMethod_Grenade.uc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Src\XModBase_Core_2_0_2\Classes\XMBAbilityCost_ActionPoints.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\XModBase_Core_2_0_2\Classes\XMBAbilityMultiTarget_Radius.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\XModBase_Core_2_0_2\Classes\XMBAbilityTag.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\XModBase_Core_2_0_2\Classes\XMBAbilityToHitCalc_StandardAim.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\XModBase_Core_2_0_2\Classes\XMBConfig.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\XModBase_Core_2_0_2\Classes\XMBDownloadableContentInfo_XModBase.uc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="Src\XModBase_Core_2_0_2\Classes\XMBTargetingMethod_Grenade.uc">
-      <SubType>Content</SubType>
-    </Content>
     <Content Include="Src\XModBase_Interfaces\Classes\XMBEffectInterface.uc">
       <SubType>Content</SubType>
     </Content>
@@ -316,10 +187,11 @@
     <Folder Include="Src\LW_Tuple\Classes" />
     <Folder Include="Src\XModBase_Core_2_0_1" />
     <Folder Include="Src\XModBase_Core_2_0_1\Classes" />
+    <Folder Include="Src\XModBase_Core_2_0_2\" />
+    <Folder Include="Src\XModBase_Core_2_0_2\Classes\" />
     <Folder Include="Src\XModBase_Interfaces" />
     <Folder Include="Src\NewResistanceOrders" />
     <Folder Include="Src\NewResistanceOrders\Classes" />
-    <Folder Include="Src\NewResistanceOrders\Classes\XMB" />
     <Folder Include="Src\XModBase_Interfaces\Classes" />
   </ItemGroup>
   <Import Project="$(MSBuildLocalExtensionPath)\XCOM2.targets" />
