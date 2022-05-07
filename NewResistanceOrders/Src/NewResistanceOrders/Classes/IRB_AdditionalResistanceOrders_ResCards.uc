@@ -32,6 +32,8 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateHunterProtocolForAssaultAndBattlescanners());
 		Techs.AddItem(CreateLongwatchForSnipers());
 
+		Techs.AddItem(CreateColdWeatherHackDefenseDebuff());
+
 		Techs.AddItem(CreateBasiliskDoctrine());
 		Techs.AddItem(CreateNoisemakerTemplate()); // will re-add after replacing the Shadow ops perk pack.
 		
@@ -62,12 +64,104 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem( GrantResistanceUnitAtCombatStartIfRetaliation());
 		Techs.AddItem( CreateGrantAdventUnitAtCombatStartIfLessThanFullSquad());
 		
-		Techs.AddItem(CreateGrantAdventMecsColdWeatherVulnerability());;
-
 		Techs.AddItem(CreateGrantVipsFragGrenades());
+		Techs.AddItem(CreateColdWeatherHackDefenseDebuff());
+		Techs.AddItem(CreateMeleeWeaknessForLostAndVipers());
+		Techs.AddItem(CreateBloodPillarForPsi());
+		Techs.AddItem(CreatePracticalOccultism());
 		return Techs;
 	}
+	//VulnerabilityMelee
 	
+	static function X2DataTemplate CreateHellishRebukeForTemplars()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_HellishRebukeForTemplars');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GranHellishRebukeForTemplars;
+		return Template; 
+	}
+
+	static function GranHellishRebukeForTemplars(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if (DoesSoldierHaveArmorOfClass(UnitState,'templar'))
+		{
+			AbilitiesToGrant.AddItem( 'MZHellishRebuke' );
+		}
+	}
+
+
+	static function X2DataTemplate CreateMeleeWeaknessForLostAndVipers()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_MeleeWeaknessForLostAndVipers');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantMeleeWeaknessForLostAndVipers;
+		return Template; 
+	}
+
+	static function GrantMeleeWeaknessForLostAndVipers(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_Alien){
+			return;
+		}
+
+		if (DoesTemplateHaveString(UnitState, "Viper") || DoesTemplateHaveString(UnitState, "Lost"))
+		{
+			AbilitiesToGrant.AddItem( 'VulnerabilityMelee' );
+		}
+	}
+
+	static function X2DataTemplate CreateBloodPillarForPsi()
+	{
+		local X2StrategyCardTemplate Template;
+		
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_BloodPillarForPsi');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantBloodPillarForPsi;
+		return Template;
+	}
+
+	static function GrantBloodPillarForPsi(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		if (DoesSoldierHavePsiRating(UnitState))
+		{
+			AbilitiesToGrant.AddItem( 'MZBloodPillar' );
+		}
+	}
+
+	static function X2DataTemplate CreatePracticalOccultism()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_PracticalOccultism');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantPracticalOccultism;
+		return Template; 
+	}
+
+	static function GrantPracticalOccultism(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		if (DoesSoldierHaveArmorOfClass(UnitState, 'reaper'))
+		{
+			AbilitiesToGrant.AddItem( 'MZBloodTeleport' ); 
+			AbilitiesToGrant.AddItem( 'MZCloakOfShadows' ); 
+		}
+	}
+
+
 	//NOTE: This also includes event listeners for the black market parts
 	static function X2DataTemplate CreateVisceraCleanupDetail()
 	{
@@ -111,7 +205,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		}
 	}
 
-	static function X2DataTemplate CreateGrantAdventMecsColdWeatherVulnerability()
+	static function X2DataTemplate CreateColdWeatherHackDefenseDebuff()
 		{
 			local X2StrategyCardTemplate Template;
 
@@ -123,9 +217,28 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		static function GrantMabExploit(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 		{		
-			if (IsAdventMEC(UnitState) || IsADVENTTurret(UnitState))
+			if (IsADVENTTurret(UnitState) || IsAdventMEC(UnitState))
 			{
 				AbilitiesToGrant.AddItem( 'ILB_EasyToHackInTundra' ); 
+			}
+		}
+
+
+	static function X2DataTemplate CreateGrantTurretsWeakHackDefense()
+		{
+			local X2StrategyCardTemplate Template;
+
+			`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_AestasExploit');
+			Template.Category = "ResistanceCard";
+			Template.GetAbilitiesToGrantFn = GrantAestasExploit;
+			return Template; 
+		}
+
+		static function GrantAestasExploit(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+		{		
+			if (IsADVENTTurret(UnitState))
+			{
+				AbilitiesToGrant.AddItem( 'ILB_EasyToHack' ); 
 			}
 		}
 
@@ -151,6 +264,10 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			}
 		}
 	
+	
+	static function bool DoesTemplateHaveString(XComGameState_Unit UnitState, string str){
+		return InStr(UnitState.GetMyTemplateName(), str) >= 0; 
+	}
 
 	static function bool IsAdventMEC(XComGameState_Unit UnitState){
 		return InStr(UnitState.GetMyTemplateName(), "MEC") >= 0; 
@@ -177,7 +294,7 @@ static function X2DataTemplate CreateGrantVipsFragGrenades()
 			|| UnitState.GetMyTemplateName() == 'Scientist_VIP'
 			|| UnitState.GetMyTemplateName() == 'Engineer_VIP')
 		{
-			AbilitiesToGrant.AddItem( 'ILB_TwoExtraFrags' ); 
+			AbilitiesToGrant.AddItem( 'ILB_DangerousVips' ); 
 		}
 	}
 
@@ -1001,6 +1118,19 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 		return false;
 	}
+	
+	static function bool DoesSoldierHavePsiRating(XComGameState_Unit UnitState){
+	
+		local XComGameStateHistory History;
+		`assert(UnitState != none);
+
+		History = `XCOMHISTORY;
+		if (UnitState.GetCurrentStat(eStat_PsiOffense) > 0){
+			return true;
+		}
+
+		return false;
+	}
 
 	static function bool DoesSoldierHaveArmorOfClass(XComGameState_Unit UnitState, name Classification){
 	
@@ -1026,6 +1156,10 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 				if (Armor.ArmorClass == Classification){
 					return true;
 				}
+				if (Armor.ArmorCat == Classification){
+					return true;
+				}
+				
 			}
 		}
 		return false;

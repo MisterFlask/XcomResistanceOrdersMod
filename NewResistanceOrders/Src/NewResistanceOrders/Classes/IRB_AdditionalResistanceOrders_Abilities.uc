@@ -8,6 +8,11 @@
 class IRB_AdditionalResistanceOrders_Abilities extends XMBAbility
 	config(GameCore);
 
+	
+var config int ILB_CUTTHROAT_BONUS_CRIT_CHANCE;
+var config int ILB_CUTTHROAT_BONUS_CRIT_DAMAGE;
+var config int ILB_CUTTHROAT_BONUS_ARMOR_PIERCE;
+
 	//UltrasonicLure
 /// <summary>
 /// Creates the set of default abilities every unit should have in X-Com 2
@@ -19,10 +24,11 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(FreeFragGrenades());
 	Templates.AddItem(FreeUltrasonicLure());
 	Templates.AddItem(ArcticEasyToHack());
+	Templates.AddItem(EasyToHack());
 	Templates.AddItem(AridFastUnit());
 	Templates.AddItem(PlatedVestShielding());
 	Templates.AddItem(HazmatShielding());
-
+	Templates.AddItem(AddTurretHackabilityDebuff());
 	return Templates;
 }
 
@@ -111,6 +117,37 @@ static function X2AbilityTemplate AridFastUnit()
 }
 
 
+// Perk name:		Aestas Exploit
+// Perk effect:		-60 hack defense
+// Localized text:	"You gain <Ability:+Defense/> Defense and <Ability:+Mobility/> Mobility in cold climates."
+// Config:			(AbilityName="XMBExample_ArcticWarrior")
+static function X2AbilityTemplate EasyToHack()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_PersistentStatChange Effect;
+	local X2Condition_MapProperty Condition;
+	
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_EasyToHack', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+
+	// Create a persistent stat change effect
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'EasyToHack';
+
+	// The effect doesn't expire
+	Effect.BuildPersistentEffect(1, true, false, false);
+
+	Effect.AddPersistentStatChange(eStat_HackDefense, -60);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+}
+
+
+
 
 // Perk name:		Mab Exploit
 // Perk effect:		-60 hack defense in cold climates
@@ -160,7 +197,7 @@ static function X2AbilityTemplate ArcticEasyToHack()
 		ItemEffect.DataName = 'FragGrenade';
 		ItemEffect.BaseCharges = 2;
 		// Create the template using a helper function
-		Template = Passive('ILB_TwoExtraFrags', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
+		Template = Passive('ILB_DangerousVips', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
 
 		return Template;
 	}
@@ -238,4 +275,70 @@ static function X2AbilityTemplate Passive(name DataName, string IconImage, optio
 	Template.bCrossClassEligible = bCrossClassEligible;
 
 	return Template;
+}
+
+static function X2AbilityTemplate AddTurretHackabilityDebuff()
+{
+	local X2AbilityTemplate						Template;
+	local X2AbilityTargetStyle                  TargetStyle;
+	local X2AbilityTrigger						Trigger;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'ILB_TurretHackDefenseDebuff');
+
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Neutral;
+
+	Template.AbilityToHitCalc = default.DeadEye;
+
+	TargetStyle = new class'X2AbilityTarget_Self';
+	Template.AbilityTargetStyle = TargetStyle;
+
+	Trigger = new class'X2AbilityTrigger_UnitPostBeginPlay';
+	Template.AbilityTriggers.AddItem(Trigger);
+
+	//
+	Template.AddTargetEffect( class'X2StatusEffects'.static.CreateHackDefenseChangeStatusEffect( -60 ) ); //todo: config
+
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+	//  NOTE: No visualization on purpose!
+
+	return Template;
+}
+
+
+// Perk name:		Cutthroat
+// Perk effect:		Your melee attacks against biological enemies ignore their armor, have increased critical chance, and do additional critical damage.
+// Localized text:	"Your melee attacks against biological enemies ignore their armor, have a +<Ability:CUTTHROAT_BONUS_CRIT_CHANCE/> critical chance, and do +<Ability:CUTTHROAT_BONUS_CRIT_DAMAGE/> critical damage."
+// Config:			(AbilityName="LW2WotC_Cutthroat")
+static function X2AbilityTemplate Cutthroat()
+{
+	local XMBEffect_ConditionalBonus Effect;
+	local XMBCondition_AbilityProperty MeleeOnlyCondition;
+	local X2Condition_UnitProperty OrganicCondition;
+
+	// Create a conditional bonus
+	Effect = new class'XMBEffect_ConditionalBonus';
+
+    // The bonus adds critical hit chance
+	Effect.AddToHitModifier(default.ILB_CUTTHROAT_BONUS_CRIT_CHANCE, eHit_Crit);
+
+	// The bonus adds damage to critical hits
+	Effect.AddDamageModifier(default.ILB_CUTTHROAT_BONUS_CRIT_DAMAGE, eHit_Crit);
+
+    // The bonus ignores armor
+    Effect.AddArmorPiercingModifier(default.ILB_CUTTHROAT_BONUS_ARMOR_PIERCE);
+    
+	// Only melee attacks
+	MeleeOnlyCondition = new class'XMBCondition_AbilityProperty';
+	MeleeOnlyCondition.bRequireMelee = true;
+	Effect.AbilityTargetConditions.AddItem(MeleeOnlyCondition);
+	
+	// Only against organics
+	OrganicCondition = new class'X2Condition_UnitProperty';
+	OrganicCondition.ExcludeRobotic = true;
+	Effect.AbilityTargetConditions.AddItem(OrganicCondition);
+
+	// Create the template using a helper function
+	return Passive('ILB_LW2WotC_Cutthroat', "img:///UILibrary_LW_PerkPack.LW_AbilityCutthroat", false, Effect);
 }

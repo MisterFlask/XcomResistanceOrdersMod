@@ -20,6 +20,53 @@ static event OnLoadedSavedGame()
 {
 }
 
+exec function SetCardToActiveInSlot(string cardname, int slot){
+
+	local XComGameStateHistory History;
+	local X2TacticalGameRuleset Rules;
+	local XComGameState_HeadquartersResistance ResHQ;
+	local XComGameState NewGameState;
+	local XComGameState_StrategyCard StrategyCard; 
+	Rules = `TACTICALRULES;
+	History = `XCOMHISTORY;
+	
+	StrategyCard = GetCardByName(cardname);
+	
+	if (StrategyCard == none){
+		`LOG("Couldn't find strategy card.  Bummer.");
+		return;
+	}
+	
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Place Card in Slot");
+	ResHQ = GetResistanceHQ();
+	ResHQ = XComGameState_HeadquartersResistance(NewGameState.ModifyStateObject(class'XComGameState_HeadquartersResistance', ResHQ.ObjectID));
+	ResHQ.PlaceCardInSlot(StrategyCard.GetReference(), slot);
+	
+	//todo
+	//Rules.ApplyResistancePoliciesToStartState(NewGameState);
+}
+
+
+function XComGameState_HeadquartersResistance GetResistanceHQ()
+{
+	return XComGameState_HeadquartersResistance(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
+}
+
+function XComGameState_StrategyCard GetCardByName(string nam){
+	local XComGameStateHistory History;
+	local XComGameState_StrategyCard CurrentCard;
+	local X2StrategyCardTemplate CurrentTemplate;
+ 
+	foreach History.IterateByClassType(class'XComGameState_StrategyCard', CurrentCard)
+	{
+		CurrentTemplate = CurrentCard.GetMyTemplate();
+		if (string(CurrentTemplate.DataName) == nam){
+			return CurrentCard;
+		}
+	}
+	return none;
+}
+
 exec function VerifyPlayableCards()
 {
 	local XComGameStateHistory History;

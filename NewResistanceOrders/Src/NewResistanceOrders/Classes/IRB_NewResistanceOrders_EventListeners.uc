@@ -126,6 +126,7 @@ static function AddItemToBlackMarket(
 	local X2ItemTemplate ItemTemplate;
 	local Commodity ForSaleItem;
 
+	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	MarketState = XComGameState_BlackMarket(EventData);
 	
 	//??
@@ -139,12 +140,15 @@ static function AddItemToBlackMarket(
 	ItemTemplateMgr = class'X2ItemTemplateManager'.static.GetItemTemplateManager();
 	ItemTemplate = ItemTemplateMgr.FindItemTemplate(ItemToAdd);
 	ItemState = ItemTemplate.CreateInstanceFromTemplate(NewGameState);
-	ItemState.Quantity = NumToAdd;
+	// ItemState.Quantity = NumToAdd; // possibly not necessary
+	
+	NewGameState.AddStateObject(ItemState); // should I be doing this?
 
 	// Create the reward
 	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate('Reward_Item'));
 	RewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
+	
 	RewardState.SetReward(ItemState.GetReference());
 
 	// Fill out the commodity (default)
@@ -155,7 +159,7 @@ static function AddItemToBlackMarket(
 
 	// Fill out the commodity (custom)
 	ForSaleItem.Title = ItemTemplate.GetItemFriendlyName(); // Get rid of the "1"
-	ForSaleItem.Desc = default.DefaultSpecialGoodsBlackMarketDescription;
+	ForSaleItem.Desc = "TODO";
 	ForSaleItem.Cost = GetForSaleItemCost(Price);// todo: config
 
 	// Add to sale
@@ -183,16 +187,21 @@ static function AddItemToBlackMarket(
 
 		AdditionalSoldierDiscount = 20;
 		MarketState = XComGameState_BlackMarket(EventData);
-	
+		StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+
 		RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate('Reward_Soldier'));
 	
+		// Get the latest pending state
+		MarketState = XComGameState_BlackMarket(NewGameState.ModifyStateObject(class'XComGameState_BlackMarket', MarketState.ObjectID));
+
 		// Only give the personnel reward if it is available for the player
 		if (RewardTemplate.IsRewardAvailableFn == none || RewardTemplate.IsRewardAvailableFn())
 		{
 			RewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
 
-			NewGameState.AddStateObject(RewardState);
-			RewardState.GenerateReward(NewGameState, , );
+			NewGameState.AddStateObject(RewardState); 
+
+			RewardState.GenerateReward(NewGameState, , MarketState.Region);
 			ForSaleItem.RewardRef = RewardState.GetReference();
 
 			ForSaleItem.Title = RewardState.GetRewardString();
@@ -211,6 +220,9 @@ static function AddItemToBlackMarket(
 			}*///TODO: fix photo
 
 			MarketState.ForSaleItems.AddItem(ForSaleItem);
+
+			// `SubmitGameState(NewGameState);//is this correct?
+
 		}
 	}
 
