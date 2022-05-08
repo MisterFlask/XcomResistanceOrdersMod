@@ -143,6 +143,9 @@ static function AddItemToBlackMarket(
 	// ItemState.Quantity = NumToAdd; // possibly not necessary
 	
 	NewGameState.AddStateObject(ItemState); // should I be doing this?
+	
+	// IS THIS CORRECT?
+	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
 
 	// Create the reward
 	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
@@ -150,6 +153,7 @@ static function AddItemToBlackMarket(
 	RewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
 	
 	RewardState.SetReward(ItemState.GetReference());
+	
 
 	// Fill out the commodity (default)
 	ForSaleItem.RewardRef = RewardState.GetReference();

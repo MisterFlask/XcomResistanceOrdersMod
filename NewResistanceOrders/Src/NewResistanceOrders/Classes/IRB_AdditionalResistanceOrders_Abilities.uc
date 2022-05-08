@@ -8,11 +8,30 @@
 class IRB_AdditionalResistanceOrders_Abilities extends XMBAbility
 	config(GameCore);
 
+var config int ILB_PROMETHIUM_FIRE_DMG_BONUS;
 	
 var config int ILB_CUTTHROAT_BONUS_CRIT_CHANCE;
 var config int ILB_CUTTHROAT_BONUS_CRIT_DAMAGE;
 var config int ILB_CUTTHROAT_BONUS_ARMOR_PIERCE;
 
+var config int ILB_SHELLBUSTER_MOBILITY_BUFF;
+
+var config int ILB_DAWN_MACHINES_MOBILITY_BUFF;
+var config int ILB_DAWN_MACHINES_SHIELDS_BUFF;
+
+var config int ILB_SAFETY_FIRST_SHIELDS_BUFF;
+var config int ILB_HAZMAT_SHIELDS_BUFF;
+
+var config int ILB_WITCH_HUNTER_PASSIVE_DMG;
+
+var config int HACK_DEFENSE_DEBUFF;
+var config int HACK_DEFENSE_DEBUFF_TUNDRA;
+
+var config int ILB_MELEE_DMG_BUFF;
+var config int ILB_VIP_SMOKES;
+var config int ILB_VIP_FRAGS;
+
+var config int ROOKIE_COMBAT_HP_BONUS;
 	//UltrasonicLure
 /// <summary>
 /// Creates the set of default abilities every unit should have in X-Com 2
@@ -22,15 +41,45 @@ static function array<X2DataTemplate> CreateTemplates()
 	local array<X2DataTemplate> Templates;
 
 	Templates.AddItem(FreeFragGrenades());
+	Templates.AddItem(FreeSmokeGrenades());
 	Templates.AddItem(FreeUltrasonicLure());
 	Templates.AddItem(ArcticEasyToHack());
+	Templates.AddItem(WitchHunterBuff());
 	Templates.AddItem(EasyToHack());
 	Templates.AddItem(AridFastUnit());
 	Templates.AddItem(PlatedVestShielding());
 	Templates.AddItem(HazmatShielding());
 	Templates.AddItem(AddTurretHackabilityDebuff());
+	Templates.AddItem(RookieHpBuff());
+	Templates.AddItem(ExtraBurnDamageFromPromethiumSupplyLines());
+	Templates.AddItem(ExtraMeleeDamage());
+
 	return Templates;
 }
+
+
+static function X2AbilityTemplate WitchHunterBuff()
+{
+	local X2AbilityTemplate Template;
+	local ILB_X2Effect_WitchHunter Effect;
+	local X2Condition_MapProperty Condition;
+	
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_WitchHunter', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+
+	// Create a persistent stat change effect
+	Effect = new class'ILB_X2Effect_WitchHunter';
+	Effect.Bonus = default.ILB_WITCH_HUNTER_PASSIVE_DMG; //todo: configs
+	Effect.EffectName = 'Witch Hunter Passive';
+
+	// The effect doesn't expire
+	Effect.BuildPersistentEffect(1, true, false, false);
+
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+}
+
 
 static function X2AbilityTemplate HazmatShielding()
 {
@@ -43,20 +92,12 @@ static function X2AbilityTemplate HazmatShielding()
 
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
-	Effect.EffectName = 'AridFast';
+	Effect.EffectName = 'HazmatShielding';
 
 	// The effect doesn't expire
 	Effect.BuildPersistentEffect(1, true, false, false);
 
-	// The effect gives +10 Defense and +3 Mobility
-	Effect.AddPersistentStatChange(eStat_Mobility, 4);
-
-	// Create a condition that only applies the stat change when in the Tundra biome
-	Condition = new class'X2Condition_MapProperty';
-	Condition.AllowedBiomes.AddItem("Arid");
-
-	// Add the condition to the stat change effect
-	Effect.TargetConditions.AddItem(Condition);
+	Effect.AddPersistentStatChange(eStat_ShieldHP, default.ILB_HAZMAT_SHIELDS_BUFF);
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.
@@ -82,7 +123,7 @@ static function X2AbilityTemplate PlatedVestShielding()
 	Effect.BuildPersistentEffect(1, true, false, false);
 
 	// The effect gives +10 Defense and +3 Mobility
-	Effect.AddPersistentStatChange(eStat_ShieldHP, 1);
+	Effect.AddPersistentStatChange(eStat_ShieldHP, default.ILB_SAFETY_FIRST_SHIELDS_BUFF);
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.
@@ -91,28 +132,121 @@ static function X2AbilityTemplate PlatedVestShielding()
 	return Template;
 }
 
+static function X2AbilityTemplate ExtraBurnDamageFromPromethiumSupplyLines()
+{
+	local XMBEffect_BonusDamageByDamageType Effect;
+	local X2AbilityTemplate Template;
+	local XMBEffect_AddUtilityItem ItemEffect;
+
+	// Create an effect that adds +1 damage to fire attacks and +1 damage to burn damage
+	Effect = new class'XMBEffect_BonusDamageByDamageType';
+	Effect.EffectName = 'Promethium Supply Chain';
+	Effect.RequiredDamageTypes.AddItem('fire');
+	Effect.DamageBonus = default.ILB_PROMETHIUM_FIRE_DMG_BONUS;
+
+	// Create the template using a helper function
+	Template = Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+
+	return Template;
+}
+
+
+// Perk name:		Reverse Engineering
+// Perk effect:		When you kill an enemy robotic unit you gain a permanent Hacking increase of 5.
+// Localized text:	"When you kill an enemy robotic unit you gain a permanent Hacking increase of <Ability:Hacking/>."
+// Config:			(AbilityName="XMBExample_ReverseEngineering")
+static function X2AbilityTemplate RookieHpBuff()
+{
+	local XMBEffect_PermanentStatChange Effect;
+	local X2AbilityTemplate Template;
+	local X2Condition_UnitProperty Condition;
+
+	Effect = new class'XMBEffect_PermanentStatChange';
+	Effect.AddStatChange(eStat_HP, default.ROOKIE_COMBAT_HP_BONUS);
+
+	// Create a triggered ability that activates whenever the unit gets a kill
+	
+	Template = Passive('ILB_RookieHpBuff', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+
+	return Template;
+}
+
+static function X2AbilityTemplate ExtraMeleeDamage()
+{
+	local XMBEffect_BonusDamageByDamageType Effect;
+	local X2AbilityTemplate Template;
+	local XMBEffect_AddUtilityItem ItemEffect;
+
+	Effect = new class'XMBEffect_BonusDamageByDamageType';
+	Effect.EffectName = 'Extra Melee Damage';
+	Effect.RequiredDamageTypes.AddItem('melee');
+	Effect.DamageBonus = default.ILB_MELEE_DMG_BUFF;
+
+	// Create the template using a helper function
+	Template = Passive('ILB_AdditionalMeleeDamage', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+
+	return Template;
+}
+
+static function X2AbilityTemplate ShellbusterMobilityBuff()
+{
+	local X2Effect_PersistentStatChange Effect;
+	local X2AbilityTemplate Template;
+	local XMBEffect_AddUtilityItem ItemEffect;
+	
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'DawnMachines_Mobility';
+
+	Effect.BuildPersistentEffect(1, true, false, false);
+	Effect.AddPersistentStatChange(eStat_Mobility, default.ILB_SHELLBUSTER_MOBILITY_BUFF);
+
+	// Create the template using a helper function
+	Template = Passive('ILB_ShellbusterMobilityBuff', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+
+	return Template;
+}
+
+
 static function X2AbilityTemplate AridFastUnit()
 {
 	local X2AbilityTemplate Template;
 	local X2Effect_PersistentStatChange Effect;
 	local X2Condition_MapProperty Condition;
 	
+	// Create a condition that only applies the stat change when in the Tundra biome
+	Condition = new class'X2Condition_MapProperty';
+	Condition.AllowedBiomes.AddItem("Arid");
+
+	// Add the condition to the stat change effect
+	Effect.TargetConditions.AddItem(Condition);
+
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_DawnMachines', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
 
-	// Create a persistent stat change effect
+	//DEFENSE
 	Effect = new class'X2Effect_PersistentStatChange';
-	Effect.EffectName = 'HazmatShielding';
+	Effect.EffectName = 'DawnMachines_Defense';
 
-	// The effect doesn't expire
 	Effect.BuildPersistentEffect(1, true, false, false);
 
-	Effect.AddPersistentStatChange(eStat_ShieldHP, 1);
+	Effect.AddPersistentStatChange(eStat_ShieldHP, default.ILB_DAWN_MACHINES_SHIELDS_BUFF);
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.
 	AddSecondaryEffect(Template, Effect);
+	
+	//SPEED
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'DawnMachines_Mobility';
 
+	Effect.BuildPersistentEffect(1, true, false, false);
+
+	Effect.AddPersistentStatChange(eStat_Mobility, default.ILB_DAWN_MACHINES_MOBILITY_BUFF);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+	
 	return Template;
 }
 
@@ -137,7 +271,7 @@ static function X2AbilityTemplate EasyToHack()
 	// The effect doesn't expire
 	Effect.BuildPersistentEffect(1, true, false, false);
 
-	Effect.AddPersistentStatChange(eStat_HackDefense, -60);
+	Effect.AddPersistentStatChange(eStat_HackDefense, default.HACK_DEFENSE_DEBUFF);
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.
@@ -170,7 +304,7 @@ static function X2AbilityTemplate ArcticEasyToHack()
 	Effect.BuildPersistentEffect(1, true, false, false);
 
 	// The effect gives +10 Defense and +3 Mobility
-	Effect.AddPersistentStatChange(eStat_HackDefense, -60);
+	Effect.AddPersistentStatChange(eStat_HackDefense, default.HACK_DEFENSE_DEBUFF);
 
 	// Create a condition that only applies the stat change when in the Tundra biome
 	Condition = new class'X2Condition_MapProperty';
@@ -188,6 +322,20 @@ static function X2AbilityTemplate ArcticEasyToHack()
 
 
 
+	static function X2AbilityTemplate FreeSmokeGrenades()
+	{
+		local X2AbilityTemplate Template;
+		local XMBEffect_AddUtilityItem ItemEffect;
+
+		ItemEffect = new class'XMBEffect_AddUtilityItem';
+		ItemEffect.DataName = 'SmokeGrenade';
+		ItemEffect.BaseCharges = default.ILB_VIP_SMOKES;
+		// Create the template using a helper function
+		Template = Passive('ILB_DangerousVips_Smoke', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
+
+		return Template;
+	}
+
 	static function X2AbilityTemplate FreeFragGrenades()
 	{
 		local X2AbilityTemplate Template;
@@ -195,9 +343,9 @@ static function X2AbilityTemplate ArcticEasyToHack()
 
 		ItemEffect = new class'XMBEffect_AddUtilityItem';
 		ItemEffect.DataName = 'FragGrenade';
-		ItemEffect.BaseCharges = 2;
+		ItemEffect.BaseCharges = default.ILB_VIP_FRAGS;
 		// Create the template using a helper function
-		Template = Passive('ILB_DangerousVips', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
+		Template = Passive('ILB_DangerousVips_Frag', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
 
 		return Template;
 	}

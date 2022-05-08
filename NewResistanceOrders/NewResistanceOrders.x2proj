@@ -30,6 +30,9 @@
     <Content Include="Src\NewResistanceOrders\Classes\Examples.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_X2Effect_WitchHunter.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\IRB_AdditionalResistanceOrders_Abilities.uc">
       <SubType>Content</SubType>
     </Content>

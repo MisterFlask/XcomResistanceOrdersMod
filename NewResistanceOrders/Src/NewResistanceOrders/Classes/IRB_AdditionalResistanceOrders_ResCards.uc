@@ -37,9 +37,6 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateBasiliskDoctrine());
 		Techs.AddItem(CreateNoisemakerTemplate()); // will re-add after replacing the Shadow ops perk pack.
 		
-		Techs.AddItem(CreateDawnMachines());
-
-
 		// There are event listeners attached to the names of these next ones, so they don't intrinsically do anything.
 		// The following are for doubling the effects of proving grounds/research projects
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_HaasBioroidContacts'));
@@ -51,6 +48,8 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		// Techs modifying missions generated; see the X2DownloadableContentInfo.
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_EyeForValue'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BoobyTraps'));
+
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BigDamnHeroes'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BureaucraticInfighting'));
 
@@ -67,8 +66,13 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateGrantVipsFragGrenades());
 		Techs.AddItem(CreateColdWeatherHackDefenseDebuff());
 		Techs.AddItem(CreateMeleeWeaknessForLostAndVipers());
+		Techs.AddItem(CreateFireWeaknessForVipersAndSectoids());
 		Techs.AddItem(CreateBloodPillarForPsi());
 		Techs.AddItem(CreatePracticalOccultism());
+		Techs.AddItem(CreateGrantRookiesPermaHp());
+		Techs.AddItem(CreateCheaperSoldiersWithBeatdown());
+		Techs.AddItem(CreateDawnMachines());
+
 		return Techs;
 	}
 	//VulnerabilityMelee
@@ -94,13 +98,55 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			AbilitiesToGrant.AddItem( 'MZHellishRebuke' );
 		}
 	}
+	
+	static function X2DataTemplate CreateCheaperSoldiersWithBeatdown()
+	{
+		local X2StrategyCardTemplate Template;
 
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_SendInTheNextWave');
+		Template.Category = "ResistanceCard";
+		Template.OnDeactivatedFn = class'X2StrategyElement_XpackResistanceActions'.static.DeactivateRecruitingCenters;
+		Template.OnActivatedFn = class'X2StrategyElement_XpackResistanceActions'.static.ActivateRecruitingCenters;
+		Template.GetAbilitiesToGrantFn = GrantBeatdown;
+		return Template; 
+	}
+
+	static function GrantBeatdown(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if (IsRookie(UnitState) || IsSquaddie(UnitState))
+		{
+			AbilitiesToGrant.AddItem( 'Beatdown' );
+		}
+	}
+
+	static function X2DataTemplate CreateFireWeaknessForVipersAndSectoids()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_Promethium');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantPromethium;
+		return Template; 
+	}
+
+	static function GrantPromethium(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCOM){
+			return;
+		}
+		AbilitiesToGrant.AddItem( 'ILB_AdditionalFireDamage' );
+
+	}
 
 	static function X2DataTemplate CreateMeleeWeaknessForLostAndVipers()
 	{
 		local X2StrategyCardTemplate Template;
 
-		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_MeleeWeaknessForLostAndVipers');
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_BetterMelee');
 		Template.Category = "ResistanceCard";
 		Template.GetAbilitiesToGrantFn = GrantMeleeWeaknessForLostAndVipers;
 		return Template; 
@@ -108,14 +154,11 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantMeleeWeaknessForLostAndVipers(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
-		if (UnitState.GetTeam() != eTeam_Alien){
+		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
+		AbilitiesToGrant.AddItem( 'ILB_AdditionalMeleeDamage' );
 
-		if (DoesTemplateHaveString(UnitState, "Viper") || DoesTemplateHaveString(UnitState, "Lost"))
-		{
-			AbilitiesToGrant.AddItem( 'VulnerabilityMelee' );
-		}
 	}
 
 	static function X2DataTemplate CreateBloodPillarForPsi()
@@ -276,13 +319,32 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	static function bool IsADVENTTurret(XComGameState_Unit UnitState){
 		return InStr(UnitState.GetMyTemplateName(), "Turret") >= 0; 
 	}
+	
+
+static function X2DataTemplate CreateGrantRookiesPermaHp()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_GrantRookiesPermaHp');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantRookiesPermaHp;
+		return Template; 
+	}
+
+	static function GrantRookiesPermaHp(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (IsRookie(UnitState)) // Rookies always get the hp buff
+		{
+			AbilitiesToGrant.AddItem( 'ILB_RookieHpBuff' ); 
+		}
+	}
 
 
 static function X2DataTemplate CreateGrantVipsFragGrenades()
 	{
 		local X2StrategyCardTemplate Template;
 
-		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_TunnelRats');
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_VeryIncandescentPersons');
 		Template.Category = "ResistanceCard";
 		Template.GetAbilitiesToGrantFn = GrantVipsFragGrenades;
 		return Template; 
@@ -294,7 +356,8 @@ static function X2DataTemplate CreateGrantVipsFragGrenades()
 			|| UnitState.GetMyTemplateName() == 'Scientist_VIP'
 			|| UnitState.GetMyTemplateName() == 'Engineer_VIP')
 		{
-			AbilitiesToGrant.AddItem( 'ILB_DangerousVips' ); 
+			AbilitiesToGrant.AddItem( 'ILB_DangerousVips_Frag' ); 
+			AbilitiesToGrant.AddItem( 'ILB_DangerousVips_Smoke' ); 
 		}
 	}
 
@@ -467,6 +530,15 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		`LOG("Discovered soldiers: " $ NumSoldiers);
 		return NumSoldiers;
 	}
+	
+	static function bool IsSquaddie(XComGameState_Unit UnitState){
+		return UnitState.GetSoldierRank() == 1;
+	}
+	static function bool IsRookie(XComGameState_Unit UnitState){
+		return UnitState.GetSoldierRank() == 0;
+	}
+
+
 
 	static function int NumRookiesOrSquaddies(XComGameState StartState)
 	{
@@ -601,7 +673,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 		if(DoesSoldierHaveMindShield(UnitState))
 		{
-			AbilitiesToGrant.AddItem( 'GrimyHexHunter' ); 
+			AbilitiesToGrant.AddItem( 'WitchHunterBuff' ); 
 		}
 	}
 
