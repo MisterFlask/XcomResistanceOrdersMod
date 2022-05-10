@@ -1,7 +1,5 @@
 class IRB_NewResistanceOrders_EventListeners extends X2EventListener ;
 
-var localized string DefaultSpecialGoodsBlackMarketDescription;
-
 static function array<X2DataTemplate> CreateTemplates()
 {
 	local array<X2DataTemplate> Templates;
@@ -30,37 +28,17 @@ static protected function X2EventListenerTemplate AddListenersForTech()
 
 static protected function X2EventListenerTemplate AddListenersForBlackMarketReset()
 {
-	local X2EventListenerTemplate Template;
+	local CHEventListenerTemplate Template;
 	`log("Registering Events: IRB_AdditionalResistanceOrders_ResCards");
 
-	`CREATE_X2TEMPLATE(class'X2EventListenerTemplate', Template, 'ILB_ListenersForBlackMarket');
-	Template.AddEvent('BlackMarketGoodsReset', BlackMarketResetListener);
+	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForBlackMarket');
+	Template.AddCHEvent('BlackMarketGoodsReset', BlackMarketResetListener, ELD_Immediate, 99);
 	Template.RegisterInStrategy = true;
 
 	`log("On research complete listener CREATED for IRB_AdditionalResistanceOrders_ResCards");
 
 	return Template;
 }
-
-
-static function GenerateSupplyReward(){
-//https://github.com/Lucubration/XCOM2/blob/a24366aafaa50421c8cb2648b563e452c6717902/TestModWotc/TestModWotc/Src/XComGame/Classes/X2StrategyElement_DefaultTechs.uc
-}
-
-
-//EVENT CARDS
-
-// intel for breakthroughs
-// supply for killing chosen
-// elereum cores and shards from killing facilities
-// Alien Collection: knocking out and abducting Sectoids, Sneks gains supply.
-// ADVENT Collection: knocking out and abducting ADVENT gains suppl
-/////// Covert Infiltration
-// 1-2 new guaranteed ADVENT smash n grab missions per month [LOOTERS]
-// 1 guaranteed new SPARK heist event chain per month (if one is not in progress)
-
-// X2Effect_SpawnGhost 
-
 
 
 static function EventListenerReturn OnResearchCompleted(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
@@ -129,10 +107,8 @@ static function AddItemToBlackMarket(
 	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	MarketState = XComGameState_BlackMarket(EventData);
 	
-	//??
 	if (MarketState == none) return;
 
-	// Check if we reached the relevant part 
 	// Get the latest pending state
 	MarketState = XComGameState_BlackMarket(NewGameState.ModifyStateObject(class'XComGameState_BlackMarket', MarketState.ObjectID));
 
@@ -140,13 +116,8 @@ static function AddItemToBlackMarket(
 	ItemTemplateMgr = class'X2ItemTemplateManager'.static.GetItemTemplateManager();
 	ItemTemplate = ItemTemplateMgr.FindItemTemplate(ItemToAdd);
 	ItemState = ItemTemplate.CreateInstanceFromTemplate(NewGameState);
-	// ItemState.Quantity = NumToAdd; // possibly not necessary
+	ItemState.Quantity = NumToAdd;
 	
-	NewGameState.AddStateObject(ItemState); // should I be doing this?
-	
-	// IS THIS CORRECT?
-	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
-
 	// Create the reward
 	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate('Reward_Item'));
@@ -164,7 +135,7 @@ static function AddItemToBlackMarket(
 	// Fill out the commodity (custom)
 	ForSaleItem.Title = ItemTemplate.GetItemFriendlyName(); // Get rid of the "1"
 	ForSaleItem.Desc = "TODO";
-	ForSaleItem.Cost = GetForSaleItemCost(Price);// todo: config
+	ForSaleItem.Cost = GetForSaleItemCost(Price); 
 
 	// Add to sale
 	MarketState.ForSaleItems.AddItem(ForSaleItem);
@@ -187,7 +158,7 @@ static function AddItemToBlackMarket(
 		local int AdditionalSoldierDiscount;
 		//local XComPhotographer_Strategy Photo;	
 
-		//Photo = `GAME.StrategyPhotographer;
+		//Photo = `GAME.StrategyPhotographer; //TODO: Compilation error with strategy photographer, can skip for now
 
 		AdditionalSoldierDiscount = 20;
 		MarketState = XComGameState_BlackMarket(EventData);
@@ -209,8 +180,8 @@ static function AddItemToBlackMarket(
 			ForSaleItem.RewardRef = RewardState.GetReference();
 
 			ForSaleItem.Title = RewardState.GetRewardString();
-			ForSaleItem.Cost = GetForSaleItemCost(70);
-			ForSaleItem.Desc = RewardState.GetBlackMarketString();
+			ForSaleItem.Cost = GetForSaleItemCost(70); // todo: move this to config
+			ForSaleItem.Desc = "TODO";
 			ForSaleItem.Image = RewardState.GetRewardImage();
 			ForSaleItem.CostScalars = class'XComGameState_BlackMarket'.default.GoodsCostScalars;
 			ForSaleItem.DiscountPercent = class'XComGameState_BlackMarket'.default.GoodsCostPercentDiscount;
@@ -224,9 +195,6 @@ static function AddItemToBlackMarket(
 			}*///TODO: fix photo
 
 			MarketState.ForSaleItems.AddItem(ForSaleItem);
-
-			// `SubmitGameState(NewGameState);//is this correct?
-
 		}
 	}
 
@@ -244,10 +212,11 @@ static function AddItemToBlackMarket(
 			return;
 		}
 
-		`log("Tech matches duplicator resistance card, rerunning on tech complete function again");
+		`log("Tech matches duplicator resistance card, rerunning on-tech-complete function again");
 		Tech.OnResearchCompleted(NewGameState);
 
 		// IS THIS CORRECT?
+		// If I don't have this here it looks like the extra rewards for the tech just don't get added.
 		`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
 	}
 
@@ -257,7 +226,7 @@ public static function HandleHaasBioroidContacts(name TechName, XComGameState_Te
 		return;
 	}
 
-	if (TechName == 'BuildSpark' || TechName == 'MechanizedWarfare') //TODO: BuildExpSpark is from Mechatronic Warfare; figure out how to integrate without dependency?
+	if (TechName == 'BuildSpark' || TechName == 'MechanizedWarfare')
 	{
 		`log("Creating additional spark as per resistance order.");
 		class'X2StrategyElement_DLC_Day90Techs'.static.CreateSparkSoldier(GameState, TechData);
@@ -281,6 +250,7 @@ static function bool IsResistanceOrderActive(name ResistanceOrderName){
 	
 	ResHQ = GetResistanceHQ();
 
+	// First, going over faction-agnostic card slots
 	foreach ResHQ.WildCardSlots(CardRef)
 	{
 		if(CardRef.ObjectID != 0)
@@ -302,6 +272,7 @@ static function bool IsResistanceOrderActive(name ResistanceOrderName){
 	{
 		`Log("Checking over every single order in this faction to see if it's the one we want: " $ FactionState.GetMyTemplateName());
 
+		// for each faction checking each card slot in turn
 		foreach FactionState.CardSlots(CardRef)
 		{
 			if(CardRef.ObjectID != 0)
@@ -329,7 +300,8 @@ static function XComGameState_HeadquartersResistance GetResistanceHQ()
 {
 	return XComGameState_HeadquartersResistance(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
 }
-static function  StrategyCost GetForSaleItemCost(int IntelAmount)
+
+static function StrategyCost GetForSaleItemCost(int IntelAmount)
 {
 	local StrategyCost Cost;
 	local ArtifactCost ResourceCost;

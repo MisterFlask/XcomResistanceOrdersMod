@@ -75,7 +75,6 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		return Techs;
 	}
-	//VulnerabilityMelee
 	
 	static function X2DataTemplate CreateHellishRebukeForTemplars()
 	{
@@ -532,9 +531,16 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 	}
 	
 	static function bool IsSquaddie(XComGameState_Unit UnitState){
+		local int SoldierRank;
+		SoldierRank = UnitState.GetSoldierRank() ;
+		`LOG("Soldier rank (checking for squaddie, rank 1) detected for soldier " $ UnitState.GetFullName() $ ": " $ SoldierRank);
 		return UnitState.GetSoldierRank() == 1;
 	}
+
 	static function bool IsRookie(XComGameState_Unit UnitState){
+		local int SoldierRank;
+		SoldierRank = UnitState.GetSoldierRank() ;
+		`LOG("Soldier rank (checking for rookie, rank 0) detected for soldier " $ UnitState.GetFullName() $ ": " $ SoldierRank);
 		return UnitState.GetSoldierRank() == 0;
 	}
 
@@ -630,7 +636,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if (IsPlotType("Tunnels_Sewer") || IsPlotType("Tunnels_Subway"))
 		{	
-			AbilitiesToGrant.AddItem( 'Phantom' ); 
+			AbilitiesToGrant.AddItem( 'Stealth' ); 
 		}
 	}
 	//////// FLASHPOINT for grenadiers
@@ -828,7 +834,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon')){
-			AbilitiesToGrant.AddItem( 'PocketFlamer' );
+			AbilitiesToGrant.AddItem( 'MZPocketFlamer' );
 		}
 	}
 

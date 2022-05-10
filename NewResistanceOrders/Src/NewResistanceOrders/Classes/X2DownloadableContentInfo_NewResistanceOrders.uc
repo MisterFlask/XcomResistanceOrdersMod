@@ -96,6 +96,55 @@ exec function VerifyPlayableCards()
 	}
 }
 
+exec function ActivateAllCards()
+{
+	local XComGameStateHistory History;
+	local XComGameState NewGameState;
+	local XComGameState_ResistanceFaction FactionState;
+	local XComGameState_StrategyCard CardState;
+	local X2StrategyCardTemplate CurrentTemplate;
+	local XComGameState_StrategyCard CurrentCard;
+	History = `XCOMHISTORY;
+
+	`LOG("INFO:Checking all templates for errors.");
+	
+	foreach History.IterateByClassType(class'XComGameState_StrategyCard', CurrentCard)
+	{
+		ActivatePolicyCard(string(CurrentCard.GetMyTemplateName()));
+	}
+}
+function ActivatePolicyCard( string PolicyName )
+{
+	local XComGameStateHistory History;
+	local X2StrategyElementTemplateManager TemplateManager;
+	local X2StrategyCardTemplate PolicyTemplate;
+	local XComGameState NewGameState;
+	local XComGameState_StrategyCard PolicyState;
+	local XComGameState_HeadquartersResistance ResHQ;
+
+	History = `XCOMHISTORY;
+
+	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+	PolicyTemplate = X2StrategyCardTemplate( TemplateManager.FindStrategyElementTemplate( name(PolicyName) ) );
+
+	if (PolicyTemplate == none)
+		return;
+
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("CHEAT: ActivatePolicyCard");
+
+	PolicyState = PolicyTemplate.CreateInstanceFromTemplate( NewGameState );
+	PolicyState.bDrawn = true;
+
+	ResHQ = XComGameState_HeadquartersResistance( History.GetSingleGameStateObjectForClass( class'XComGameState_HeadquartersResistance' ) );
+	ResHQ = XComGameState_HeadquartersResistance( NewGameState.ModifyStateObject( class'XComGameState_HeadquartersResistance', ResHQ.ObjectID ) );
+
+	ResHQ.WildCardSlots.AddItem( PolicyState.GetReference() );
+
+	PolicyState.ActivateCard( NewGameState );
+
+	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
+}
+
 
 /// <summary>
 /// Called when the player starts a new campaign while this DLC / Mod is installed
