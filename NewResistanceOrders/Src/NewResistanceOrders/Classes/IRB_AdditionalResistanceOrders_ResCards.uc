@@ -32,6 +32,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateHunterProtocolForAssaultAndBattlescanners());
 		Techs.AddItem(CreateLongwatchForSnipers());
 
+		Techs.AddItem(CreateGrantTurretsWeakHackDefense());
 		Techs.AddItem(CreateColdWeatherHackDefenseDebuff());
 
 		Techs.AddItem(CreateBasiliskDoctrine());

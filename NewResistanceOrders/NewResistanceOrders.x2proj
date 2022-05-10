@@ -19,8 +19,9 @@
     <Content Include="Config\XComGameData.ini">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Content\WP_ModExampleWeapon_CV.upk" />
-    <Content Include="Content\ExampleWeapon_ModShaderCache.upk" />
+    <Content Include="Content\UILibrary_PolicyCards.upk">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Localization\XComGame.int" />
     <Content Include="ModPreview.jpg" />
     <Content Include="ReadMe.txt" />
