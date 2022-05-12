@@ -7,7 +7,7 @@ static function array<X2DataTemplate> CreateTemplates()
 
 
 	Templates.AddItem( AddListenersForTech() );
-	Templates.AddItem( AddListenersForBlackMarketReset() );
+	Templates.AddItem( AddListenersForBlackMarketReset() ); // handling this via UI State Listener instead
 
 	return Templates;
 }
@@ -32,7 +32,7 @@ static protected function X2EventListenerTemplate AddListenersForBlackMarketRese
 	`log("Registering Events: IRB_AdditionalResistanceOrders_ResCards");
 
 	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForBlackMarket');
-	Template.AddCHEvent('BlackMarketGoodsReset', BlackMarketResetListener, ELD_Immediate, 99);
+	Template.AddCHEvent('BlackMarketGoodsReset', SetStateFlagForScreenListener, ELD_Immediate, 99);
 	Template.RegisterInStrategy = true;
 
 	`log("On research complete listener CREATED for IRB_AdditionalResistanceOrders_ResCards");
@@ -40,6 +40,9 @@ static protected function X2EventListenerTemplate AddListenersForBlackMarketRese
 	return Template;
 }
 
+static function SetStateFlagForScreenListener(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData){
+	class'IRB_BlackMarketState'.static.HandleBlackMarketReset();
+}
 
 static function EventListenerReturn OnResearchCompleted(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {

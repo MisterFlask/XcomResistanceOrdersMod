@@ -6,7 +6,7 @@
 //  Copyright (c) 2016 Firaxis Games, Inc. All rights reserved.
 //---------------------------------------------------------------------------------------
 class IRB_AdditionalResistanceOrders_Abilities extends XMBAbility
-	config(GameCore);
+	config(Abilities);
 
 var config int ILB_PROMETHIUM_FIRE_DMG_BONUS;
 	
@@ -143,7 +143,6 @@ static function X2AbilityTemplate ExtraBurnDamageFromPromethiumSupplyLines()
 	Effect.EffectName = 'Promethium Supply Chain';
 	Effect.RequiredDamageTypes.AddItem('fire');
 	Effect.DamageBonus = default.ILB_PROMETHIUM_FIRE_DMG_BONUS;
-
 	// Create the template using a helper function
 	Template = Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
 
@@ -173,14 +172,17 @@ static function X2AbilityTemplate RookieHpBuff()
 
 static function X2AbilityTemplate ExtraMeleeDamage()
 {
-	local XMBEffect_BonusDamageByDamageType Effect;
+	local XMBEffect_ConditionalBonus Effect;
 	local X2AbilityTemplate Template;
 	local XMBEffect_AddUtilityItem ItemEffect;
-
-	Effect = new class'XMBEffect_BonusDamageByDamageType';
+	local XMBCondition_AbilityProperty MeleeOnlyCondition;
+	Effect = new class'XMBEffect_ConditionalBonus';
 	Effect.EffectName = 'Extra Melee Damage';
-	Effect.RequiredDamageTypes.AddItem('melee');
-	Effect.DamageBonus = default.ILB_MELEE_DMG_BUFF;
+	Effect.AddDamageModifier(default.ILB_MELEE_DMG_BUFF, eHit_Success);
+
+	MeleeOnlyCondition = new class'XMBCondition_AbilityProperty';
+	MeleeOnlyCondition.bRequireMelee = true;
+	Effect.AbilityTargetConditions.AddItem(MeleeOnlyCondition);
 
 	// Create the template using a helper function
 	Template = Passive('ILB_AdditionalMeleeDamage', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);

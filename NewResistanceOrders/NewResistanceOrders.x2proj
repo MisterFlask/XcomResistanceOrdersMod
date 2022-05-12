@@ -13,6 +13,9 @@
     <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Config\XComAbilities.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Config\XComEditor.ini" />
     <Content Include="Config\XComEngine.ini" />
     <Content Include="Config\XComGame.ini" />
@@ -31,6 +34,9 @@
     <Content Include="Src\NewResistanceOrders\Classes\Examples.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_BlackMarketState.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_X2Effect_WitchHunter.uc">
       <SubType>Content</SubType>
     </Content>
@@ -43,7 +49,13 @@
     <Content Include="Src\NewResistanceOrders\Classes\IRB_NewResistanceOrders_EventListeners.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\IRB_UIBlackMarketScreenListener.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\X2DownloadableContentInfo_NewResistanceOrders.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\XcomGameState_ILB_BlackMarketState.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\NewResistanceOrders\Classes\XMBAbility.uc">

@@ -138,7 +138,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		if (UnitState.GetTeam() != eTeam_XCOM){
 			return;
 		}
-		AbilitiesToGrant.AddItem( 'ILB_AdditionalFireDamage' );
+		AbilitiesToGrant.AddItem( 'ILB_PromethiumFireDamageBonus' );
 
 	}
 
