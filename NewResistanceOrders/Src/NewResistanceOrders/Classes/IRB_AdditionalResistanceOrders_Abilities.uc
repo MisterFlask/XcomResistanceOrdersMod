@@ -141,6 +141,7 @@ static function X2AbilityTemplate ExtraBurnDamageFromPromethiumSupplyLines()
 	// Create an effect that adds +1 damage to fire attacks and +1 damage to burn damage
 	Effect = new class'XMBEffect_BonusDamageByDamageType';
 	Effect.EffectName = 'Promethium Supply Chain';
+	Effect.RequiredDamageTypes.AddItem('Fire');
 	Effect.RequiredDamageTypes.AddItem('fire');
 	Effect.DamageBonus = default.ILB_PROMETHIUM_FIRE_DMG_BONUS;
 	// Create the template using a helper function

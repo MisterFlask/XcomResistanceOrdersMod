@@ -40,8 +40,9 @@ static protected function X2EventListenerTemplate AddListenersForBlackMarketRese
 	return Template;
 }
 
-static function SetStateFlagForScreenListener(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData){
-	class'IRB_BlackMarketState'.static.HandleBlackMarketReset();
+static function EventListenerReturn SetStateFlagForScreenListener(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData){
+	class'XComGameState_ILB_BlackMarketState'.static.HandleBlackMarketReset(GameState);
+	return ELR_NoInterrupt;
 }
 
 static function EventListenerReturn OnResearchCompleted(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)

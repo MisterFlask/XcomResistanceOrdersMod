@@ -176,7 +176,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
-		if (DoesSoldierHavePsiRating(UnitState))
+		if (DoesSoldierHavePsiRating(UnitState) || DoesSoldierHaveSpecificItem(SustainingSphere) || DoesSoldierHaveArmorOfClass('templar'))
 		{
 			AbilitiesToGrant.AddItem( 'MZBloodPillar' );
 		}
@@ -877,7 +877,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 
-		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'pistol') || DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'autopistol'))
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon') || DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'autopistol'))
 		{
 			AbilitiesToGrant.AddItem( 'Entrench' );//https://docs.google.com/spreadsheets/d/11nKVN8Rd4MoIOtBbkmzLkwq7NWb0ZI8Q2VNAD16mFTE/edit#gid=0
 		}
@@ -1153,7 +1153,9 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 	}
 
 	static function bool DoesSoldierHaveSword(XComGameState_Unit UnitState){
-		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sword') || DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'combatknife');
+		return DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sword') 
+			|| DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'combatknife')
+			|| DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'wristblade');
 	}
 
 	static function bool DoesSoldierHavePistol(XComGameState_Unit UnitState){

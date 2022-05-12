@@ -23,18 +23,16 @@ static function CreateSingletonIfNotExists()
 	}
 }
 
-static function HandleBlackMarketReset(){
-	local XComGameState NewGameState;
-	local XComGameState_ILB_BlackMarketState ILBBlackMarketState;
+static function HandleBlackMarketReset(XComGameState NewGameState){
+	local XComGameState_ILB_BlackMarketState ILB_BlackMarketState;
+
 	CreateSingletonIfNotExists();
 	`LOG("ILB: Black market reset occurring!  Must reset ui screen listener accordingly.");
 
-	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("ILB: Black market reset occurring.");
+	ILB_BlackMarketState = GetSingleton();
+	ILB_BlackMarketState = XComGameState_ILB_BlackMarketState(NewGameState.ModifyStateObject(class'XComGameState_ILB_BlackMarketState', ILB_BlackMarketState.ObjectID));
 
-	ILBBlackMarketState = GetSingleton();
-	ILBBlackMarketState = ILB_BlackMarketState(NewGameState.ModifyStateObject(class'ILB_BlackMarketState', ILB_BlackMarketState.ObjectID));
-
-	ILBBlackMarketState.bPopulatedBlackMarketWithResistanceOrders = false;
+	ILB_BlackMarketState.bPopulatedBlackMarketWithResistanceOrders = false;
 
 	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
 
@@ -42,12 +40,13 @@ static function HandleBlackMarketReset(){
 
 static function HandleBlackMarketScreenOpened(){
 	local XComGameState NewGameState;
-	local XComGameState_ILB_BlackMarketState ILBBlackMarketState;
+	local XComGameState_ILB_BlackMarketState ILB_BlackMarketState;
 	
 	CreateSingletonIfNotExists();
-	ILBBlackMarketState = GetSingleton();
 
-	if (ILBBlackMarketState.bPopulatedBlackMarketWithResistanceOrders){
+	ILB_BlackMarketState = GetSingleton();
+
+	if (ILB_BlackMarketState.bPopulatedBlackMarketWithResistanceOrders){
 		// we've done all we must
 		`LOG("ILB: Black market update not necessary; already done for this month");
 		return;
@@ -55,12 +54,12 @@ static function HandleBlackMarketScreenOpened(){
 
 	`LOG("ILB: Haven't populated black market yet!  Handling resistance orders.");
 	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("ILB: Black market state.");
-	ILBBlackMarketState = ILB_BlackMarketState(NewGameState.ModifyStateObject(class'ILB_BlackMarketState', ILB_BlackMarketState.ObjectID));
+	ILB_BlackMarketState = XComGameState_ILB_BlackMarketState(NewGameState.ModifyStateObject(class'XComGameState_ILB_BlackMarketState', ILB_BlackMarketState.ObjectID));
 	
-	ILBBlackMarketState.bPopulatedBlackMarketWithResistanceOrders = true;
+	ILB_BlackMarketState.bPopulatedBlackMarketWithResistanceOrders = true;
 	
 	// HACK: Don't feel like refactoring at the moment.  Just gonna call event listener code as though I were handling the actual bm reset.
-	class'IRB_NewResistanceOrders_EventListeners'.static.BlackMarketResetListener(GetBlackMarketState(), none, NewGameState, none, none);
+	class'IRB_NewResistanceOrders_EventListeners'.static.BlackMarketResetListener(GetBlackMarketState(), none, NewGameState, 'DummyEvent', none);
 	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
 }
 
@@ -69,6 +68,6 @@ static function XComGameState_ILB_BlackMarketState GetSingleton(optional bool Al
 	return XComGameState_ILB_BlackMarketState(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_ILB_BlackMarketState', AllowNull));
 }
 
-static function GetBlackMarketState(){
-	return XComGameState_BlackMarket(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_ILB_BlackMarketState', true));
+static function XComGameState_BlackMarket GetBlackMarketState(){
+	return XComGameState_BlackMarket(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_BlackMarket', true));
 }
