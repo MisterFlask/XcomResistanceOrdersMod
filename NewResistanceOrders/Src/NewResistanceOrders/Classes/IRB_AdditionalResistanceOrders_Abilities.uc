@@ -142,7 +142,6 @@ static function X2AbilityTemplate ExtraBurnDamageFromPromethiumSupplyLines()
 	Effect = new class'XMBEffect_BonusDamageByDamageType';
 	Effect.EffectName = 'Promethium Supply Chain';
 	Effect.RequiredDamageTypes.AddItem('Fire');
-	Effect.RequiredDamageTypes.AddItem('fire');
 	Effect.DamageBonus = default.ILB_PROMETHIUM_FIRE_DMG_BONUS;
 	// Create the template using a helper function
 	Template = Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);

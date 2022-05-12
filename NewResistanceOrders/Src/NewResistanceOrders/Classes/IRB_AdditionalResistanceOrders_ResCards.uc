@@ -15,6 +15,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		
 		// Templates of the form "if condition X, grant soldier perk Y"
 		Techs.AddItem(CreateTunnelRatsTemplate());
+		Techs.AddItem(CreateMedikitQuickpatchTemplate());
 		Techs.AddItem(CreateFlashpointForGrenadiersTemplate());
 		Techs.AddItem(CreateHexhunterForMindshieldsTemplate());
 		Techs.AddItem(CreateNeedlepointBuffForPistolTemplate());
@@ -25,7 +26,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreatePocketFlamerForCannonsTemplate());
 		Techs.AddItem(CreateBattleSpaceForBattleScannersTemplate());
 		Techs.AddItem(CreatePistolGrantsEntrenchAbility());
-
+		Techs.AddItem(CreateHellishRebukeForTemplars());
 		Techs.AddItem(CreateSwordsAndKnivesGrantShellbustAbility());
 		Techs.AddItem(CreateGrantFirepowerForSparksTemplate());
 		Techs.AddItem(CreateGrenadeLauncherGrantsWatchThemRunTemplate());
@@ -95,7 +96,11 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		if (DoesSoldierHaveArmorOfClass(UnitState,'templar'))
 		{
-			AbilitiesToGrant.AddItem( 'MZHellishRebuke' );
+			AbilitiesToGrant.AddItem( 'MZStormForce' );
+			//AbilitiesToGrant.AddItem('MZArcCleaveTemplar'); //animation's broken
+			//AbilitiesToGrant.AddItem('MZAbyssalPistolShot'); // doesn't work with autopistol
+			AbilitiesToGrant.AddItem( 'MZForkedLightning' );
+
 		}
 	}
 	
@@ -176,7 +181,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
-		if (DoesSoldierHavePsiRating(UnitState) || DoesSoldierHaveSpecificItem(SustainingSphere) || DoesSoldierHaveArmorOfClass('templar'))
+		if (DoesSoldierHavePsiRating(UnitState) || DoesSoldierHaveSpecificItem(UnitState,'SustainingSphere') || DoesSoldierHaveArmorOfClass(UnitState,'templar'))
 		{
 			AbilitiesToGrant.AddItem( 'MZBloodPillar' );
 		}
@@ -680,7 +685,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 		if(DoesSoldierHaveMindShield(UnitState))
 		{
-			AbilitiesToGrant.AddItem( 'WitchHunterBuff' ); 
+			AbilitiesToGrant.AddItem( 'ILB_WitchHunter' ); 
 		}
 	}
 
@@ -877,7 +882,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 
-		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon') || DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'autopistol'))
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon'))
 		{
 			AbilitiesToGrant.AddItem( 'Entrench' );//https://docs.google.com/spreadsheets/d/11nKVN8Rd4MoIOtBbkmzLkwq7NWb0ZI8Q2VNAD16mFTE/edit#gid=0
 		}
@@ -926,7 +931,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if(DoesSoldierHaveGrenadeLauncher(UnitState))
 		{
-			AbilitiesToGrant.AddItem( 'WatchThemRun' );//todo: verify
+			AbilitiesToGrant.AddItem( 'F_WatchThemRun' );//todo: verify
 		}
 	}
 
@@ -1235,9 +1240,11 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 					continue;
 				}
 				if (Armor.ArmorClass == Classification){
+					`LOG("Found armor of desired class " $ Classification);
 					return true;
 				}
 				if (Armor.ArmorCat == Classification){
+					`LOG("Found armor of desired armorcat " $ Classification);
 					return true;
 				}
 				

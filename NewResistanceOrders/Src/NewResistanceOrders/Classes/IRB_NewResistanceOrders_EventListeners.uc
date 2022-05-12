@@ -87,6 +87,13 @@ static function EventListenerReturn BlackMarketResetListener(Object EventData, O
 		AddItemToBlackMarket('HazmatVest', 1, 20, EventData, EventSource, GameState, Event, CallbackData);
 	}
 	
+	if (IsResistanceOrderActive('ResCard_HaasBioroidContacts')){
+		AddItemToBlackMarket('CorpseAdventMEC', 5, 25, EventData, EventSource, GameState, Event, CallbackData);
+	}
+
+	if(IsResistanceOrderActive('ResCard_SurpriseForSpiderOrWraithSuit')){
+		AddItemToBlackMarket('LightPlatedArmor', 1, 40, EventData, EventSource, GameState, Event, CallbackData);
+	}
 	
 	if (IsResistanceOrderActive('ResCard_MeatMarket')){
 		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData);
