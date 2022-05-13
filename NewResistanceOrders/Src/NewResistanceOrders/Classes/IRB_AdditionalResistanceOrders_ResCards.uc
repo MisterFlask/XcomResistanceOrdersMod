@@ -144,6 +144,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			return;
 		}
 		AbilitiesToGrant.AddItem( 'ILB_PromethiumFireDamageBonus' );
+		AbilitiesToGrant.AddItem('ILB_PlusFlamerCharges');
 
 	}
 
@@ -707,7 +708,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 		if (SoldierHasPistol(UnitState))
 		{
-			AbilitiesToGrant.AddItem( 'GrimyNeedlePointPassive' ); 
+			AbilitiesToGrant.AddItem( 'PistolShotsDealPoisonPassive' );
 		}
 	}
 
@@ -773,7 +774,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'gremlin'))
 		{
-			AbilitiesToGrant.AddItem( 'Multitasking' );
+			AbilitiesToGrant.AddItem( 'ILB_AidProtocolRefund' ); 
 		}
 	}
 
@@ -840,7 +841,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon')){
-			AbilitiesToGrant.AddItem( 'MZPocketFlamer' );
+			AbilitiesToGrant.AddItem( 'ILB_SmallerFlamethrower' );
 		}
 	}
 
@@ -954,7 +955,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if(UnitState.IsRobotic())
 		{
-			AbilitiesToGrant.AddItem( 'ABB_Cannonade' );
+			AbilitiesToGrant.AddItem( 'ILB_Rocketeer' );
 			AbilitiesToGrant.AddItem( 'WalkFire' );
 		}
 	}
@@ -1120,33 +1121,10 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'holotargeter'))
 		{
-			//TODO
+
 		}
 	}
 	
-    //SKV_Shield_5HP for mechanical units (or alternatively SKV_AlloyCarbidePlating ) (Adaptive armor?)
-	// wraith/spider suits grant Surprise. (F_FirstStrike) 
-	// cannons grant F_Havoc
-	// EXO and WAR suits grant armor and decrease mobility. (SKV_ExtraPlating)
-	// Skulljacks grant +2 melee damage.
-	// gremlins grant F_Recharge (killing enemy grants -1 to all cooldowns)
-	// EXO and WAR suits grant Riot Control
-	// Wraith/Spider suits grant F_QuickFeet and F_Preservation
-	// Medikits grant F_QuickPatch [no action cost]
-	// research breakthroughs also yield an Elereum Core (research-sharing agreements)
-	// Labs(Workshops) grant 1 free Resistance Contact
-	// Labs(Workshops) grant 3 additional Power
-	// NBN Corporate Contacts:  Grants 25 supply and 25 intel each time you kill a Chosen or an ADVENT Field Commander.  ("Someone is always watching" --unofficial NBN corporate motto)
-	// City Center: Gain phantom. [Secret Identities] [As you can see from our paperwork, we're a rock band, which explains our large amount of equipment in otherwise-suspicious opaque cases. --Cpl. Jane Kelly]
-	// City Center: Gain Tracking as per perk.  [Guess who got admin access to the municipal security network?]
-	// bBreakthrough researches grant 50 intel on completion (Jinteki Corporate Contacts)
-	// Melange Mining Corp Contacts:  On excavating machinery, gain 2 free Turret Wrecks and MEC Wrecks.  SPARKs gain 3 shield at mission start.
-	// Melange Mining Corp Contacts II:  On excavating machinery, gain 4 free Turret Wrecks and MEC Wrecks.  SPARKs gain 5 shield at mission start.
-	// Convert supplies + time in proving grounds into Elereum Cores [15 days, 20 supply, grants 1 core]
-	// Convert supplies + time in proving grounds into Elereum Shards [15 days, 20 supply, grants 30 shards]
-	// Refraction Fields grant Evasive.
-	// stukov's war perk pack: is there a shield?
-
 	static function bool DoesSoldierHaveRocketLauncher(XComGameState_Unit UnitState){
 		return DoesSoldierHaveSpecificItem(UnitState, 'RocketLauncher');
 	}

@@ -40,6 +40,8 @@ static function array<X2DataTemplate> CreateTemplates()
 { 
 	local array<X2DataTemplate> Templates;
 
+	Templates.AddItem(Rocketeer());
+	Templates.AddItem(PlusFlamerCharges());
 	Templates.AddItem(FreeFragGrenades());
 	Templates.AddItem(FreeSmokeGrenades());
 	Templates.AddItem(FreeUltrasonicLure());
@@ -53,9 +55,37 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(RookieHpBuff());
 	Templates.AddItem(ExtraBurnDamageFromPromethiumSupplyLines());
 	Templates.AddItem(ExtraMeleeDamage());
+	Templates.AddItem(PistolShotsDealPoisonPassive());
+	Templates.AddItem(AidProtocolRefund());
 
 	return Templates;
 }
+static function X2AbilityTemplate AidProtocolRefund()
+{
+	local XMBEffect_AbilityCostRefund Effect;
+	local XMBCondition_AbilityName AbilityNameCondition;
+	
+	// Create an effect that will refund the cost of attacks
+	Effect = new class'XMBEffect_AbilityCostRefund';
+	Effect.EffectName = 'AidProtocolRefund';
+	Effect.TriggeredEvent = 'AidProtocolRefund';
+
+	// Only refund once per turn
+	Effect.CountValueName = 'AidProtocolUsesThisTurn';
+	Effect.MaxRefundsPerTurn = 1;
+
+	// The bonus only applies to standard shots
+	AbilityNameCondition = new class'XMBCondition_AbilityName';
+	AbilityNameCondition.IncludeAbilityNames.AddItem('WOTC_APA_AidProtocol');
+	AbilityNameCondition.IncludeAbilityNames.AddItem('AidProtocol');
+	Effect.AbilityTargetConditions.AddItem(AbilityNameCondition);
+
+	// Create the template using a helper function
+	return Passive('ILB_AidProtocolRefund', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+}
+
+
+//WOTC_APA_AidProtocol version of Multitasking
 
 
 static function X2AbilityTemplate WitchHunterBuff()
@@ -72,6 +102,7 @@ static function X2AbilityTemplate WitchHunterBuff()
 	Effect.Bonus = default.ILB_WITCH_HUNTER_PASSIVE_DMG; //todo: configs
 	Effect.EffectName = 'Witch Hunter Passive';
 
+	
 	// The effect doesn't expire
 	Effect.BuildPersistentEffect(1, true, false, false);
 
@@ -132,6 +163,56 @@ static function X2AbilityTemplate PlatedVestShielding()
 	return Template;
 }
 
+static function X2AbilityTemplate PlusFlamerCharges(){
+	local XMBEffect_AddAbilityCharges Effect;
+	local X2AbilityTemplate Template;
+
+	// Flamethrower abilities
+	Effect = new class'XMBEffect_AddAbilityCharges';
+	Effect.AbilityNames.AddItem('AdvPurifierFlamethrower');
+	Effect.AbilityNames.AddItem('LWFlamethrower');
+	Effect.AbilityNames.AddItem('FireMZPocketFlamethrower');
+	Effect.AbilityNames.AddItem('FlamethrowerMk2');
+	Effect.AbilityNames.AddItem('Flamethrower');
+	Effect.BonusCharges = 1;
+	Effect.bAllowUseAmmoAsCharges = true;
+
+	// The effect isn't an X2Effect_Persistent, so we can't use it as the effect for Passive(). Let
+	// Passive() create its own effect.
+	Template = Passive('ILB_PlusFlamerCharges', "img:///UILibrary_PerkIcons.UIPerk_command", true);
+
+	// Add the XMBEffect_AddItemCharges as an extra effect.
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+
+}
+
+// Perk name:		Rocketeer
+// Perk effect:		Your equipped heavy weapon gets an additional use.
+// Localized text:	"Your equipped heavy weapon gets an additional use."
+// Config:			(AbilityName="XMBExample_Rocketeer")
+static function X2AbilityTemplate Rocketeer()
+{
+	local XMBEffect_AddItemCharges Effect;
+	local X2AbilityTemplate Template;
+
+	// Create an effect that adds a charge to the equipped heavy weapon
+	Effect = new class'XMBEffect_AddItemCharges';
+	Effect.ApplyToSlots.AddItem(eInvSlot_HeavyWeapon);
+	Effect.PerItemBonus = 1;
+
+	// The effect isn't an X2Effect_Persistent, so we can't use it as the effect for Passive(). Let
+	// Passive() create its own effect.
+	Template = Passive('ILB_Rocketeer', "img:///UILibrary_PerkIcons.UIPerk_command", true);
+
+	// Add the XMBEffect_AddItemCharges as an extra effect.
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+}
+
+// Your frag grenades inflict Fire Weakness?  SOMETHING inflicts Fire Weakness?
 static function X2AbilityTemplate ExtraBurnDamageFromPromethiumSupplyLines()
 {
 	local XMBEffect_BonusDamageByDamageType Effect;
@@ -141,8 +222,8 @@ static function X2AbilityTemplate ExtraBurnDamageFromPromethiumSupplyLines()
 	// Create an effect that adds +1 damage to fire attacks and +1 damage to burn damage
 	Effect = new class'XMBEffect_BonusDamageByDamageType';
 	Effect.EffectName = 'Promethium Supply Chain';
-	Effect.RequiredDamageTypes.AddItem('Fire');
-	Effect.DamageBonus = default.ILB_PROMETHIUM_FIRE_DMG_BONUS;
+	Effect.RequiredDamageTypes.AddItem('fire');
+	Effect.DamageBonus = 1;
 	// Create the template using a helper function
 	Template = Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
 
@@ -187,6 +268,13 @@ static function X2AbilityTemplate ExtraMeleeDamage()
 	// Create the template using a helper function
 	Template = Passive('ILB_AdditionalMeleeDamage', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
 
+	return Template;
+}
+
+static function X2AbilityTemplate PistolShotsDealPoisonPassive(){
+
+	local X2AbilityTemplate Template;
+	Template = Passive('PistolShotsDealPoisonPassive', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
 	return Template;
 }
 

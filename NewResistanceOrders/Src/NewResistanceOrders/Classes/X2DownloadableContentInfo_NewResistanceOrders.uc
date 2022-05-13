@@ -9,7 +9,10 @@
 //  Copyright (c) 2016 Firaxis Games, Inc. All rights reserved.
 //---------------------------------------------------------------------------------------
 
-class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableContentInfo;
+class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableContentInfo
+	config(Abilities);
+
+var config array<name> PISTOL_SKILLS;
 
 /// <summary>
 /// This method is run if the player loads a saved game that was created prior to this DLC / Mod being installed, and allows the 
@@ -151,6 +154,31 @@ function ActivatePolicyCard( string PolicyName )
 /// </summary>
 static event InstallNewCampaign(XComGameState StartState)
 {
+}
+
+static function UpdateAbilities()
+{
+
+	local X2AbilityTemplateManager				AbilityManager;
+	local X2AbilityTemplate						AbilityTemplate, PistolAbility;
+	local X2Condition_AbilityProperty			AbilityCondition;
+	local name									AbilityName;
+	local X2Effect_PersistentStatChange			PoisonedEffect, PoisonEffect;	
+	AbilityManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
+	// Poison Effect
+	AbilityCondition = new class'X2Condition_AbilityProperty';
+	AbilityCondition.OwnerHasSoldierAbilities.AddItem('PistolShotsDealPoisonPassive'); //PistolShotsDealPoisonPassive is the name of the ability
+	PoisonEffect = class'X2StatusEffects'.static.CreatePoisonedStatusEffect();
+	PoisonEffect.EffectTickedFn = none;
+	PoisonEffect.TargetConditions.AddItem(AbilityCondition);
+
+	foreach default.PISTOL_SKILLS(AbilityName) {
+		PistolAbility = AbilityManager.FindAbilityTemplate(AbilityName);
+		if ( PistolAbility != none )
+		{
+			PistolAbility.AddTargetEffect(PoisonEffect);
+		}
+	}
 }
 
 /// <summary>
