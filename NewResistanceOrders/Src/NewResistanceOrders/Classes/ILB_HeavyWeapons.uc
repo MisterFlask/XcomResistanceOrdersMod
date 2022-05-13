@@ -22,3 +22,7 @@ static function X2DataTemplate SmallerFlamethrower(){
 	Template.Abilities.AddItem('IRB_SmallerFlamethrower');
 	return Template;
 }
+
+static function X2DataTemplate GrantAbilityForSmallerFlamethrower(){
+
+}

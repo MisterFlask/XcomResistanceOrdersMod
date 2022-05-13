@@ -145,7 +145,7 @@ static function AddItemToBlackMarket(
 
 	// Fill out the commodity (custom)
 	ForSaleItem.Title = ItemTemplate.GetItemFriendlyName(); // Get rid of the "1"
-	ForSaleItem.Desc = "TODO";
+	ForSaleItem.Desc = "Not generally available via the black market, but for a resourceful commander, such things are possible."; //todo: figure out localization
 	ForSaleItem.Cost = GetForSaleItemCost(Price); 
 
 	// Add to sale
@@ -191,8 +191,8 @@ static function AddItemToBlackMarket(
 			ForSaleItem.RewardRef = RewardState.GetReference();
 
 			ForSaleItem.Title = RewardState.GetRewardString();
-			ForSaleItem.Cost = GetForSaleItemCost(70); // todo: move this to config
-			ForSaleItem.Desc = "TODO";
+			ForSaleItem.Cost = GetForSaleItemCostInSupply(70); // todo: move this to config
+			ForSaleItem.Desc = "The Meat Market giveth; and the Meat Market taketh away.";
 			ForSaleItem.Image = RewardState.GetRewardImage();
 			ForSaleItem.CostScalars = class'XComGameState_BlackMarket'.default.GoodsCostScalars;
 			ForSaleItem.DiscountPercent = class'XComGameState_BlackMarket'.default.GoodsCostPercentDiscount;
@@ -319,6 +319,17 @@ static function StrategyCost GetForSaleItemCost(int IntelAmount)
 	
 	ResourceCost.ItemTemplateName = 'Intel';
 	ResourceCost.Quantity = IntelAmount;
+	Cost.ResourceCosts.AddItem(ResourceCost);
+
+	return Cost;
+}
+static function StrategyCost GetForSaleItemCostInSupply(int SupplyCost)
+{
+	local StrategyCost Cost;
+	local ArtifactCost ResourceCost;
+	
+	ResourceCost.ItemTemplateName = 'Supplies';
+	ResourceCost.Quantity = SupplyCost;
 	Cost.ResourceCosts.AddItem(ResourceCost);
 
 	return Cost;

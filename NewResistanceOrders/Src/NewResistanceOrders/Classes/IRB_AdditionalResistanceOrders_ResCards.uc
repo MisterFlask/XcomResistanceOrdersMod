@@ -144,8 +144,6 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			return;
 		}
 		AbilitiesToGrant.AddItem( 'ILB_PromethiumFireDamageBonus' );
-		AbilitiesToGrant.AddItem('ILB_PlusFlamerCharges');
-
 	}
 
 	static function X2DataTemplate CreateMeleeWeaknessForLostAndVipers()
@@ -708,7 +706,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 		if (SoldierHasPistol(UnitState))
 		{
-			AbilitiesToGrant.AddItem( 'PistolShotsDealPoisonPassive' );
+			AbilitiesToGrant.AddItem( 'ILB_PistolShotsDealPoisonPassive' );
 		}
 	}
 
@@ -841,7 +839,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon')){
-			AbilitiesToGrant.AddItem( 'ILB_SmallerFlamethrower' );
+			AbilitiesToGrant.AddItem( 'ILB_PocketFlamer' );
 		}
 	}
 

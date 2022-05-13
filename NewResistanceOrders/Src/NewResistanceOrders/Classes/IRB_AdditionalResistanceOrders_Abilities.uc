@@ -39,9 +39,8 @@ var config int ROOKIE_COMBAT_HP_BONUS;
 static function array<X2DataTemplate> CreateTemplates()
 { 
 	local array<X2DataTemplate> Templates;
-
+	Templates.AddItem(ILBPocketFlamer());
 	Templates.AddItem(Rocketeer());
-	Templates.AddItem(PlusFlamerCharges());
 	Templates.AddItem(FreeFragGrenades());
 	Templates.AddItem(FreeSmokeGrenades());
 	Templates.AddItem(FreeUltrasonicLure());
@@ -53,7 +52,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(HazmatShielding());
 	Templates.AddItem(AddTurretHackabilityDebuff());
 	Templates.AddItem(RookieHpBuff());
-	Templates.AddItem(ExtraBurnDamageFromPromethiumSupplyLines());
+	Templates.AddItem(IncreaseFlamethrowerDamageAndCharges());
 	Templates.AddItem(ExtraMeleeDamage());
 	Templates.AddItem(PistolShotsDealPoisonPassive());
 	Templates.AddItem(AidProtocolRefund());
@@ -163,30 +162,18 @@ static function X2AbilityTemplate PlatedVestShielding()
 	return Template;
 }
 
-static function X2AbilityTemplate PlusFlamerCharges(){
-	local XMBEffect_AddAbilityCharges Effect;
-	local X2AbilityTemplate Template;
+static function array<name> GetNamesOfFlamethrowerAbilities(){
+	local array<name> AbilitiesList;
 
-	// Flamethrower abilities
-	Effect = new class'XMBEffect_AddAbilityCharges';
-	Effect.AbilityNames.AddItem('AdvPurifierFlamethrower');
-	Effect.AbilityNames.AddItem('LWFlamethrower');
-	Effect.AbilityNames.AddItem('FireMZPocketFlamethrower');
-	Effect.AbilityNames.AddItem('FlamethrowerMk2');
-	Effect.AbilityNames.AddItem('Flamethrower');
-	Effect.BonusCharges = 1;
-	Effect.bAllowUseAmmoAsCharges = true;
-
-	// The effect isn't an X2Effect_Persistent, so we can't use it as the effect for Passive(). Let
-	// Passive() create its own effect.
-	Template = Passive('ILB_PlusFlamerCharges', "img:///UILibrary_PerkIcons.UIPerk_command", true);
-
-	// Add the XMBEffect_AddItemCharges as an extra effect.
-	AddSecondaryEffect(Template, Effect);
-
-	return Template;
-
+	AbilitiesList.AddItem('AdvPurifierFlamethrower');
+	AbilitiesList.AddItem('LWFlamethrower');
+	AbilitiesList.AddItem('FireMZPocketFlamethrower');
+	AbilitiesList.AddItem('FlamethrowerMk2');
+	AbilitiesList.AddItem('Flamethrower');
+	return AbilitiesList;
 }
+
+
 
 // Perk name:		Rocketeer
 // Perk effect:		Your equipped heavy weapon gets an additional use.
@@ -212,20 +199,55 @@ static function X2AbilityTemplate Rocketeer()
 	return Template;
 }
 
-// Your frag grenades inflict Fire Weakness?  SOMETHING inflicts Fire Weakness?
-static function X2AbilityTemplate ExtraBurnDamageFromPromethiumSupplyLines()
+static function X2AbilityTemplate IncreaseFlamethrowerDamageAndCharges()
 {
-	local XMBEffect_BonusDamageByDamageType Effect;
+	local XMBEffect_ConditionalBonus Effect;
+	local XMBEffect_AddAbilityCharges SecondaryEffect;
+	local X2Condition_UnitProperty UnitPropertyCondition;
+	local XMBCondition_AbilityName AbilityNameCondition;
 	local X2AbilityTemplate Template;
-	local XMBEffect_AddUtilityItem ItemEffect;
+	Effect = new class'XMBEffect_ConditionalBonus';
+	Effect.AddDamageModifier(2);
 
-	// Create an effect that adds +1 damage to fire attacks and +1 damage to burn damage
-	Effect = new class'XMBEffect_BonusDamageByDamageType';
-	Effect.EffectName = 'Promethium Supply Chain';
-	Effect.RequiredDamageTypes.AddItem('fire');
-	Effect.DamageBonus = 1;
-	// Create the template using a helper function
-	Template = Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+	AbilityNameCondition = new class'XMBCondition_AbilityName';
+	AbilityNameCondition.IncludeAbilityNames = GetNamesOfFlamethrowerAbilities();
+	Effect.AbilityTargetConditions.AddItem(AbilityNameCondition);
+	
+	SecondaryEffect = new class'XMBEffect_AddAbilityCharges';
+	SecondaryEffect.AbilityNames = GetNamesOfFlamethrowerAbilities();
+	SecondaryEffect.BonusCharges = 1;
+	SecondaryEffect.bAllowUseAmmoAsCharges = true;
+
+
+	Template= Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", false, Effect);
+	AddSecondaryEffect(Template, SecondaryEffect);
+	return Template;
+}
+
+static function X2AbilityTemplate ILBPocketFlamer()
+{
+	local X2AbilityTemplate Template;
+	local MZ_Effect_AddSevenWeapon ItemEffect;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'ILB_PocketFlamer');
+	
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Neutral;
+	Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_flamethrower";
+
+	Template.AbilityToHitCalc = default.DeadEye;
+	Template.AbilityTargetStyle = default.SelfTarget;
+	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
+
+	ItemEffect = new class'MZ_Effect_AddSevenWeapon';
+	ItemEffect.DataName = 'IRB_SmallerFlamethrower';
+	ItemEffect.BaseCharges = 2;
+	ItemEffect.InvSlotEnum = eInvSlot_SeptenaryWeapon;
+	ItemEffect.BuildPersistentEffect(1, false, false, , eGameRule_PlayerTurnBegin); 
+	Template.AddTargetEffect(ItemEffect);
+
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 
 	return Template;
 }
@@ -274,7 +296,7 @@ static function X2AbilityTemplate ExtraMeleeDamage()
 static function X2AbilityTemplate PistolShotsDealPoisonPassive(){
 
 	local X2AbilityTemplate Template;
-	Template = Passive('PistolShotsDealPoisonPassive', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_PistolShotsDealPoisonPassive', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
 	return Template;
 }
 

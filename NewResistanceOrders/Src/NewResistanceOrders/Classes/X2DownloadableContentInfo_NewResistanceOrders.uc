@@ -167,7 +167,7 @@ static function UpdateAbilities()
 	AbilityManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 	// Poison Effect
 	AbilityCondition = new class'X2Condition_AbilityProperty';
-	AbilityCondition.OwnerHasSoldierAbilities.AddItem('PistolShotsDealPoisonPassive'); //PistolShotsDealPoisonPassive is the name of the ability
+	AbilityCondition.OwnerHasSoldierAbilities.AddItem('ILB_PistolShotsDealPoisonPassive'); //PistolShotsDealPoisonPassive is the name of the ability
 	PoisonEffect = class'X2StatusEffects'.static.CreatePoisonedStatusEffect();
 	PoisonEffect.EffectTickedFn = none;
 	PoisonEffect.TargetConditions.AddItem(AbilityCondition);
