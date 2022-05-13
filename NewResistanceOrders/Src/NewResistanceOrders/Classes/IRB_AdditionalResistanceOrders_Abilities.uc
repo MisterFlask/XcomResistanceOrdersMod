@@ -170,6 +170,8 @@ static function array<name> GetNamesOfFlamethrowerAbilities(){
 	AbilitiesList.AddItem('FireMZPocketFlamethrower');
 	AbilitiesList.AddItem('FlamethrowerMk2');
 	AbilitiesList.AddItem('Flamethrower');
+	AbilitiesList.AddItem('ILB_SmallerFlamethrower');
+
 	return AbilitiesList;
 }
 
@@ -206,8 +208,19 @@ static function X2AbilityTemplate IncreaseFlamethrowerDamageAndCharges()
 	local X2Condition_UnitProperty UnitPropertyCondition;
 	local XMBCondition_AbilityName AbilityNameCondition;
 	local X2AbilityTemplate Template;
+
+	local XMBEffect_ConditionalBonus EffectForChemthrowers;
+	local XMBCondition_WeaponName ConditionForChemthrowers;
+
+	EffectForChemthrowers = new class'XMBEffect_ConditionalBonus';
+	EffectForChemthrowers.AddDamageModifier(1);
+	
+	ConditionForChemthrowers = new class'XMBCondition_WeaponName';
+	ConditionForChemthrowers.IncludeWeaponNames.AddItem('chemthrower');
+	EffectForChemthrowers.AbilityTargetConditions.AddItem(ConditionForChemthrowers);
+
 	Effect = new class'XMBEffect_ConditionalBonus';
-	Effect.AddDamageModifier(2);
+	Effect.AddDamageModifier(1);
 
 	AbilityNameCondition = new class'XMBCondition_AbilityName';
 	AbilityNameCondition.IncludeAbilityNames = GetNamesOfFlamethrowerAbilities();
@@ -219,8 +232,11 @@ static function X2AbilityTemplate IncreaseFlamethrowerDamageAndCharges()
 	SecondaryEffect.bAllowUseAmmoAsCharges = true;
 
 
+
+
 	Template= Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", false, Effect);
 	AddSecondaryEffect(Template, SecondaryEffect);
+	AddSecondaryEffect(Template, EffectForChemthrowers);
 	return Template;
 }
 
@@ -231,6 +247,7 @@ static function X2AbilityTemplate ILBPocketFlamer()
 
 	`CREATE_X2ABILITY_TEMPLATE(Template, 'ILB_PocketFlamer');
 	
+	`LOG("Registering ability: grant small flamethrower");
 	Template.AbilitySourceName = 'eAbilitySource_Perk';
 	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
 	Template.Hostility = eHostility_Neutral;
@@ -241,7 +258,7 @@ static function X2AbilityTemplate ILBPocketFlamer()
 	Template.AbilityTriggers.AddItem(default.UnitPostBeginPlayTrigger);
 
 	ItemEffect = new class'MZ_Effect_AddSevenWeapon';
-	ItemEffect.DataName = 'IRB_SmallerFlamethrower';
+	ItemEffect.DataName = 'ILB_SmallerFlamethrower';
 	ItemEffect.BaseCharges = 2;
 	ItemEffect.InvSlotEnum = eInvSlot_SeptenaryWeapon;
 	ItemEffect.BuildPersistentEffect(1, false, false, , eGameRule_PlayerTurnBegin); 
@@ -469,7 +486,6 @@ static function X2AbilityTemplate ArcticEasyToHack()
 
 		ItemEffect = new class'XMBEffect_AddUtilityItem';
 		ItemEffect.DataName = 'UltrasonicLure';
-		ItemEffect.BaseCharges = 1;
 		// Create the template using a helper function
 		Template = Passive('ILB_FreeUltrasonicLure', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
 

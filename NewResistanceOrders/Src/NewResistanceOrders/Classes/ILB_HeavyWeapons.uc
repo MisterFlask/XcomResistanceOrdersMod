@@ -13,16 +13,15 @@ static function array<X2DataTemplate> CreateTemplates()
 //we're just copying the regular flamethrower template and making targeted edits, specifically to damage
 static function X2DataTemplate SmallerFlamethrower(){
 	local X2WeaponTemplate Template;
+	`LOG("Registering small flamethrower");
 	Template = class'X2Item_HeavyWeapons'.static.Flamethrower();
-
+	
+	Template.InventorySlot = eInvSlot_SeptenaryWeapon;
+	Template.StowedLocation = eSlot_HeavyWeapon;
 	Template.SetTemplateName('ILB_SmallerFlamethrower');
 	Template.BaseDamage = default.SMALLERFLAMETHROWER_BASEDAMAGE;
 	Template.RewardDecks.RemoveItem('ExperimentalHeavyWeaponRewards');
 	Template.Abilities.RemoveItem('Flamethrower');
-	Template.Abilities.AddItem('IRB_SmallerFlamethrower');
+	Template.Abilities.AddItem('ILB_SmallerFlamethrower');
 	return Template;
-}
-
-static function X2DataTemplate GrantAbilityForSmallerFlamethrower(){
-
 }

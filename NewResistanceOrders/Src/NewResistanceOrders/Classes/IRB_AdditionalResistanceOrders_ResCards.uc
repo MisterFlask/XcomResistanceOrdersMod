@@ -965,7 +965,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_Noisemaker');
 		Template.Category = "ResistanceCard";
-		Template.GetAbilitiesToGrantFn = GrantHeavyWeaponUseAndWalkFireIfSpark;
+		Template.GetAbilitiesToGrantFn = GrantNoisemakerIfGremlin;
 		return Template; 
 	}
 
@@ -1089,13 +1089,9 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 
-		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'bullpup'))
-		{
-			AbilitiesToGrant.AddItem( 'Shredder' );
-		}
-
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'wristblade'))
 		{
+			AbilitiesToGrant.AddItem( 'Shredder' );
 			AbilitiesToGrant.AddItem( 'TakeUnder' );
 		}
 	}

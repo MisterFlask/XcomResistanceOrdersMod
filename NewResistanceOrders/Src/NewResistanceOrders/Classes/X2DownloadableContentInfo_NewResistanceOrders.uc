@@ -156,6 +156,11 @@ static event InstallNewCampaign(XComGameState StartState)
 {
 }
 
+static event OnPostTemplatesCreated(){
+	`LOG("ILB:  Updating Abilities");
+	UpdateAbilities();
+}
+
 static function UpdateAbilities()
 {
 
@@ -172,7 +177,9 @@ static function UpdateAbilities()
 	PoisonEffect.EffectTickedFn = none;
 	PoisonEffect.TargetConditions.AddItem(AbilityCondition);
 
-	foreach default.PISTOL_SKILLS(AbilityName) {
+	foreach default.PISTOL_SKILLS(AbilityName) 
+	{
+		`LOG("adding poison effect to pistol skill " $ AbilityName);
 		PistolAbility = AbilityManager.FindAbilityTemplate(AbilityName);
 		if ( PistolAbility != none )
 		{
