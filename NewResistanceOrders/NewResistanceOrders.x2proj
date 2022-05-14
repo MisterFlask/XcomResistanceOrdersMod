@@ -22,6 +22,9 @@
     <Content Include="Config\XComGameData.ini">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Config\XComResCards.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Content\UILibrary_PolicyCards.upk">
       <SubType>Content</SubType>
     </Content>

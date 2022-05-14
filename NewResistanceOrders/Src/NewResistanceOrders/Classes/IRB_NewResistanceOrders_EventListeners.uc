@@ -1,4 +1,11 @@
-class IRB_NewResistanceOrders_EventListeners extends X2EventListener ;
+class IRB_NewResistanceOrders_EventListeners extends X2EventListener config(ResCards) ;
+
+var config int SOLDIER_COST_IN_SUPPLY;
+var config int SPIDER_SUIT_INTEL_COST;
+var config int EXO_SUIT_INTEL_COST;
+var config int FIVE_MEC_CORPSES_INTEL_COST;
+var config int HAZMAT_VEST_INTEL_COST;
+var config int PLATED_VEST_INTEL_COST;
 
 static function array<X2DataTemplate> CreateTemplates()
 {
@@ -88,11 +95,11 @@ static function EventListenerReturn BlackMarketResetListener(Object EventData, O
 	}
 	
 	if (IsResistanceOrderActive('ResCard_HaasBioroidContacts')){
-		AddItemToBlackMarket('CorpseAdventMEC', 5, 25, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('CorpseAdventMEC', 5, FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 
 	if(IsResistanceOrderActive('ResCard_SurpriseForSpiderOrWraithSuit')){
-		AddItemToBlackMarket('LightPlatedArmor', 1, 40, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('LightPlatedArmor', 1, SPIDER_SUIT_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 	
 	if (IsResistanceOrderActive('ResCard_MeatMarket')){
@@ -191,7 +198,7 @@ static function AddItemToBlackMarket(
 			ForSaleItem.RewardRef = RewardState.GetReference();
 
 			ForSaleItem.Title = RewardState.GetRewardString();
-			ForSaleItem.Cost = GetForSaleItemCostInSupply(70); // todo: move this to config
+			ForSaleItem.Cost = GetForSaleItemCostInSupply(default.SOLDIER_COST_IN_SUPPLY); // todo: move this to config
 			ForSaleItem.Desc = "The Meat Market giveth; and the Meat Market taketh away.";
 			ForSaleItem.Image = RewardState.GetRewardImage();
 			ForSaleItem.CostScalars = class'XComGameState_BlackMarket'.default.GoodsCostScalars;

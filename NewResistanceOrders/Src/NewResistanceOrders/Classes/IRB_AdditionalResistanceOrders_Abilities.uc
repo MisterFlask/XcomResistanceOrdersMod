@@ -7,6 +7,7 @@
 //---------------------------------------------------------------------------------------
 class IRB_AdditionalResistanceOrders_Abilities extends XMBAbility
 	config(Abilities);
+var config array<name> FLAMER_SKILLS;
 
 var config int ILB_PROMETHIUM_FIRE_DMG_BONUS;
 	
@@ -164,21 +165,7 @@ static function X2AbilityTemplate PlatedVestShielding()
 
 ///These are the abilities that benefit from Promethium Caches.
 static function array<name> GetNamesOfFlamethrowerAbilities(){
-	local array<name> AbilitiesList;
-
-	AbilitiesList.AddItem('AdvPurifierFlamethrower');
-	AbilitiesList.AddItem('LWFlamethrower');
-	AbilitiesList.AddItem('FireMZPocketFlamethrower');
-	AbilitiesList.AddItem('FlamethrowerMk2');
-	AbilitiesList.AddItem('Flamethrower');
-	AbilitiesList.AddItem('ILB_SmallerFlamethrower');
-
-	// now: chemthrower
-	AbilitiesList.AddItem('MZFireCanisterActivate');
-	AbilitiesList.AddItem('MZFireThrower');
-	AbilitiesList.AddItem('MZFireThrowerOverwatchShot');
-
-	return AbilitiesList;
+	return default.FLAMER_SKILLS;
 }
 
 
@@ -328,7 +315,7 @@ static function X2AbilityTemplate ShellbusterMobilityBuff()
 	local XMBEffect_AddUtilityItem ItemEffect;
 	
 	Effect = new class'X2Effect_PersistentStatChange';
-	Effect.EffectName = 'DawnMachines_Mobility';
+	Effect.EffectName = 'Shellbuster_mobility';
 
 	Effect.BuildPersistentEffect(1, true, false, false);
 	Effect.AddPersistentStatChange(eStat_Mobility, default.ILB_SHELLBUSTER_MOBILITY_BUFF);
@@ -347,11 +334,7 @@ static function X2AbilityTemplate AridFastUnit()
 	local X2Condition_MapProperty Condition;
 	
 	// Create a condition that only applies the stat change when in the Tundra biome
-	Condition = new class'X2Condition_MapProperty';
-	Condition.AllowedBiomes.AddItem("Arid");
 
-	// Add the condition to the stat change effect
-	Effect.TargetConditions.AddItem(Condition);
 
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_DawnMachines', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
@@ -359,6 +342,10 @@ static function X2AbilityTemplate AridFastUnit()
 	//DEFENSE
 	Effect = new class'X2Effect_PersistentStatChange';
 	Effect.EffectName = 'DawnMachines_Defense';
+	// Add the condition to the stat change effect
+	Condition = new class'X2Condition_MapProperty';
+	Condition.AllowedBiomes.AddItem("Arid");
+	Effect.TargetConditions.AddItem(Condition);
 
 	Effect.BuildPersistentEffect(1, true, false, false);
 
@@ -373,6 +360,10 @@ static function X2AbilityTemplate AridFastUnit()
 	Effect.EffectName = 'DawnMachines_Mobility';
 
 	Effect.BuildPersistentEffect(1, true, false, false);
+	// Add the condition to the stat change effect
+	Condition = new class'X2Condition_MapProperty';
+	Condition.AllowedBiomes.AddItem("Arid");
+	Effect.TargetConditions.AddItem(Condition);
 
 	Effect.AddPersistentStatChange(eStat_Mobility, default.ILB_DAWN_MACHINES_MOBILITY_BUFF);
 
