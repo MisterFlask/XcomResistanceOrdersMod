@@ -152,6 +152,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_BetterMelee');
 		Template.Category = "ResistanceCard";
+		Template.OnActivatedFn = ActivateStayWithMe;
+		Template.OnDeactivatedFn = DeactivateStayWithMe;
+
 		Template.GetAbilitiesToGrantFn = GrantMeleeWeaknessForLostAndVipers;
 		return Template; 
 	}
@@ -163,6 +166,16 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		}
 		AbilitiesToGrant.AddItem( 'ILB_AdditionalMeleeDamage' );
 
+	}
+	//---------------------------------------------------------------------------------------
+	static function ActivateStayWithMe(XComGameState NewGameState, StateObjectReference InRef, optional bool bReactivate = false)
+	{
+		AddSoldierUnlock(NewGameState, 'StayWithMeUnlock');
+	}
+	//---------------------------------------------------------------------------------------
+	static function DeactivateStayWithMe(XComGameState NewGameState, StateObjectReference InRef)
+	{
+		RemoveSoldierUnlock(NewGameState, 'StayWithMeUnlock');
 	}
 
 	static function X2DataTemplate CreateBloodPillarForPsi()
