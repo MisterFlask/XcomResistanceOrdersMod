@@ -193,7 +193,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
-		if (DoesSoldierHavePsiRating(UnitState) || DoesSoldierHaveSpecificItem(UnitState,'SustainingSphere') || DoesSoldierHaveArmorOfClass(UnitState,'templar'))
+		if (DoesSoldierHavePsiRating(UnitState) ||  DoesSoldierHaveArmorOfClass(UnitState,'templar'))
 		{
 			AbilitiesToGrant.AddItem( 'MZBloodPillar' );
 		}
