@@ -23,7 +23,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateMultitaskingForGremlinsTemplate());
 		Techs.AddItem(CreateSmokerForLaunchersTemplate());
 		Techs.AddItem(CreateCombatDrugsForMedikitTemplate());
-		Techs.AddItem(CreatePocketFlamerForCannonsTemplate());
+		//Techs.AddItem(CreatePocketFlamerForCannonsTemplate());
 		Techs.AddItem(CreateBattleSpaceForBattleScannersTemplate());
 		Techs.AddItem(CreatePistolGrantsEntrenchAbility());
 		Techs.AddItem(CreateHellishRebukeForTemplars());

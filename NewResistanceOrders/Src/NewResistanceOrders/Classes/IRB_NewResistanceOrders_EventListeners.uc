@@ -14,11 +14,11 @@ static function array<X2DataTemplate> CreateTemplates()
 
 static protected function X2EventListenerTemplate AddListenersForTech()
 {
-	local X2EventListenerTemplate Template;
+	local CHEventListenerTemplate Template;
 	`log("Registering Events: IRB_AdditionalResistanceOrders_ResCards");
 
-	`CREATE_X2TEMPLATE(class'X2EventListenerTemplate', Template, 'ILB_ListenersForTech');
-	Template.AddEvent('ResearchCompleted', OnResearchCompleted);
+	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForTech');
+	Template.AddCHEvent('ResearchCompleted', OnResearchCompleted, ELD_Immediate, 99);
 	Template.RegisterInStrategy = true;
 
 	`log("On research complete listener CREATED for IRB_AdditionalResistanceOrders_ResCards");

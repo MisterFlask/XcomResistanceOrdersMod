@@ -162,6 +162,7 @@ static function X2AbilityTemplate PlatedVestShielding()
 	return Template;
 }
 
+///These are the abilities that benefit from Promethium Caches.
 static function array<name> GetNamesOfFlamethrowerAbilities(){
 	local array<name> AbilitiesList;
 
@@ -171,6 +172,11 @@ static function array<name> GetNamesOfFlamethrowerAbilities(){
 	AbilitiesList.AddItem('FlamethrowerMk2');
 	AbilitiesList.AddItem('Flamethrower');
 	AbilitiesList.AddItem('ILB_SmallerFlamethrower');
+
+	// now: chemthrower
+	AbilitiesList.AddItem('MZFireCanisterActivate');
+	AbilitiesList.AddItem('MZFireThrower');
+	AbilitiesList.AddItem('MZFireThrowerOverwatchShot');
 
 	return AbilitiesList;
 }
@@ -230,8 +236,6 @@ static function X2AbilityTemplate IncreaseFlamethrowerDamageAndCharges()
 	SecondaryEffect.AbilityNames = GetNamesOfFlamethrowerAbilities();
 	SecondaryEffect.BonusCharges = 1;
 	SecondaryEffect.bAllowUseAmmoAsCharges = true;
-
-
 
 
 	Template= Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", false, Effect);

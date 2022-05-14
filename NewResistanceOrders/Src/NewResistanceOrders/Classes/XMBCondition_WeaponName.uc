@@ -33,6 +33,7 @@ event name CallAbilityMeetsCondition(XComGameState_Ability kAbility, XComGameSta
 
 	SourceWeapon = kAbility.GetSourceWeapon();
 	WeaponName = SourceWeapon.GetMyTemplateName();
+
 	if (bCheckAmmo)
 	{
 		AmmoTemplate = SourceWeapon.GetLoadedAmmoTemplate(kAbility);
