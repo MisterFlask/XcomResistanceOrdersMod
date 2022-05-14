@@ -87,19 +87,19 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 static function EventListenerReturn BlackMarketResetListener(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {
 	if (IsResistanceOrderActive('ResCard_SafetyFirst')){
-		AddItemToBlackMarket('PlatedVest', 1, 20, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('PlatedVest', 1, default.PLATED_VEST_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 	
 	if (IsResistanceOrderActive('ResCard_CleanupDetail')){
-		AddItemToBlackMarket('HazmatVest', 1, 20, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('HazmatVest', 1, default.HAZMAT_VEST_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 	
 	if (IsResistanceOrderActive('ResCard_HaasBioroidContacts')){
-		AddItemToBlackMarket('CorpseAdventMEC', 5, FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('CorpseAdventMEC', 5, default.FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 
 	if(IsResistanceOrderActive('ResCard_SurpriseForSpiderOrWraithSuit')){
-		AddItemToBlackMarket('LightPlatedArmor', 1, SPIDER_SUIT_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('LightPlatedArmor', 1, default.SPIDER_SUIT_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 	
 	if (IsResistanceOrderActive('ResCard_MeatMarket')){

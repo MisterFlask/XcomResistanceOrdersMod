@@ -82,7 +82,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	{
 		local X2StrategyCardTemplate Template;
 
-		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_HellishRebukeForTemplars');
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_AdditionalTemplarPower');
 		Template.Category = "ResistanceCard";
 		Template.GetAbilitiesToGrantFn = GrantTemplarMagicBuff;
 		return Template; 
@@ -1351,7 +1351,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		XComHQ.RemoveSoldierUnlockTemplate(UnlockTemplateName);
 	}
 
-	static function XComTeamSoldierSpawnTacticalStartModifier(name CharTemplateName, XComGameState StartState)
+	static function XComGameState_Unit XComTeamSoldierSpawnTacticalStartModifier(name CharTemplateName, XComGameState StartState)
 	{
 		local X2CharacterTemplate Template;
 		local XComGameState_Unit SoldierState;
@@ -1396,6 +1396,8 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		XComHQ.Squad.AddItem( SoldierState.GetReference() );
 		XComHQ.AllSquads[0].SquadMembers.AddItem( SoldierState.GetReference() );
+
+		return SoldierState;
 	}
 
 	static function bool IsSplitMission( XComGameState StartState )
