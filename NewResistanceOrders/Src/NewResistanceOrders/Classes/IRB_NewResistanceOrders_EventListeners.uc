@@ -62,14 +62,14 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 		return ELR_NoInterrupt;
 	}
 
-	DuplicateRewardFromProjectIfResOrderEnabled('EXOSuit', 'ResCard_GrndlContactsII', TechState, GameState);
+	DuplicateRewardFromProjectIfResOrderEnabled('EXOSuit', 'ResCard_ExoSuitDoubling', TechState, GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('SpiderSuit', 'ResCard_GlobalsecContacts', TechState, GameState);
-	DuplicateRewardFromProjectIfResOrderEnabled('WARSuit', 'ResCard_GrndlContactsII', TechState, GameState);
+	DuplicateRewardFromProjectIfResOrderEnabled('WARSuit', 'ResCard_ExoSuitDoubling', TechState, GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('WraithSuit', 'ResCard_GlobalsecContacts',  TechState,GameState);
 
-	DuplicateRewardFromProjectIfResOrderEnabled('ExperimentalAmmo', 'ResCard_GlobalsecContactsII', TechState, GameState);
-	DuplicateRewardFromProjectIfResOrderEnabled('AdvancedGrenades', 'ResCard_GrndlContacts',  TechState,GameState);
-	DuplicateRewardFromProjectIfResOrderEnabled('HeavyWeapons', 'ResCard_ArgusSecurityContacts',  TechState,GameState);
+	DuplicateRewardFromProjectIfResOrderEnabled('ExperimentalAmmo', 'ResCard_ExperimentalAmmoDoubling', TechState, GameState);
+	DuplicateRewardFromProjectIfResOrderEnabled('AdvancedGrenades', 'ResCard_ExperimentalGrenadeDoubling',  TechState,GameState);
+	DuplicateRewardFromProjectIfResOrderEnabled('HeavyWeapons', 'ResCard_ExperimentalHeavyWeaponDoubling',  TechState,GameState);
 	// ADVENT datapad decryption: What should it grant?  Just additional intel?
 
 	HandleHaasBioroidContacts(TechState.GetMyTemplateName(), TechState, GameState);

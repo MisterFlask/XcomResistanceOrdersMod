@@ -20,13 +20,13 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateHexhunterForMindshieldsTemplate());
 		Techs.AddItem(CreateNeedlepointBuffForPistolTemplate());
 		Techs.AddItem(CreateAntimimeticScalesForVestsTemplate());
-		Techs.AddItem(CreateMultitaskingForGremlinsTemplate());
+		Techs.AddItem(CreateFreeAidForGremlinsTemplate());
 		Techs.AddItem(CreateSmokerForLaunchersTemplate());
 		Techs.AddItem(CreateCombatDrugsForMedikitTemplate());
 		//Techs.AddItem(CreatePocketFlamerForCannonsTemplate());
 		Techs.AddItem(CreateBattleSpaceForBattleScannersTemplate());
-		Techs.AddItem(CreatePistolGrantsEntrenchAbility());
-		Techs.AddItem(CreateHellishRebukeForTemplars());
+		Techs.AddItem(CreateCannonGrantsEntrenchAbility());
+		Techs.AddItem(CreateTemplarMagicBuff());
 		Techs.AddItem(CreateSwordsAndKnivesGrantShellbustAbility());
 		Techs.AddItem(CreateGrantFirepowerForSparksTemplate());
 		Techs.AddItem(CreateGrenadeLauncherGrantsWatchThemRunTemplate());
@@ -43,10 +43,10 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		// The following are for doubling the effects of proving grounds/research projects
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_HaasBioroidContacts'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GlobalsecContacts'));
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GlobalsecContactsII'));
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GrndlContacts'));
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_GrndlContactsII'));
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ArgusSecurityContacts'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ExperimentalAmmoDoubling'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ExperimentalGrenadeDoubling'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ExoSuitDoubling'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ExperimentalHeavyWeaponDoubling'));
 
 		// Techs modifying missions generated; see the X2DownloadableContentInfo.
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_EyeForValue'));
@@ -65,10 +65,10 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem( GrantResistanceUnitAtCombatStartIfRetaliation());
 		Techs.AddItem( CreateGrantAdventUnitAtCombatStartIfLessThanFullSquad());
 		
-		Techs.AddItem(CreateGrantVipsFragGrenades());
+		Techs.AddItem(CreateGrantVipsGrenades());
 		Techs.AddItem(CreateColdWeatherHackDefenseDebuff());
-		Techs.AddItem(CreateMeleeWeaknessForLostAndVipers());
-		Techs.AddItem(CreateFireWeaknessForVipersAndSectoids());
+		Techs.AddItem(CreateGeneralMeleeBuff());
+		Techs.AddItem(CreateFlamethrowerBuffCard());
 		Techs.AddItem(CreateBloodPillarForPsi());
 		Techs.AddItem(CreatePracticalOccultism());
 		Techs.AddItem(CreateGrantRookiesPermaHp());
@@ -78,17 +78,17 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		return Techs;
 	}
 	
-	static function X2DataTemplate CreateHellishRebukeForTemplars()
+	static function X2DataTemplate CreateTemplarMagicBuff()
 	{
 		local X2StrategyCardTemplate Template;
 
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_HellishRebukeForTemplars');
 		Template.Category = "ResistanceCard";
-		Template.GetAbilitiesToGrantFn = GranHellishRebukeForTemplars;
+		Template.GetAbilitiesToGrantFn = GrantTemplarMagicBuff;
 		return Template; 
 	}
 
-	static function GranHellishRebukeForTemplars(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	static function GrantTemplarMagicBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
@@ -128,7 +128,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		}
 	}
 
-	static function X2DataTemplate CreateFireWeaknessForVipersAndSectoids()
+	static function X2DataTemplate CreateFlamethrowerBuffCard()
 	{
 		local X2StrategyCardTemplate Template;
 
@@ -146,7 +146,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		AbilitiesToGrant.AddItem( 'ILB_PromethiumFireDamageBonus' );
 	}
 
-	static function X2DataTemplate CreateMeleeWeaknessForLostAndVipers()
+	static function X2DataTemplate CreateGeneralMeleeBuff()
 	{
 		local X2StrategyCardTemplate Template;
 
@@ -155,11 +155,11 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Template.OnActivatedFn = ActivateStayWithMe;
 		Template.OnDeactivatedFn = DeactivateStayWithMe;
 
-		Template.GetAbilitiesToGrantFn = GrantMeleeWeaknessForLostAndVipers;
+		Template.GetAbilitiesToGrantFn = GrantGeneralMeleeBuff;
 		return Template; 
 	}
 
-	static function GrantMeleeWeaknessForLostAndVipers(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	static function GrantGeneralMeleeBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
@@ -306,7 +306,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		{
 			local X2StrategyCardTemplate Template;
 
-			`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_DawnMachines');
+			`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_MachineBuffsIfAridClimate');
 			Template.Category = "ResistanceCard";
 			Template.GetAbilitiesToGrantFn = GrantDawnMachines;
 			return Template; 
@@ -357,7 +357,7 @@ static function X2DataTemplate CreateGrantRookiesPermaHp()
 	}
 
 
-static function X2DataTemplate CreateGrantVipsFragGrenades()
+static function X2DataTemplate CreateGrantVipsGrenades()
 	{
 		local X2StrategyCardTemplate Template;
 
@@ -768,17 +768,17 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 	}
 
 	// multitasking for gremlins
-	static function X2DataTemplate CreateMultitaskingForGremlinsTemplate()
+	static function X2DataTemplate CreateFreeAidForGremlinsTemplate()
 	{
 		local X2StrategyCardTemplate Template;
 
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_MultitaskingForGremlins');
 		Template.Category = "ResistanceCard";
-		Template.GetAbilitiesToGrantFn = GrantMultitaskingIfGremlin;
+		Template.GetAbilitiesToGrantFn = GrantFreeAidIfGremlin;
 		return Template; 
 	}
 
-	static function  GrantMultitaskingIfGremlin(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	static function  GrantFreeAidIfGremlin(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{	
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
@@ -878,7 +878,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 	}
 
-	static function X2DataTemplate CreatePistolGrantsEntrenchAbility()
+	static function X2DataTemplate CreateCannonGrantsEntrenchAbility()
 	{
 		local X2StrategyCardTemplate Template;
 
