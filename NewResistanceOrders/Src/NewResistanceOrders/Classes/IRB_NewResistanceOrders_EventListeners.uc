@@ -75,7 +75,8 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 	DuplicateRewardFromProjectIfResOrderEnabled('WraithSuit', 'ResCard_GlobalsecContacts',  TechState,GameState);
 
 	DuplicateRewardFromProjectIfResOrderEnabled('ExperimentalAmmo', 'ResCard_ExperimentalAmmoDoubling', TechState, GameState);
-	DuplicateRewardFromProjectIfResOrderEnabled('AdvancedGrenades', 'ResCard_ExperimentalGrenadeDoubling',  TechState,GameState);
+	DuplicateRewardFromProjectIfResOrderEnabled('ExperimentalGrenade', 'ResCard_ExperimentalGrenadeDoubling',  TechState,GameState);
+	DuplicateRewardFromProjectIfResOrderEnabled('AdvancedGrenade', 'ResCard_ExperimentalGrenadeDoubling',  TechState,GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('HeavyWeapons', 'ResCard_ExperimentalHeavyWeaponDoubling',  TechState,GameState);
 	// ADVENT datapad decryption: What should it grant?  Just additional intel?
 
@@ -240,15 +241,16 @@ static function AddItemToBlackMarket(
 
 public static function HandleHaasBioroidContacts(name TechName, XComGameState_Tech TechData, XComGameState GameState)
 {
+	if (TechName != 'BuildSpark' && TechName != 'MechanizedWarfare'){
+		return;
+	}
+
 	if (!IsResistanceOrderActive('ResCard_HaasBioroidContacts')){
 		return;
 	}
 
-	if (TechName == 'BuildSpark' || TechName == 'MechanizedWarfare')
-	{
-		`log("Creating additional spark as per resistance order.");
-		class'X2StrategyElement_DLC_Day90Techs'.static.CreateSparkSoldier(GameState, TechData);
-	}
+	`log("Creating additional spark as per resistance order.");
+	class'X2StrategyElement_DLC_Day90Techs'.static.CreateSparkSoldier(GameState, TechData);
 }
 
 static function bool IsResistanceOrderActive(name ResistanceOrderName){
