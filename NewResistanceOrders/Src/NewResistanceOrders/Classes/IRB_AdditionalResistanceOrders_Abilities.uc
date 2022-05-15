@@ -81,7 +81,7 @@ static function X2AbilityTemplate AidProtocolRefund()
 	Effect.AbilityTargetConditions.AddItem(AbilityNameCondition);
 
 	// Create the template using a helper function
-	return Passive('ILB_AidProtocolRefund', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+	return Passive('ILB_AidProtocolRefund', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
 }
 
 
@@ -95,7 +95,7 @@ static function X2AbilityTemplate WitchHunterBuff()
 	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_WitchHunter', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_WitchHunter', "img:///UILibrary_PerkIcons.UIPerk_sectoid_mindspin", true, none);
 
 	// Create a persistent stat change effect
 	Effect = new class'ILB_X2Effect_WitchHunter';
@@ -119,7 +119,7 @@ static function X2AbilityTemplate HazmatShielding()
 	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_HazmatShielding', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_HazmatShielding', "img:///UILibrary_PerkIcons.UIPerk_item_nanofibervest", true, none);
 
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
@@ -144,7 +144,7 @@ static function X2AbilityTemplate PlatedVestShielding()
 	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_PlatedShielding', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_PlatedShielding',"img:///UILibrary_PerkIcons.UIPerk_item_nanofibervest", true, none);
 
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
@@ -186,7 +186,7 @@ static function X2AbilityTemplate Rocketeer()
 
 	// The effect isn't an X2Effect_Persistent, so we can't use it as the effect for Passive(). Let
 	// Passive() create its own effect.
-	Template = Passive('ILB_Rocketeer', "img:///UILibrary_PerkIcons.UIPerk_command", true);
+	Template = Passive('ILB_Rocketeer', "img:///UILibrary_PerkIcons.UIPerk_firerocket", true);
 
 	// Add the XMBEffect_AddItemCharges as an extra effect.
 	AddSecondaryEffect(Template, Effect);
@@ -225,7 +225,7 @@ static function X2AbilityTemplate IncreaseFlamethrowerDamageAndCharges()
 	SecondaryEffect.bAllowUseAmmoAsCharges = true;
 
 
-	Template= Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_command", false, Effect);
+	Template= Passive('ILB_PromethiumFireDamageBonus', "img:///UILibrary_PerkIcons.UIPerk_flamethrower", false, Effect);
 	AddSecondaryEffect(Template, SecondaryEffect);
 	AddSecondaryEffect(Template, EffectForChemthrowers);
 	return Template;
@@ -276,7 +276,7 @@ static function X2AbilityTemplate RookieHpBuff()
 
 	// Create a triggered ability that activates whenever the unit gets a kill
 	
-	Template = Passive('ILB_RookieHpBuff', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+	Template = Passive('ILB_RookieHpBuff', "img:///UILibrary_PerkIcons.UIPerk_fieldmedic", true, Effect);
 
 	return Template;
 }
@@ -296,7 +296,7 @@ static function X2AbilityTemplate ExtraMeleeDamage()
 	Effect.AbilityTargetConditions.AddItem(MeleeOnlyCondition);
 
 	// Create the template using a helper function
-	Template = Passive('ILB_AdditionalMeleeDamage', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+	Template = Passive('ILB_AdditionalMeleeDamage', "img:///UILibrary_PerkIcons.UIPerk_muton_punch", true, Effect);
 
 	return Template;
 }
@@ -304,7 +304,7 @@ static function X2AbilityTemplate ExtraMeleeDamage()
 static function X2AbilityTemplate PistolShotsDealPoisonPassive(){
 
 	local X2AbilityTemplate Template;
-	Template = Passive('ILB_PistolShotsDealPoisonPassive', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_PistolShotsDealPoisonPassive', "img:///UILibrary_PerkIcons.UIPerk_poisonspit", true, none);
 	return Template;
 }
 
@@ -337,7 +337,7 @@ static function X2AbilityTemplate AridFastUnit()
 
 
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_DawnMachines', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_DawnMachines',"img:///UILibrary_PerkIcons.UIPerk_andromedon_robotbattlesuit", true, none);
 
 	//DEFENSE
 	Effect = new class'X2Effect_PersistentStatChange';
@@ -386,7 +386,7 @@ static function X2AbilityTemplate EasyToHack()
 	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_EasyToHack', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_EasyToHack', "img:///UILibrary_PerkIcons.UIPerk_hack", true, none);
 
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
@@ -418,7 +418,7 @@ static function X2AbilityTemplate ArcticEasyToHack()
 	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
-	Template = Passive('ILB_EasyToHackInTundra', "img:///UILibrary_PerkIcons.UIPerk_command", true, none);
+	Template = Passive('ILB_EasyToHackInTundra', "img:///UILibrary_PerkIcons.UIPerk_hack", true, none);
 
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
