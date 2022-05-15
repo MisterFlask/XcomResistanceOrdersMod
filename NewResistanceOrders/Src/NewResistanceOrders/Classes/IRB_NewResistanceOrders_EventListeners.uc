@@ -151,7 +151,7 @@ static function AddItemToBlackMarket(
 	ForSaleItem.DiscountPercent = MarketState.GoodsCostPercentDiscount;
 
 	// Fill out the commodity (custom)
-	ForSaleItem.Title = ItemTemplate.GetItemFriendlyName(); // Get rid of the "1"
+	ForSaleItem.Title = string(NumToAdd) $ " " $ ItemTemplate.GetItemFriendlyName();
 	ForSaleItem.Desc = "Not generally available via the black market, but for a resourceful commander, such things are possible."; //todo: figure out localization
 	ForSaleItem.Cost = GetForSaleItemCost(Price); 
 

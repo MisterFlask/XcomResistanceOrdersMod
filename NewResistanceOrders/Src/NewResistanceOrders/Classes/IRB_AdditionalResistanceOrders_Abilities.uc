@@ -25,8 +25,8 @@ var config int ILB_HAZMAT_SHIELDS_BUFF;
 
 var config int ILB_WITCH_HUNTER_PASSIVE_DMG;
 
-var config int HACK_DEFENSE_DEBUFF;
-var config int HACK_DEFENSE_DEBUFF_TUNDRA;
+var config float HACK_DEFENSE_DEBUFF;
+var config float HACK_DEFENSE_DEBUFF_TUNDRA;
 
 var config int ILB_MELEE_DMG_BUFF;
 var config int ILB_VIP_SMOKES;
@@ -375,7 +375,7 @@ static function X2AbilityTemplate AridFastUnit()
 }
 
 
-// Perk name:		Aestas Exploit
+// Perk name:		Oberon Exploit
 // Perk effect:		-60 hack defense
 // Localized text:	"You gain <Ability:+Defense/> Defense and <Ability:+Mobility/> Mobility in cold climates."
 // Config:			(AbilityName="XMBExample_ArcticWarrior")
@@ -395,7 +395,7 @@ static function X2AbilityTemplate EasyToHack()
 	// The effect doesn't expire
 	Effect.BuildPersistentEffect(1, true, false, false);
 
-	Effect.AddPersistentStatChange(eStat_HackDefense, default.HACK_DEFENSE_DEBUFF);
+	Effect.AddPersistentStatChange(eStat_HackDefense, default.HACK_DEFENSE_DEBUFF, MODOP_PostMultiplication);
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.
@@ -427,8 +427,7 @@ static function X2AbilityTemplate ArcticEasyToHack()
 	// The effect doesn't expire
 	Effect.BuildPersistentEffect(1, true, false, false);
 
-	// The effect gives +10 Defense and +3 Mobility
-	Effect.AddPersistentStatChange(eStat_HackDefense, default.HACK_DEFENSE_DEBUFF);
+	Effect.AddPersistentStatChange(eStat_HackDefense, default.HACK_DEFENSE_DEBUFF, MODOP_PostMultiplication);
 
 	// Create a condition that only applies the stat change when in the Tundra biome
 	Condition = new class'X2Condition_MapProperty';
@@ -575,41 +574,4 @@ static function X2AbilityTemplate AddTurretHackabilityDebuff()
 	//  NOTE: No visualization on purpose!
 
 	return Template;
-}
-
-
-// Perk name:		Cutthroat
-// Perk effect:		Your melee attacks against biological enemies ignore their armor, have increased critical chance, and do additional critical damage.
-// Localized text:	"Your melee attacks against biological enemies ignore their armor, have a +<Ability:CUTTHROAT_BONUS_CRIT_CHANCE/> critical chance, and do +<Ability:CUTTHROAT_BONUS_CRIT_DAMAGE/> critical damage."
-// Config:			(AbilityName="LW2WotC_Cutthroat")
-static function X2AbilityTemplate Cutthroat()
-{
-	local XMBEffect_ConditionalBonus Effect;
-	local XMBCondition_AbilityProperty MeleeOnlyCondition;
-	local X2Condition_UnitProperty OrganicCondition;
-
-	// Create a conditional bonus
-	Effect = new class'XMBEffect_ConditionalBonus';
-
-    // The bonus adds critical hit chance
-	Effect.AddToHitModifier(default.ILB_CUTTHROAT_BONUS_CRIT_CHANCE, eHit_Crit);
-
-	// The bonus adds damage to critical hits
-	Effect.AddDamageModifier(default.ILB_CUTTHROAT_BONUS_CRIT_DAMAGE, eHit_Crit);
-
-    // The bonus ignores armor
-    Effect.AddArmorPiercingModifier(default.ILB_CUTTHROAT_BONUS_ARMOR_PIERCE);
-    
-	// Only melee attacks
-	MeleeOnlyCondition = new class'XMBCondition_AbilityProperty';
-	MeleeOnlyCondition.bRequireMelee = true;
-	Effect.AbilityTargetConditions.AddItem(MeleeOnlyCondition);
-	
-	// Only against organics
-	OrganicCondition = new class'X2Condition_UnitProperty';
-	OrganicCondition.ExcludeRobotic = true;
-	Effect.AbilityTargetConditions.AddItem(OrganicCondition);
-
-	// Create the template using a helper function
-	return Passive('ILB_LW2WotC_Cutthroat', "img:///UILibrary_LW_PerkPack.LW_AbilityCutthroat", false, Effect);
 }

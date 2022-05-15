@@ -288,13 +288,13 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		{
 			local X2StrategyCardTemplate Template;
 
-			`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_AestasExploit');
+			`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_OberonExploit');
 			Template.Category = "ResistanceCard";
-			Template.GetAbilitiesToGrantFn = GrantAestasExploit;
+			Template.GetAbilitiesToGrantFn = GrantOberonExploit;
 			return Template; 
 		}
 
-		static function GrantAestasExploit(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+		static function GrantOberonExploit(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 		{		
 			if (IsADVENTTurret(UnitState))
 			{
@@ -330,10 +330,14 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 	}
 
 	static function bool IsAdventMEC(XComGameState_Unit UnitState){
+
+		`LOG("Unit name: " $ UnitState.GetMyTemplateName() $ " ; is this a MEC?  " $ InStr(UnitState.GetMyTemplateName(), "MEC"));
 		return InStr(UnitState.GetMyTemplateName(), "MEC") >= 0; 
 	}
 
 	static function bool IsADVENTTurret(XComGameState_Unit UnitState){
+		`LOG("Unit name: " $ UnitState.GetMyTemplateName() $ " ; is this a Turret?  " $ InStr(UnitState.GetMyTemplateName(), "Turret"));
+
 		return InStr(UnitState.GetMyTemplateName(), "Turret") >= 0; 
 	}
 	
@@ -350,6 +354,9 @@ static function X2DataTemplate CreateGrantRookiesPermaHp()
 
 	static function GrantRookiesPermaHp(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
 		if (IsRookie(UnitState)) // Rookies always get the hp buff
 		{
 			AbilitiesToGrant.AddItem( 'ILB_RookieHpBuff' ); 
