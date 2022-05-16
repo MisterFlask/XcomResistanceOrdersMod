@@ -94,13 +94,17 @@ static function EventListenerReturn BlackMarketResetListener(Object EventData, O
 	if (IsResistanceOrderActive('ResCard_CleanupDetail')){
 		AddItemToBlackMarket('HazmatVest', 1, default.HAZMAT_VEST_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
-	
-	if (IsResistanceOrderActive('ResCard_HaasBioroidContacts')){
-		AddItemToBlackMarket('CorpseAdventMEC', 5, default.FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
-	}
 
 	if(IsResistanceOrderActive('ResCard_SurpriseForSpiderOrWraithSuit')){
 		AddItemToBlackMarket('LightPlatedArmor', 1, default.SPIDER_SUIT_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
+	}
+	
+	if (IsResistanceOrderActive('ResCard_FirepowerForSparks')){
+		AddItemToBlackMarket('CorpseAdventMEC', 5, default.FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
+	}
+
+	if (IsResistanceOrderActive('ResCard_MachineBuffsIfAridClimate')){
+		AddItemToBlackMarket('CorpseAdventMEC', 5, default.FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 	
 	if (IsResistanceOrderActive('ResCard_MeatMarket')){
