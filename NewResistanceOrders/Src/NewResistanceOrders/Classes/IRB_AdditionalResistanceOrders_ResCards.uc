@@ -15,6 +15,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		
 		// Templates of the form "if condition X, grant soldier perk Y"
 		Techs.AddItem(CreateTunnelRatsTemplate());
+		Techs.AddItem(CreateForgedPapersTemplate());
 		Techs.AddItem(CreateMedikitQuickpatchTemplate());
 		Techs.AddItem(CreateFlashpointForGrenadiersTemplate());
 		Techs.AddItem(CreateHexhunterForMindshieldsTemplate());
@@ -39,6 +40,9 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateBasiliskDoctrine());
 		Techs.AddItem(CreateNoisemakerTemplate()); // will re-add after replacing the Shadow ops perk pack.
 		
+		Techs.AddItem(CreateMindtakerProtocol());
+		Techs.AddItem(CreateSolShells());
+
 		// There are event listeners attached to the names of these next ones, so they don't intrinsically do anything.
 		// The following are for doubling the effects of proving grounds/research projects
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_HaasBioroidContacts'));
@@ -78,6 +82,28 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		return Techs;
 	}
 	
+	static function X2DataTemplate CreateCityTravelPapersTemplate()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_ForgedPapers');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantCityTravelPapers;
+		return Template; 
+	}
+
+	static function GrantCityTravelPapers(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if (IsPlotType("CityCenter") || IsPlotType("SmallTown"))
+		{	
+			AbilitiesToGrant.AddItem( 'Stealth' ); 
+		}
+	}
+
 	static function X2DataTemplate CreateTemplarMagicBuff()
 	{
 		local X2StrategyCardTemplate Template;
@@ -101,6 +127,50 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			//AbilitiesToGrant.AddItem('MZAbyssalPistolShot'); // doesn't work with autopistol
 			AbilitiesToGrant.AddItem( 'MZForkedLightning' );
 
+		}
+	}
+	static function X2DataTemplate CreateMindtakerProtocol()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_Mindtaker');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantMindtakerProtocol;
+		return Template; 
+	}
+
+	static function GrantMindtakerProtocol(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'skulljack'))
+		{
+			Abilities.AddItem('Interrogator');
+			Abilities.AddItem('Failsafe');
+		}
+	}
+	
+	static function X2DataTemplate CreateSolShells()
+	{
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_SolShells');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantSolShells;
+		return Template; 
+	}
+
+	static function GrantSolShells(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+
+		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'shotgun'))
+		{
+			Abilities.AddItem('GrimyGrapeShot');
 		}
 	}
 	

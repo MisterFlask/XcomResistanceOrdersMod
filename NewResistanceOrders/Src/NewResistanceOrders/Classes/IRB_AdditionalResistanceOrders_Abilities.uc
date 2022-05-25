@@ -371,6 +371,14 @@ static function X2AbilityTemplate AridFastUnit()
 	// of battle, but only if it meets the condition.
 	AddSecondaryEffect(Template, Effect);
 	
+
+	/// Now: Evergreen +4 shielding
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'DawnMachines_Mobility';
+	Effect.AddPersistentStatChange(eStat_ShieldHP, default.ILB_DAWN_MACHINES_SHIELDS_BUFF);
+	
+	AddSecondaryEffect(Template, Effect);
+
 	return Template;
 }
 
