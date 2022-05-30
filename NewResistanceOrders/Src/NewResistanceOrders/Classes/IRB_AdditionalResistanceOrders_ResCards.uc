@@ -59,6 +59,14 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BigDamnHeroes'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BureaucraticInfighting'));
 
+		// now, blank resistance orders that affect mission rewards
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_PowerCellRepurposing'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_SupplyRaidsForHacks'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_EducatedVandalism'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_IncitePowerVacuum'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_YouOweMe'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_MassivePopularity'));
+
 		// Black market techs
 		Techs.AddItem(CreateVisceraCleanupDetail());
 		Techs.AddItem(CreateSafetyFirst());
