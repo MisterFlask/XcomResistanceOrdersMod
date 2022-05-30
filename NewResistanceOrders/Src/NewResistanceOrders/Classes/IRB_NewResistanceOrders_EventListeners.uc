@@ -13,25 +13,29 @@ static function array<X2DataTemplate> CreateTemplates()
 	`log("Registering Events template: IRB_AdditionalResistanceOrders_ResCards");
 
 
-	Templates.AddItem( AddListenersForTech() );
+	Templates.AddItem( AddStrategyListeners() );
 	Templates.AddItem( AddListenersForBlackMarketReset() ); // handling this via UI State Listener instead
 
 	return Templates;
 }
 
-static protected function X2EventListenerTemplate AddListenersForTech()
+static protected function X2EventListenerTemplate AddStrategyListeners()
 {
 	local CHEventListenerTemplate Template;
 	`log("Registering Events: IRB_AdditionalResistanceOrders_ResCards");
 
 	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForTech');
 	Template.AddCHEvent('ResearchCompleted', OnResearchCompleted, ELD_Immediate, 99);
+	//Template.AddCHEvent('AfterActionModifyRecoveredLoot', AfterActionModifyRecoveredLoot, ELD_Immediate, 99);
+
 	Template.RegisterInStrategy = true;
 
 	`log("On research complete listener CREATED for IRB_AdditionalResistanceOrders_ResCards");
 
 	return Template;
 }
+
+
 
 static protected function X2EventListenerTemplate AddListenersForBlackMarketReset()
 {
@@ -78,6 +82,7 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 	DuplicateRewardFromProjectIfResOrderEnabled('ExperimentalGrenade', 'ResCard_ExperimentalGrenadeDoubling',  TechState,GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('AdvancedGrenade', 'ResCard_ExperimentalGrenadeDoubling',  TechState,GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('HeavyWeapons', 'ResCard_ExperimentalHeavyWeaponDoubling',  TechState,GameState);
+	DuplicateRewardFromProjectIfResOrderEnabled('Skulljack', 'ResCard_Mindtaker',  TechState,GameState);
 	// ADVENT datapad decryption: What should it grant?  Just additional intel?
 
 	HandleHaasBioroidContacts(TechState.GetMyTemplateName(), TechState, GameState);

@@ -60,6 +60,7 @@ static function array<X2DataTemplate> CreateTemplates()
 
 	return Templates;
 }
+
 static function X2AbilityTemplate AidProtocolRefund()
 {
 	local XMBEffect_AbilityCostRefund Effect;
@@ -583,3 +584,22 @@ static function X2AbilityTemplate AddTurretHackabilityDebuff()
 
 	return Template;
 }
+
+/*
+static function X2AbilityTemplate IncreaseTeamworkCharges()
+{
+	local XMBEffect_ConditionalBonus Effect;
+	local X2Condition_UnitProperty UnitPropertyCondition;
+	local X2AbilityTemplate Template;
+
+	Effect = new class'XMBEffect_AddAbilityCharges';
+	Effect.AbilityNames.AddItem('BondmateTeamwork');
+	Effect.AbilityNames.AddItem('BondmateTeamwork_Improved');
+	Effect.BonusCharges = 1;
+	Effect.bAllowUseAmmoAsCharges = true;
+
+	Template = Passive('ILB_MoreChargesForTeamwork', "img:///UILibrary_PerkIcons.UIPerk_flamethrower", false, Effect);
+	AddSecondaryEffect(Template, SecondaryEffect);
+	return Template;
+}
+*/

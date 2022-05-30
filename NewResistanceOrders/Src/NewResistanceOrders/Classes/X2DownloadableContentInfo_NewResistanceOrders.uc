@@ -226,8 +226,21 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'Retaliation', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ProtectDevice', GeneratedMission);//todo: double check sitrep ID
 
-		// MissionState = XComGameState_MissionSite(SourceObject);
+		MissionState = XComGameState_MissionSite(SourceObject);
 		
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_SupplyRaid', 'ResCard_SendInTheNextWave', 'Hack'); // hack missions generate a supply raid on successful completion.
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'Neutralize'); // Neutralize missions decrease the Doom Counter by seven days.
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Grenade', 'ResCard_SendInTheNextWave', 'SecureUFO'); // Reward_HeavyWeapon and Reward_AvengerResComms/Reward_AvengerPower/Reward_Grenade for hitting landed UFOs
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'DestroyObject');
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'NeutralizeFieldCommander'); //Reward_AvengerResComms
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'Recover'); // Reward_AvengerPower
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'ProtectDevice');
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'SabotageTransmitter');
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'Recover');
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'Rescue'); // Reward_ReducedContact
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_SendInTheNextWave', 'Extract'); // Reward_ReducedContact
+
+
 		/*
 		//Ugh.
 		if (IRB_NewResistanceOrders_EventListeners.static.IsResistanceOrderActive('ResCard_TheOnesWhoKnock'))
@@ -277,35 +290,47 @@ name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMissio
 		`LOG("Mission family needed to have been " $ RequiredMissionFamily $ " for " $ ResCard $ " but was " $ GeneratedMission.Mission.MissionFamily);
 	}
 }
-/*
-static function AddRewardsToMissionState(XComGameState_MissionSite MissionState, name RewardId)
+
+//AlienDataPad 
+static function AddRewardsToMissionFamilyIfResistanceCardActive(XComGameState_MissionSite MissionState, GeneratedMissionData GeneratedMission, name RewardId, name ResCard, name RequiredMissionFamily)
 {
 	local XComGameState_Reward RewardState;
 	local X2RewardTemplate RewardTemplate;
 	local XComGameState_HeadquartersResistance ResHQ;
 	local X2StrategyElementTemplateManager TemplateManager;
-	local XComGameState AddToGameState;
+	local XComGameState NewGameState;
 
-	AddToGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
 	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
-
-	RewardTemplate = X2RewardTemplate(TemplateManager.FindStrategyElementTemplate(RewardId));
-
-	if (RewardTemplate != none)
-	{		
-		RewardState = RewardTemplate.CreateInstanceFromTemplate(AddToGameState);
-		RewardState.GenerateReward(NewGameState, ResHQ.GetMissionResourceRewardScalar(RewardState)); //ignoring regionref
-		MissionState.Rewards.AddItem(RewardState.GetReference());
-	}
-	else
+	
+	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
-		`Log("Can't find reward template!  " $ RewardId)
+		if (string(RequiredMissionFamily) == GeneratedMission.Mission.MissionFamily)
+		{
+			`LOG("Resistance card IS active for current mission: " $ ResCard $ "  | "  $ RequiredMissionFamily);
+			
+			RewardTemplate = X2RewardTemplate(TemplateManager.FindStrategyElementTemplate(RewardId));
+
+			if (RewardTemplate != none)
+			{		
+				RewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
+				RewardState.Quantity = 1;
+				RewardState.GenerateReward(NewGameState, ResHQ.GetMissionResourceRewardScalar(RewardState)); //ignoring regionref
+				MissionState.Rewards.AddItem(RewardState.GetReference());
+			}
+			else
+			{
+				`Log("Can't find reward template!  " $ RewardId);
+			}
+
+			`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
+			
+			return;
+		}
+		`LOG("Mission family needed to have been " $ RequiredMissionFamily $ " for " $ ResCard $ " but was " $ GeneratedMission.Mission.MissionFamily);
 	}
 
-	`XCOMGAME.GameRuleset.SubmitGameState(AddToGameState);
-	//History.CleanupPendingGameState(AddToGameState);
-
+	`XCOMHISTORY.CleanupPendingGameState(NewGameState);
 
 }
-*/

@@ -15,7 +15,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		
 		// Templates of the form "if condition X, grant soldier perk Y"
 		Techs.AddItem(CreateTunnelRatsTemplate());
-		Techs.AddItem(CreateForgedPapersTemplate());
+		Techs.AddItem(CreateCityTravelPapersTemplate());
 		Techs.AddItem(CreateMedikitQuickpatchTemplate());
 		Techs.AddItem(CreateFlashpointForGrenadiersTemplate());
 		Techs.AddItem(CreateHexhunterForMindshieldsTemplate());
@@ -147,8 +147,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'skulljack'))
 		{
-			Abilities.AddItem('Interrogator');
-			Abilities.AddItem('Failsafe');
+			AbilitiesToGrant.AddItem('Interrogator');
 		}
 	}
 	
@@ -170,7 +169,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'shotgun'))
 		{
-			Abilities.AddItem('GrimyGrapeShot');
+			AbilitiesToGrant.AddItem('GrimyGrapeShot');
 		}
 	}
 	
@@ -1139,6 +1138,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sniper_rifle') )
 		{
 			AbilitiesToGrant.AddItem( 'LongWatch' );
+			AbilitiesToGrant.AddItem( 'Sentinel' );
 		}
 	}
 	static function X2DataTemplate CreateHunterProtocolForAssaultAndBattlescanners()
@@ -1179,7 +1179,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 
-		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'wristblade'))
+		if(DoesSoldierHaveArmorOfClass(UnitState, 'skirmisher'))
 		{
 			AbilitiesToGrant.AddItem( 'Shredder' );
 			AbilitiesToGrant.AddItem( 'TakeUnder' );
