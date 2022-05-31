@@ -108,6 +108,9 @@ Also, Mitzruti’s Perk Pack, the ABB Perk Pack, and Favid’s Extended Perk Pac
     <Content Include="Src\NewResistanceOrders\Classes\ILB_HeavyWeapons.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_Reward_Squaddie.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_X2Effect_WitchHunter.uc">
       <SubType>Content</SubType>
     </Content>

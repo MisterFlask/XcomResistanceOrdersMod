@@ -233,12 +233,12 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_IncitePowerVacuum', 'Neutralize', 336); //336=2 weeks
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_AvengerPower', 'ResCard_PowerCellRepurposing', 'SecureUFO', 2); // Reward_HeavyWeapon/Reward_Grenade for hitting landed UFOs [Skirm] [include SupplyLineRaid]
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_HeavyWeapon', 'ResCard_PowerCellRepurposing', 'SecureUFO', 1); // Reward_HeavyWeapon/Reward_Grenade for hitting landed UFOs [Skirm] [include SupplyLineRaid]
-		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Alloys', 'ResCard_EducatedVandalism', 'DestroyObject', 20); // Reward_Alloys : Educated Vandalism (skirms) [include SabotageTransmitter]
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Alloys', 'ResCard_EducatedVandalism', 'DestroyObject', 15); // Reward_Alloys : Educated Vandalism (skirms) [include SabotageTransmitter]
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_IncitePowerVacuum', 'NeutralizeFieldCommander', 336); //Reward_AvengerResComms [reaper]
-		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Alloys', 'ResCard_EducatedVandalism', 'SabotageTransmitter', 20);
-		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_AvengerResComms', 'ResCard_YouOweMe', 'Extract', 2); // Reward_ReducedContact
-		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Soldier', 'ResCard_MassivePopularity', 'Terror', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
-		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Soldier', 'ResCard_MassivePopularity', 'ChosenRetaliation', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Alloys', 'ResCard_EducatedVandalism', 'SabotageTransmitter', 15);
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_AvengerResComms', 'ResCard_YouOweMe', 'Extract', 1); // Reward_ReducedContact
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'ILB_Reward_Squaddie', 'ResCard_MassivePopularity', 'Terror', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'ILB_Reward_Squaddie', 'ResCard_MassivePopularity', 'ChosenRetaliation', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 
 
 		/*
