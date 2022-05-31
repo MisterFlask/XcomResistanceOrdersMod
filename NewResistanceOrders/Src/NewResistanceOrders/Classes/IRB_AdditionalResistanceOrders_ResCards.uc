@@ -66,6 +66,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_IncitePowerVacuum'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_YouOweMe'));
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_MassivePopularity'));
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_StolenShippingSchedules'));
 
 		// Black market techs
 		Techs.AddItem(CreateVisceraCleanupDetail());

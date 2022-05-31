@@ -239,6 +239,8 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_AvengerResComms', 'ResCard_YouOweMe', 'Extract', 1); // Reward_ReducedContact
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'ILB_Reward_Squaddie', 'ResCard_MassivePopularity', 'Terror', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'ILB_Reward_Squaddie', 'ResCard_MassivePopularity', 'ChosenRetaliation', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Ammo', 'ResCard_StolenShippingSchedules', 'SupplyLineRaid', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Supply', 'ResCard_StolenShippingSchedules', 'SupplyLineRaid', 100); // Retaliation/terror missions grant an additional soldier when successfully completed.
 
 
 		/*
