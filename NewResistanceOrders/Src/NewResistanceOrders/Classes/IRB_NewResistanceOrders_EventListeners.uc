@@ -82,7 +82,7 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 	DuplicateRewardFromProjectIfResOrderEnabled('ExperimentalGrenade', 'ResCard_ExperimentalGrenadeDoubling',  TechState,GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('AdvancedGrenade', 'ResCard_ExperimentalGrenadeDoubling',  TechState,GameState);
 	DuplicateRewardFromProjectIfResOrderEnabled('HeavyWeapons', 'ResCard_ExperimentalHeavyWeaponDoubling',  TechState,GameState);
-	DuplicateRewardFromProjectIfResOrderEnabled('Skulljack', 'ResCard_Mindtaker',  TechState,GameState);
+	// DuplicateRewardFromProjectIfResOrderEnabled('Skulljack', 'ResCard_Mindtaker',  TechState,GameState);
 	// ADVENT datapad decryption: What should it grant?  Just additional intel?
 
 	HandleHaasBioroidContacts(TechState.GetMyTemplateName(), TechState, GameState);

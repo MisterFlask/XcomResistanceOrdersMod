@@ -130,7 +130,6 @@ static function X2AbilityTemplate HazmatShielding()
 	Effect.BuildPersistentEffect(1, true, false, false);
 
 	Effect.AddPersistentStatChange(eStat_ShieldHP, default.ILB_HAZMAT_SHIELDS_BUFF);
-
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.
 	AddSecondaryEffect(Template, Effect);
@@ -146,7 +145,7 @@ static function X2AbilityTemplate PlatedVestShielding()
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_PlatedShielding',"img:///UILibrary_PerkIcons.UIPerk_item_nanofibervest", true, none);
-
+	
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
 	Effect.EffectName = 'PlatedVestShielding';
@@ -188,6 +187,7 @@ static function X2AbilityTemplate Rocketeer()
 	// The effect isn't an X2Effect_Persistent, so we can't use it as the effect for Passive(). Let
 	// Passive() create its own effect.
 	Template = Passive('ILB_Rocketeer', "img:///UILibrary_PerkIcons.UIPerk_firerocket", true);
+	Template.Hostility = eHostility_Neutral;
 
 	// Add the XMBEffect_AddItemCharges as an extra effect.
 	AddSecondaryEffect(Template, Effect);
@@ -375,7 +375,7 @@ static function X2AbilityTemplate AridFastUnit()
 
 	/// Now: Evergreen +4 shielding
 	Effect = new class'X2Effect_PersistentStatChange';
-	Effect.EffectName = 'DawnMachines_Mobility';
+	Effect.EffectName = 'DawnMachines_Shield_Evergreen';
 	Effect.AddPersistentStatChange(eStat_ShieldHP, default.ILB_DAWN_MACHINES_SHIELDS_BUFF);
 	
 	AddSecondaryEffect(Template, Effect);
@@ -400,6 +400,7 @@ static function X2AbilityTemplate EasyToHack()
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
 	Effect.EffectName = 'EasyToHack';
+	Effect.BuffCategory = ePerkBuff_Penalty;
 
 	// The effect doesn't expire
 	Effect.BuildPersistentEffect(1, true, false, false);
@@ -428,9 +429,9 @@ static function X2AbilityTemplate ArcticEasyToHack()
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_EasyToHackInTundra', "img:///UILibrary_PerkIcons.UIPerk_hack", true, none);
-
 	// Create a persistent stat change effect
 	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.BuffCategory = ePerkBuff_Penalty;
 	Effect.EffectName = 'ArcticEasyToHack';
 
 	// The effect doesn't expire

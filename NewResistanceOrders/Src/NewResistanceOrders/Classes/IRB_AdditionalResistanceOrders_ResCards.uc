@@ -150,7 +150,11 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 
 	static function GrantMindtakerProtocol(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
-		if (UnitState.GetTeam() != eTeam_XCom){
+		if (UnitState.GetTeam() != eTeam_XCom)
+		{
+			if (!UnitState.IsRobotic()){
+				AbilitiesToGrant.AddItem('ILB_EasyToHack');
+			}
 			return;
 		}
 
