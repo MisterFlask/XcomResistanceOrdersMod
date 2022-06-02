@@ -228,19 +228,29 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 
 		MissionState = XComGameState_MissionSite(SourceObject);
 		
-		//Reward_TechRush
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Intel', 'ResCard_BureaucraticInfighting', 'Recover', 30); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
+
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Supplies', 'ResCard_YouOweMe', 'Extract', 50); 
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_AvengerResComms', 'ResCard_YouOweMe', 'SwarmDefense', 1); // Reward_ReducedContact
+
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_TechRush', 'ResCard_TechRushForHacks', 'Hack', 1); 
+
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Intel', 'ResCard_SupplyRaidsForHacks', 'Hack', 30); 
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_SupplyRaid', 'ResCard_SupplyRaidsForHacks', 'Hack', 1); 
+		
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_IncitePowerVacuum', 'Neutralize', 336); //336 hours =2 weeks
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_IncitePowerVacuum', 'NeutralizeFieldCommander', 336); //Reward_AvengerResComms [reaper]
+
+		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Elereum', 'ResCard_PowerCellRepurposing', 'DestroyDevice', 15); 
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_AvengerPower', 'ResCard_PowerCellRepurposing', 'SecureUFO', 2); // Reward_HeavyWeapon/Reward_Grenade for hitting landed UFOs [Skirm] [include SupplyLineRaid]
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_HeavyWeapon', 'ResCard_PowerCellRepurposing', 'SecureUFO', 1); // Reward_HeavyWeapon/Reward_Grenade for hitting landed UFOs [Skirm] [include SupplyLineRaid]
+
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Alloys', 'ResCard_EducatedVandalism', 'DestroyObject', 15); // Reward_Alloys : Educated Vandalism (skirms) [include SabotageTransmitter]
-		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_IncitePowerVacuum', 'NeutralizeFieldCommander', 336); //Reward_AvengerResComms [reaper]
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Alloys', 'ResCard_EducatedVandalism', 'SabotageTransmitter', 15);
-		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_AvengerResComms', 'ResCard_YouOweMe', 'SwarmDefense', 1); // Reward_ReducedContact
+
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'ILB_Reward_Squaddie', 'ResCard_MassivePopularity', 'Terror', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'ILB_Reward_Squaddie', 'ResCard_MassivePopularity', 'ChosenRetaliation', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
+		
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Ammo', 'ResCard_StolenShippingSchedules', 'SupplyLineRaid', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Grenade', 'ResCard_StolenShippingSchedules', 'SupplyLineRaid', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 
