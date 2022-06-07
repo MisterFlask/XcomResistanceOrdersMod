@@ -262,6 +262,67 @@ public static function HandleHaasBioroidContacts(name TechName, XComGameState_Te
 	class'X2StrategyElement_DLC_Day90Techs'.static.CreateSparkSoldier(GameState, TechData);
 }
 
+static function int NumReaperCardsActive(){
+	return NumCardsActiveOfFaction('Faction_Reapers');
+}
+static function int NumTemplarCardsActive(){
+	return NumCardsActiveOfFaction('Faction_Templars');
+}
+static function int NumSkirmisherCardsActive(){
+	return NumCardsActiveOfFaction('Faction_Skirmishers');
+}
+
+static function int NumCardsActiveOfFaction(name FactionName){
+	local XComGameState_StrategyCard CardState;
+	local StateObjectReference CardRef;
+	local bool bCardPlayed;
+	local XComGameStateHistory History;
+	local XComGameState_ResistanceFaction FactionState;
+	local XComGameState NewGameState;
+	local array<Name> ExclusionList;
+	local int FactionCardsFound;
+	
+	local XComGameState_HeadquartersResistance ResHQ;
+
+	FactionCardsFound=0;
+	History = `XCOMHISTORY;
+	`Log("Checking over every single resistance faction to see if it's the one we want; looking for: " $ FactionName);
+	// go over each card active for each faction
+	
+	ResHQ = GetResistanceHQ();
+
+	// First, going over faction-agnostic card slots
+	foreach ResHQ.WildCardSlots(CardRef)
+	{
+		if(CardRef.ObjectID != 0)
+		{
+			CardState = XComGameState_StrategyCard(History.GetGameStateForObjectID(CardRef.ObjectID));
+			if (CardState.GetMyTemplate().AssociatedEntity == FactionName){
+				FactionCardsFound++;
+			}
+		}
+	}
+
+	foreach History.IterateByClassType(class'XComGameState_ResistanceFaction', FactionState)
+	{
+		`Log("Checking over every single order in this faction to see if it's the one we want: " $ FactionState.GetMyTemplateName());
+
+		// for each faction checking each card slot in turn
+		foreach FactionState.CardSlots(CardRef)
+		{
+			if(CardRef.ObjectID != 0)
+			{
+				CardState = XComGameState_StrategyCard(History.GetGameStateForObjectID(CardRef.ObjectID));
+				if (CardState.GetMyTemplate().AssociatedEntity == FactionName){
+					FactionCardsFound++;
+				}
+			}
+		}
+	}
+
+	return FactionCardsFound;
+}
+
 static function bool IsResistanceOrderActive(name ResistanceOrderName){
 	local XComGameState_StrategyCard CardState;
 	local StateObjectReference CardRef;
