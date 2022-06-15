@@ -107,8 +107,12 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			return;
 		}
 
-		if (IsPlotType("CityCenter") || IsPlotType("SmallTown"))
+		if (IsPlotType("SmallTown"))
 		{	
+			AbilitiesToGrant.AddItem( 'Stealth' ); 
+		}
+
+		if (IsPlotType("CityCenter")  && class'IRB_NewResistanceOrders_EventListeners'.static.NumSkirmisherCardsActive() >= 3){
 			AbilitiesToGrant.AddItem( 'Stealth' ); 
 		}
 	}
@@ -1286,7 +1290,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		`assert(UnitState != none);
 
 		History = `XCOMHISTORY;
-		if (UnitState.GetCurrentStat(eStat_PsiOffense) > 0){
+		if (UnitState.GetCurrentStat(eStat_PsiOffense) >= 10){
 			return true;
 		}
 

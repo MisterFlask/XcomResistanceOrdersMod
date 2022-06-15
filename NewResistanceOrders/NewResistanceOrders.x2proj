@@ -3,75 +3,9 @@
   <PropertyGroup>
     <Guid>fa9b04b1-c447-4ce3-b608-d6f7a7d0e648</Guid>
     <Name>NewResistanceOrders</Name>
-    <Description>[h1] Summary [/h1]
-Okay, real talk. Resistance orders in XCOM 2 are pretty lame. Who ever got excited about having to choose between “15% improvement to weapons research times”, or “10% increase to supply drops?” Of course, there are also the wildly overpowered ones, like Sabotage (“what if there was no ADVENT calendar?”) or Tactical Analysis (“what if you had an extra turn to alpha strike all enemies?”) or Feedback (insta-suiciding Codexes!) or Between the Eyes (“what if the Lost were pushovers?”)
+    <Description>New resistance orders!
 
-On balance? Resistance Orders feel like a missed opportunity. Which I aim to correct!
-
-My resistance orders overhaul attempts to just scrap every single resistance order and replace it with something spicier (yet hopefully somewhat balanced), so as to enable new and exciting strategic avenues for you to pursue each playthrough!
-
-[h1]Features[/h1]
-
-[list]
-[*] Fresh and interesting resistance orders! Some are based on granting new active abilities to equipment, some around giving particular missions helpful SITREPs, and some around boosts to particular proving ground projects or even specific kinds of faction soldiers. Something for everyone!
-
-[*]  Config-driven values for many of the ROs, for easy rebalancing!
-
-[*]  The ability to easily disable any resistance orders you hate! (You can see how I did this with the resistance orders at the end of XCOMGameData.ini)
-
-[*]  Flavor text! Some of which might be funny!
-[/list]
-
-New resistance orders include:
-[list]
-[*] The Mab Exploit: ADVENT Turrets and MECs gain a -70% to hack defense rating, making it suuuuper easy to take control… but only in Tundra climates.
-[*] Tunnel Rats: Your soldiers gain Conceal in subways and sewers.
-[*] Bureaucratic Infighting: Recover Device missions now always start with the Show of Force and ADVENT Loot Crates sitrep. Good for people who love the Skulljack and also want money.
-[*] Physical Paragons: Your soldiers gain +1 melee damage, and are also a lot more likely to bleed out rather than die outright to lethal damage.
-[*]  Prometheum Supply Lines: Flamethrowers and fire-based Chemthrower abilities gain +1 damage and (for charge-based abilities) +1 charge.
-[*]  Haas-Bioroid Corporate Contacts: Every time you finish the Mechanized Warfare or Build Spark projects, build an additional SPARK.
-[*] Safety First: You can buy Plated Vests from the Black Market. They also provide +1 Shield HP.
-[*]  Antimemetic Patterning: Your Nanoscale Vests grant Conceal to your soldiers.
-[*]  Witch Hunters: Your soldiers wearing a Mind Shield gain +2 damage against psionic units.
-[*]  A God Am I: Your soldiers wearing Templar armor gain +30% damage with Lightning powers (e.g. Volt) and also gain a new Volt variant that strikes two random enemies!
-[*]  Booby Traps: Retaliations and Defend Device missions always start with the High Explosives sitrep.
-[*] The Oberon Exploit: ADVENT Turrets gain -70% hack defense at all times. Which means you can nearly always mind control them if you’ve brought a hacker. Go to town!
-[*]  Haven Defense Training: Your Retaliation missions start with an additional Resistance soldier.
-[*]  Power Armor Acquisition: Whenever you build an EXO or WAR suit, get another!
-[/list]
-… and many many more! I made about 45 new resistance orders, last I counted. Hopefully enough to ensure plenty of variety in your future XCOM playthroughs!
-
-My goals in making these Resistance Orders were to ensure that they would incentivize players doing something different to take advantage of them. Whether it’s building more of a particular item, or emphasizing a particular soldier class over another, or just going hog-wild in purchasing Hazmat Vests in the Black Market, you’ll want to do something that you don’t normally do.
-
-IMPORTANT NOTES, PLEASE READ:
-
-[olist]
-[*] I’ve disabled all the existing resistance orders by setting their “strength” values to 99 in config. You can easily reverse this if you so choose. This should only affect new games.
-
-[*]  This is probably best played with a mod that allows you to view the biome and plot type of missions you go on, since some of the cards I’ve added key off those.  I recommend https://steamcommunity.com/sharedfiles/filedetails/?id=1183583781
-
-[*]  Use any class pack you want, they all work. I’ve done my best to ensure functional compatibility with arbitrarily large and complicated mod loadouts, which means I have no orders that specify classes– only gear, and sometimes mechanical-vs-organic. So I grant abilities based on “templar armor” rather than “templars”, or “sniper rifles” rather than “Sharpshooters”, or “mechanical units” rather than “SPARKs”.
-
-[*]  Abilities added by resistance cards won’t show up in Squad Loadout screens; instead, you’ll see them added to soldier passive/active abilities at the beginning of combat.
-
-[*]  You need to start a new campaign to take advantage of these. This will probably have no impact on your existing campaigns.
-
-[*]  Cards which double the results of Proving Grounds projects don’t give you the little popup showing what you got for the second item. Check your inventory, though– you’ll see that you still got it, whatever it was. (Note that get-random-item projects will get you something else from the random pool, not necessarily a copy of what you just received.)
-[/olist]
-
-[h1]COMPATIBILITY[/h1]
-
-I have used no MCOs, so I am not aware of any specific instances where this mod is incompatible with others.
-
-[h1]CREDITS[/h1]
-
-Big props to RustyDios for the generic resistance card images!
-
-Also, Mitzruti’s Perk Pack, the ABB Perk Pack, and Favid’s Extended Perk Pack were amazingly helpful in letting me put something together in reasonably short order.
-
-
-
-</Description>
+tags= war of the chosen, gameplay, resistance orders</Description>
     <SteamPublishID>0</SteamPublishID>
     <AssemblyName>ExampleWeapon</AssemblyName>
     <RootNamespace>ExampleWeapon</RootNamespace>

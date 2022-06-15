@@ -1,6 +1,7 @@
 class IRB_NewResistanceOrders_EventListeners extends X2EventListener config(ResCards) ;
 
 var config int SOLDIER_COST_IN_SUPPLY;
+var config int SOLDIER_COST_IN_SUPPLY_LWOTC;
 var config int SPIDER_SUIT_INTEL_COST;
 var config int EXO_SUIT_INTEL_COST;
 var config int FIVE_MEC_CORPSES_INTEL_COST;
@@ -15,7 +16,7 @@ static function array<X2DataTemplate> CreateTemplates()
 
 	Templates.AddItem( AddStrategyListeners() );
 	Templates.AddItem( AddListenersForBlackMarketReset() ); // handling this via UI State Listener instead
-
+	/// removing the black market listener ENTIRELY doesn't help anything; issue with ui state listener?
 	return Templates;
 }
 
@@ -26,7 +27,6 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 
 	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForTech');
 	Template.AddCHEvent('ResearchCompleted', OnResearchCompleted, ELD_Immediate, 99);
-	//Template.AddCHEvent('AfterActionModifyRecoveredLoot', AfterActionModifyRecoveredLoot, ELD_Immediate, 99);
 
 	Template.RegisterInStrategy = true;
 
@@ -90,6 +90,8 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 	return ELR_NoInterrupt;
 }
 
+
+/// NOTE: we perform retrieval of modifiable game state + submission in the caller of this method, not here.
 static function EventListenerReturn BlackMarketResetListener(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {
 	if (IsResistanceOrderActive('ResCard_SafetyFirst')){
@@ -167,7 +169,6 @@ static function AddItemToBlackMarket(
 
 	// Add to sale
 	MarketState.ForSaleItems.AddItem(ForSaleItem);
-
 	// We are done
 	return;
 }
@@ -208,7 +209,11 @@ static function AddItemToBlackMarket(
 			ForSaleItem.RewardRef = RewardState.GetReference();
 
 			ForSaleItem.Title = RewardState.GetRewardString();
-			ForSaleItem.Cost = GetForSaleItemCostInSupply(default.SOLDIER_COST_IN_SUPPLY); // todo: move this to config
+			if (IsModActive('LongWarOfTheChosen')){
+				ForSaleItem.Cost = GetForSaleItemCostInSupply(default.SOLDIER_COST_IN_SUPPLY_LWOTC); 
+			}else{
+				ForSaleItem.Cost = GetForSaleItemCostInSupply(default.SOLDIER_COST_IN_SUPPLY); 
+			}
 			ForSaleItem.Desc = "The Meat Market giveth; and the Meat Market taketh away.";
 			ForSaleItem.Image = RewardState.GetRewardImage();
 			ForSaleItem.CostScalars = class'XComGameState_BlackMarket'.default.GoodsCostScalars;
@@ -260,6 +265,25 @@ public static function HandleHaasBioroidContacts(name TechName, XComGameState_Te
 
 	`log("Creating additional spark as per resistance order.");
 	class'X2StrategyElement_DLC_Day90Techs'.static.CreateSparkSoldier(GameState, TechData);
+}
+
+static private function bool IsModActive(name DLCName)
+{
+    local XComOnlineEventMgr    EventManager;
+    local int                    Index;
+
+    EventManager = `ONLINEEVENTMGR;
+
+    for(Index = EventManager.GetNumDLC() - 1; Index >= 0; Index--)    
+    {
+        if(EventManager.GetDLCNames(Index) == DLCName)    
+        {
+			`LOG("Mod IS active: "$ DLCName);
+            return true;
+        }
+    }
+	`LOG("Mod IS NOT active: "$ DLCName);
+    return false;
 }
 
 static function int NumReaperCardsActive(){
@@ -319,7 +343,7 @@ static function int NumCardsActiveOfFaction(name FactionName){
 			}
 		}
 	}
-
+	`Log("Discovered quantity of cards for faction: " $ FactionName $ " : " $ FactionCardsFound);
 	return FactionCardsFound;
 }
 
@@ -353,7 +377,7 @@ static function bool IsResistanceOrderActive(name ResistanceOrderName){
 			}
 			else
 			{
-				`Log("This faction order is NOT the one I want: " $ FactionState.GetMyTemplateName());
+				`Log("This faction order is NOT the one I want: " $ CardState.GetMyTemplateName());
 			}
 		}
 	}

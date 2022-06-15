@@ -227,7 +227,15 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ProtectDevice', GeneratedMission);//todo: double check sitrep ID
 
 		MissionState = XComGameState_MissionSite(SourceObject);
-		
+
+		if (MissionState == none){
+			MissionState = XComGameState_MissionSite(`XCOMHISTORY.GetGameStateForObjectID(GeneratedMission.MissionID));
+		}
+
+		if (MissionState == none){
+			`LOG("ERROR: Could not find mission state for mission id " $ GeneratedMission.MissionID);
+		}
+			
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Intel', 'ResCard_BureaucraticInfighting', 'Recover', 30); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
 
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Supplies', 'ResCard_YouOweMe', 'Extract', 30); 
@@ -288,6 +296,9 @@ GeneratedMissionData MissionStruct, name MissionFamilyId)
 static function AddSitrepToMissionFamilyIfResistanceCardsActive(name ResCard,
 name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMission)
 {
+	local string LwVariantOfMissionFamilyAsString;
+	LwVariantOfMissionFamilyAsString = string(RequiredMissionFamily) $ "_LW";
+
 	if (GeneratedMission.SitReps.Find(Sitrep) != -1){
 		`LOG("Sitrep already exists on mission, skipping: " $ Sitrep);
 		// Sitrep is already there! TODO: Verify this logic works.
@@ -296,9 +307,12 @@ name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMissio
 
 	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
-		if (string(RequiredMissionFamily) == GeneratedMission.Mission.MissionFamily)
+		if (string(RequiredMissionFamily) == GeneratedMission.Mission.MissionFamily
+			|| LwVariantOfMissionFamilyAsString == GeneratedMission.Mission.MissionFamily)
 		{
 			GeneratedMission.SitReps.AddItem(Sitrep);
+			`LOG("Mission family was satisfied: " $ RequiredMissionFamily $ " for " $ ResCard );
+
 			return;
 		}
 		`LOG("Mission family needed to have been " $ RequiredMissionFamily $ " for " $ ResCard $ " but was " $ GeneratedMission.Mission.MissionFamily);
@@ -308,11 +322,14 @@ name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMissio
 //AlienDataPad 
 static function AddRewardsToMissionFamilyIfResistanceCardActive(XComGameState_MissionSite MissionState, GeneratedMissionData GeneratedMission, name RewardId, name ResCard, name RequiredMissionFamily, int Quantity)
 {
+	local string LwVariantOfMissionFamilyAsString;
 	local XComGameState_Reward RewardState;
 	local X2RewardTemplate RewardTemplate;
 	local XComGameState_HeadquartersResistance ResHQ;
 	local X2StrategyElementTemplateManager TemplateManager;
 	local XComGameState NewGameState;
+
+	LwVariantOfMissionFamilyAsString = string(RequiredMissionFamily) $ "_LW";
 
 	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
 	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
@@ -320,7 +337,8 @@ static function AddRewardsToMissionFamilyIfResistanceCardActive(XComGameState_Mi
 	
 	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
-		if (string(RequiredMissionFamily) == GeneratedMission.Mission.MissionFamily)
+		if (string(RequiredMissionFamily) == GeneratedMission.Mission.MissionFamily
+			|| LwVariantOfMissionFamilyAsString == GeneratedMission.Mission.MissionFamily)
 		{
 			`LOG("Resistance card IS active for current mission: " $ ResCard $ "  | "  $ RequiredMissionFamily);
 			
@@ -332,6 +350,8 @@ static function AddRewardsToMissionFamilyIfResistanceCardActive(XComGameState_Mi
 				RewardState.GenerateReward(NewGameState, ResHQ.GetMissionResourceRewardScalar(RewardState)); //ignoring regionref
 				RewardState.Quantity = Quantity;
 				MissionState.Rewards.AddItem(RewardState.GetReference());
+				`Log("Added reward template due to resistance card to mission!  " $ RewardId);
+
 			}
 			else
 			{
