@@ -353,9 +353,9 @@ static function bool IsResistanceOrderActive(name ResistanceOrderName){
 	local bool bCardPlayed;
 	local XComGameStateHistory History;
 	local XComGameState_ResistanceFaction FactionState;
-	local XComGameState NewGameState;
 	local array<Name> ExclusionList;
 	local int NumActionsToAdd;
+	local XComGameState_Continent ContinentState;
 	
 	local XComGameState_HeadquartersResistance ResHQ;
 	History = `XCOMHISTORY;
@@ -406,6 +406,27 @@ static function bool IsResistanceOrderActive(name ResistanceOrderName){
 		}
 	}
 
+	`LOG("Going over continent bonuses.");
+
+	// go over continent bonuses
+	foreach History.IterateByClassType(class'XComGameState_Continent', ContinentState){
+		CardState = XComGameState_StrategyCard(History.GetGameStateForObjectID(ContinentState.ContinentBonusCard.ObjectID));
+		if (CardState == none){
+			`LOG("Couldn't find continent bonus for object id!");
+		}
+        `LOG("observed possible continent bonus: " $ CardState.GetMyTemplateName());
+
+		if (CardState.GetMyTemplateName() == ResistanceOrderName){
+			if (ContinentState.bContinentBonusActive){
+				`LOG("successfully found targeted card as ACTIVE continent bonus: " $ ResistanceOrderName);
+				return true;
+			} else {
+				`LOG("observed targeted card as INACTIVE continent bonus: " $ ResistanceOrderName);
+			}
+		}
+	}
+
+	
 	return false;
 }
 

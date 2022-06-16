@@ -1028,7 +1028,7 @@ static function X2AbilityTemplate SlamFire()
 }
 
 static function X2AbilityTemplate SmokeAndMirrors()
-{
+{ 
 	local X2AbilityTemplate Template;
 	local XMBEffect_DoNotConsumeAllPoints CostEffect;
 	local XMBEffect_AddItemCharges BonusItemEffect;
