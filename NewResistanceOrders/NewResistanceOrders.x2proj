@@ -36,7 +36,16 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\LW_Tuple\Classes\LWTuple.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\DefaultCovertActions.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\Examples.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_DefaultCovertActionMissions.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_DefaultSitreps.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_HeavyWeapons.uc">

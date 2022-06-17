@@ -404,7 +404,7 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 			if (UnitState.GetTeam() != eTeam_XCom){
 				return;
 			}
-			if (UnitState.IsRobotic())
+			if (UnitState.IsRobotic() && !UnitState.CanTakeCover())
 			{
 				AbilitiesToGrant.AddItem( 'ILB_DawnMachines' ); 
 			}

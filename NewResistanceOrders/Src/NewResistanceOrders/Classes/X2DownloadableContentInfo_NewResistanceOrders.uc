@@ -14,6 +14,25 @@ class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableConten
 
 var config array<name> PISTOL_SKILLS;
 
+
+
+static final function bool IsModActive(name ModName)
+{
+    local XComOnlineEventMgr    EventManager;
+    local int                   Index;
+
+    EventManager = `ONLINEEVENTMGR;
+
+    for (Index = EventManager.GetNumDLC() - 1; Index >= 0; Index--) 
+    {
+        if (EventManager.GetDLCNames(Index) == ModName) 
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 /// <summary>
 /// This method is run if the player loads a saved game that was created prior to this DLC / Mod being installed, and allows the 
 /// DLC / Mod to perform custom processing in response. This will only be called once the first time a player loads a save that was

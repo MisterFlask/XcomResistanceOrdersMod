@@ -27,6 +27,7 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 
 	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForTech');
 	Template.AddCHEvent('ResearchCompleted', OnResearchCompleted, ELD_Immediate, 99);
+	Template.AddCHEvent('PostEndOfMonth', PostEndOfMonth, ELD_OnStateSubmitted, 99);
 
 	Template.RegisterInStrategy = true;
 
@@ -34,8 +35,19 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 
 	return Template;
 }
+static function EventListenerReturn PostEndOfMonth(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
+{
+	AddCovertActionToFactionConditionalOnResCard(GameState, 'ILB_CovertAction_SpawnAiTheft', 'Faction_Skirmishers', 'ResCard_StealSparkCore');
 
 
+}
+
+static function AddCovertActionToFactionConditionalOnResCard(XComGameState GameState, name CovertActionName, name FactionName, name ResCardName)
+{
+	if (IsResistanceOrderActive(ResCardName)){
+		class'DefaultCovertActions'.static.AddCovertActionToFaction(GameState, CovertActionName, FactionName);
+	}
+}
 
 static protected function X2EventListenerTemplate AddListenersForBlackMarketReset()
 {
