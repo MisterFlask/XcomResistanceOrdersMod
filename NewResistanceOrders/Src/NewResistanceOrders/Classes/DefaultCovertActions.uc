@@ -32,6 +32,19 @@ static function X2DataTemplate CreateGeneralCovertActionWithRewardTemplate(name 
 	return Template;
 }
 
+
+private static function StrategyCostReward CreateOptionalCostSlot(name ResourceName, int Quantity)
+{
+	local StrategyCostReward ActionCost;
+	local ArtifactCost Resources;
+
+	Resources.ItemTemplateName = ResourceName;
+	Resources.Quantity = Quantity;
+	ActionCost.Cost.ResourceCosts.AddItem(Resources);
+	ActionCost.Reward = 'Reward_DecreaseRisk';
+	
+	return ActionCost;
+}
 private static function CovertActionSlot CreateDefaultSoldierSlot(name SlotName, optional int iMinRank, optional bool bRandomClass, optional bool bFactionClass)
 {
 	local CovertActionSlot SoldierSlot;
@@ -60,11 +73,13 @@ private static function CovertActionSlot CreateDefaultSoldierSlot(name SlotName,
 static function AddCovertActionToFaction(XComGameState NewGameState, name CovertActionTemplateName, name FactionName){
 	local X2CovertActionTemplate ActionTemplate;
 	local XComGameState_ResistanceFaction FactionState;
+	local X2StrategyElementTemplateManager StratMgr;
+	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 
-	FactionState = GetFaction(FactionName);
+	FactionState = GetFaction(FactionName, NewGameState);
 	ActionTemplate = X2CovertActionTemplate(StratMgr.FindStrategyElementTemplate(CovertActionTemplateName));
 
-	FactionState.CovertActions.AddItem(CreateCovertAction(ActionTemplate, NewGameState, FactionState.GetReference()));
+	FactionState.CovertActions.AddItem(CreateCovertAction(NewGameState, ActionTemplate, FactionState.GetReference()));
 }
 
 //e.g. Faction_Skirmishers
@@ -86,7 +101,7 @@ static function StateObjectReference CreateCovertAction(XComGameState NewGameSta
 
 	ActionState = ActionTemplate.CreateInstanceFromTemplate(NewGameState,FactionRef);
 	ActionState.Spawn(NewGameState);
-	ActionState.RequiredFactionInfluence = UnlockLevel; // Set the Influence level required to unlock this Action
+	ActionState.RequiredFactionInfluence = 1;
 	ActionState.bNewAction = true;
 
 	return ActionState.GetReference();

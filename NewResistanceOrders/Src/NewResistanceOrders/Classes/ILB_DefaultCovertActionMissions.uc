@@ -1,5 +1,5 @@
 // This is an Unreal Script
-class ILB_DefaultCovertActionMissions extends X2StrategyElement
+class ILB_DefaultCovertActionMissions extends X2StrategyElement_DefaultRewards 
 	dependson(X2RewardTemplate)
 	config(GameData);
 
@@ -70,7 +70,8 @@ optional int OrderHours = -1)
 	
 	MissionDuration = float((default.MissionMinDuration + `SYNC_RAND_STATIC(default.MissionMaxDuration - default.MissionMinDuration + 1)) * 3600);
 	
-	if (ReplaceMissionReward){
+	if (ReplaceExistingReward)
+	{
 		MissionRewards.Length = 0;
 	}
 
@@ -86,11 +87,6 @@ optional int OrderHours = -1)
 	MissionState.GeneratedMission.SitReps.AddItem(NegativeSitrep);
 
 	RewardState.RewardObjectReference = MissionState.GetReference();
-}
-
-function string GetMissionRewardString(XComGameState_Reward RewardState)
-{
-	return RewardState.GetMyTemplate().DisplayName;
 }
 
 ///////////////STEAL SPARK REWARD TEMPLATE FOLLOWS////////////////////////////////////////

@@ -54,6 +54,9 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_Reward_Squaddie.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_StrategicResCards.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_X2Effect_WitchHunter.uc">
       <SubType>Content</SubType>
     </Content>
