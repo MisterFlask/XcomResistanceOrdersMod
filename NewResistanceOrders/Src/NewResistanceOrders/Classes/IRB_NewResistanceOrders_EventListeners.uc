@@ -28,6 +28,7 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForTech');
 	Template.AddCHEvent('ResearchCompleted', OnResearchCompleted, ELD_Immediate, 99);
 	Template.AddCHEvent('PostEndOfMonth', PostEndOfMonth, ELD_OnStateSubmitted, 99);
+	Template.AddCHEvent('AllowActionToSpawnRandomly', AllowActionToSpawnRandomly, ELD_Immediate, 99);
 
 	Template.RegisterInStrategy = true;
 
@@ -37,16 +38,43 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 }
 static function EventListenerReturn PostEndOfMonth(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {
-	AddCovertActionToFactionConditionalOnResCard(GameState, 'ILB_CovertAction_SpawnAiTheft', 'Faction_Skirmishers', 'ResCard_StealSparkCore');
+	local XComGameState NewGameState;
+	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Adding Covert Action To Geoscape Due To Res Card");
+	
+	`LOG("hit the post-end-of-month listener; adding necessary covert actions to all factions");
+	
+	AddCovertActionToFactionConditionalOnResCard(NewGameState, 'ILB_CovertAction_SpawnAiTheft', 'Faction_Skirmishers', 'ResCard_StealSparkCore');
+	
+	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
 
+}
 
+static function EventListenerReturn AllowActionToSpawnRandomly(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
+{
+	local XComLWTuple Tuple;
+	local X2CovertActionTemplate Template;
+
+	Tuple = XComLWTuple(EventData);
+	Template = X2CovertActionTemplate(Tuple.Data[1].o);
+	`LOG("Checking on if " $ Template.DataName $ " is disallowed from spawning randomly due to rule that nothing starting with ILB_ spawns randomly.");//todo: hack
+
+	if (InStr(string(Template.DataName), "ILB_") != -1)
+	{
+		`LOG("Forbidding " $ Template.DataName $ " from spawning randomly due to rule that nothing starting with ILB_ spawns randomly.");//todo: hack
+		Tuple.Data[0].b = false;
+	}
 }
 
 static function AddCovertActionToFactionConditionalOnResCard(XComGameState GameState, name CovertActionName, name FactionName, name ResCardName)
 {
+
 	if (IsResistanceOrderActive(ResCardName)){
+
 		class'DefaultCovertActions'.static.AddCovertActionToFaction(GameState, CovertActionName, FactionName);
+
 	}
+
+
 }
 
 static protected function X2EventListenerTemplate AddListenersForBlackMarketReset()

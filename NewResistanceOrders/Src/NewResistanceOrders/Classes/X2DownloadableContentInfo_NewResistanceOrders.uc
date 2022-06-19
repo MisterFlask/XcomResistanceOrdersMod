@@ -97,6 +97,14 @@ exec function VerifyPlayableCards()
 	local XComGameState_StrategyCard CardState;
 	local X2StrategyCardTemplate CurrentTemplate;
 	local XComGameState_StrategyCard CurrentCard;
+	local array<X2DataTemplate> RelevantRewardTemplates;
+	local X2DataTemplate DataTemplate;
+	// templates for rewards
+	
+	local X2StrategyElementTemplateManager TemplateManager;
+	local X2RewardTemplate RewardTemplate;
+	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+	RelevantRewardTemplates = class'ILB_DefaultCovertActionMissions'.static.CreateTemplates();
 	History = `XCOMHISTORY;
 
 	`LOG("INFO:Checking all templates for errors.");
@@ -114,6 +122,15 @@ exec function VerifyPlayableCards()
 		}
 		if (CurrentTemplate.AssociatedEntity == ''){
 			`LOG("ERROR: FACTION EMPTY in Template " $ CurrentTemplate.DataName);
+		}
+	}
+
+	`LOG("now checking all reward templates for errors");
+
+	foreach RelevantRewardTemplates(DataTemplate){
+		RewardTemplate = X2RewardTemplate(DataTemplate);
+		if (RewardTemplate.DisplayName == ""){
+			`LOG("ERROR:  Reward template display name empty for " $ RewardTemplate.DataName);
 		}
 	}
 }
