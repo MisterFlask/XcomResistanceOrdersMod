@@ -28,7 +28,7 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions;
 	}
 
 
-	static function CreateGrndlPowerDeal(){
+	static function X2DataTemplate CreateGrndlPowerDeal(){
 		local X2StrategyCardTemplate Template;
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_GrndlPowerDeal');
 		Template.Category = "ResistanceCard";

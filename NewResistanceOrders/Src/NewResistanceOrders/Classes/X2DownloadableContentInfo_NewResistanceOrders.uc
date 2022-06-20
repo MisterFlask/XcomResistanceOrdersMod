@@ -313,7 +313,7 @@ static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_Mi
 
 	if (IsResCardActive('ResCard_NotoriousSmugglers'))
 	{
-		if (MissionSource = 'MissionSource_Retaliation')
+		if (MissionSource == 'MissionSource_Retaliation')
 		{
 			GeneratedMission.SitReps.AddItem(GrabRandomCrackdownSitrep());
 			return;
