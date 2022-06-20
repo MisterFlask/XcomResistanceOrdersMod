@@ -14,8 +14,6 @@ class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableConten
 
 var config array<name> PISTOL_SKILLS;
 
-
-
 static final function bool IsModActive(name ModName)
 {
     local XComOnlineEventMgr    EventManager;
@@ -298,29 +296,82 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Ammo', 'ResCard_StolenShippingSchedules', 'SupplyLineRaid', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 		AddRewardsToMissionFamilyIfResistanceCardActive(MissionState, GeneratedMission, 'Reward_Grenade', 'ResCard_StolenShippingSchedules', 'SupplyLineRaid', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 
-
-		/*
-		//Ugh.
-		if (IRB_NewResistanceOrders_EventListeners.static.IsResistanceOrderActive('ResCard_TheOnesWhoKnock'))
-		{
-			`CI_Trace("ResCard_TheOnesWhoKnock is active; performing reward modification?");
-
-			if (IsMissionFamily(GeneratedMission, 'NeutralizeFieldCommander')
-					|| IsMissionFamily(GeneratedMission, 'Neutralize')){
-				// rewards reference: https://github.com/Lucubration/XCOM2/blob/a24366aafaa50421c8cb2648b563e452c6717902/TestModWotc/TestModWotc/Src/XComGame/Classes/X2StrategyElement_DefaultRewards.uc
-				`CI_Trace("ResCard_TheOnesWhoKnock is active AND NeutralizeFieldCommander or Neutralize is mission type; performing reward modification?");
-
-				AddRewardsToMissionState(MissionState, 'Reward_Supply');
-			}
-			else
-			{
-				`CI_Trace("ResCard_TheOnesWhoKnock is active BUT  NeutralizeFieldCommander or Neutralize is NOT mission type; mission type is "$ GeneratedMissionData.Mission.MissionFamily);
-			}
-		}*/
+		AddCrackdownSitrepsBasedOnResistanceCardsActive(MissionState, GeneratedMission);
 	}
 
 }
 
+static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_MissionSite MissionState, GeneratedMissionData GeneratedMission){
+	local int PercentageCrackdownChance;
+	local int CrackdownRoll;
+	local name MissionSource;
+	local bool RelevantMissionSourceForRandomCrackdown;
+	RelevantMissionSourceForRandomCrackdown = false;
+	MissionSource = MissionState.GetMissionSource().DataName; // e.g. 'MissionSource_GuerillaOp'
+
+	// First: handle retaliation crackdowns
+
+	if (IsResCardActive('ResCard_NotoriousSmugglers'))
+	{
+		if (MissionSource = 'MissionSource_Retaliation')
+		{
+			GeneratedMission.SitReps.AddItem(GrabRandomCrackdownSitrep());
+			return;
+		}
+	}
+
+
+	if (MissionSource == 'MissionSource_GuerillaOp' 
+		|| MissionSource == 'MissionSource_Council') //todo: verify mission source names
+	{
+		RelevantMissionSourceForRandomCrackdown = true;
+	}
+
+	// now we handle generic crackdowns based on res cards selected
+	if (!RelevantMissionSourceForRandomCrackdown){
+		`LOG("Mission type excluded from crackdown due to being " $ MissionSource);
+		return;
+	}
+
+	/// calculation of crackdown chance based on active resistance cards.
+	/// should ensure none of these can be continent bonuses.
+	PercentageCrackdownChance = 0;
+	if (IsResCardActive('ResCard_RadioFreeLily')){
+		PercentageCrackdownChance += 15;
+	}
+
+	if (IsResCardActive('ResCard_NotoriousSmugglers')){
+		PercentageCrackdownChance += 15;
+	}
+
+
+	`LOG("Total percent crackdown chance based on res cards active: " $ PercentageCrackdownChance);
+	CrackdownRoll = Rand(100);
+	`LOG("Crackdown Roll (1-100): " $ CrackdownRoll);
+
+	if (CrackdownRoll < PercentageCrackdownChance)
+	{
+		GeneratedMission.SitReps.AddItem(GrabRandomCrackdownSitrep());
+	}
+	else
+	{
+		`LOG("Elected not to use crackdown sitrep on eligible mission.");
+	}
+}
+
+static function name GrabRandomCrackdownSitrep(){
+	local int DieRoll;
+	local array<name> CrackdownSitreps;
+
+	CrackdownSitreps = class'ILB_DefaultSitreps'.static.CrackdownSitreps();
+    DieRoll = Rand(CrackdownSitreps.length);
+	`LOG("Returning sitrep to be used in mission: " $ CrackdownSitreps[DieRoll]);
+	return CrackdownSitreps[DieRoll];
+}
+
+static function bool IsResCardActive(name ResCardName){
+	return class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCardName);
+}
 
 static function bool IsMissionFamily(
 GeneratedMissionData MissionStruct, name MissionFamilyId)

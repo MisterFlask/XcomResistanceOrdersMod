@@ -10,6 +10,15 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(CreateSparkRewardTemplate());
 	Templates.AddItem(CreateSparkMissionRewardTemplate());
 
+	Templates.AddItem(CreateSwarmDefenseMissionReward_GrantsSupplies());
+	Templates.AddItem(CreateSwarmDefenseMissionReward_GrantsResistanceContact());
+
+	// gather survivors mission!
+	// extract supplies?
+	// eliminate field commander!  We have a proposition for you.
+	// Kill this guy, we give you some of our finest in heavy armaments.
+	// see PlayerState.SetSquadConcealment(true);
+	// 
 	return Templates;
 }
 
@@ -23,6 +32,52 @@ static function X2DataTemplate CreateSparkMissionRewardTemplate()
 	Template.GetRewardStringFn = GetMissionRewardString;
 
 	return Template;
+}
+
+static function X2RewardTemplate CreateSwarmDefenseMissionReward_GrantsSupplies(){
+
+	local X2RewardTemplate Template;
+
+	`CREATE_X2Reward_TEMPLATE(Template, 'ILB_Reward_SwarmDefenseForSupplies');
+
+	Template.GiveRewardFn = GiveSwarmDefenseForSuppliesMission;
+	Template.GetRewardStringFn = GetMissionRewardString;
+
+	return Template;
+}
+
+
+static function X2RewardTemplate CreateSwarmDefenseMissionReward_GrantsResistanceContact(){
+
+	local X2RewardTemplate Template;
+
+	`CREATE_X2Reward_TEMPLATE(Template, 'ILB_Reward_SwarmDefenseForResistanceContact');
+
+	Template.GiveRewardFn = GiveSwarmDefenseForResistanceContactMission;
+	Template.GetRewardStringFn = GetMissionRewardString;
+
+	return Template;
+}
+
+
+function GiveSwarmDefenseForSuppliesMission(
+XComGameState NewGameState,
+XComGameState_Reward RewardState,
+optional StateObjectReference AuxRef,
+optional bool bOrder = false,
+optional int OrderHours = -1){
+	GiveRiskyMissionReward(NewGameState, RewardState, 'ShowOfForce',
+	 'Reward_Supplies', 'SwarmDefense', 
+	 false, AuxRef);
+}
+
+function GiveSwarmDefenseForResistanceContactMission(
+XComGameState NewGameState,
+XComGameState_Reward RewardState,
+optional StateObjectReference AuxRef,
+optional bool bOrder = false,
+optional int OrderHours = -1){
+	GiveRiskyMissionReward(NewGameState, RewardState, 'ShowOfForce', 'Reward_ResistanceContact', 'SwarmDefense', false, AuxRef);
 }
 
 function GiveSparkCoreHeistReward(

@@ -58,7 +58,95 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(PistolShotsDealPoisonPassive());
 	Templates.AddItem(AidProtocolRefund());
 
+	// now, enemy abilities
+	Templates.AddItem(BrutePoison());
+	Templates.AddItem(CreatePoisonImmunity());
 	return Templates;
+}
+
+
+static function X2AbilityTemplate BrutePoison()
+{
+	local X2AbilityTemplate						Template;
+	local X2Effect_ApplyWeaponDamage            DamageEffect;
+	local X2AbilityMultiTarget_Radius MultiTarget;
+	local X2AbilityTrigger_EventListener		EventListener;
+	local X2Effect_ApplyPoisonToWorld PoisonEffect;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'ILB_BrutePoison');
+
+	Template.AbilitySourceName = 'eAbilitySource_Standard';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Defensive;
+	Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_burn";
+
+	Template.AbilityToHitCalc = default.DeadEye;
+	Template.AbilityTargetStyle = default.SelfTarget;
+	Template.AbilityShooterConditions.AddItem(default.LivingShooterProperty);
+
+	DamageEffect = new class'X2Effect_ApplyWeaponDamage';
+	DamageEffect.DamageTypes.AddItem('Poison');
+	Template.AddTargetEffect(DamageEffect);
+
+	Template.AddMultiTargetEffect(class'X2StatusEffects'.static.CreatePoisonedStatusEffect());
+	PoisonEffect = new class'X2Effect_ApplyPoisonToWorld';	
+	Template.AddMultiTargetEffect(PoisonEffect);
+
+	MultiTarget = new class'X2AbilityMultiTarget_Radius';
+    MultiTarget.bUseWeaponRadius = true;
+	MultiTarget.bExcludeSelfAsTargetIfWithinRadius = false;
+	Template.AbilityMultiTargetStyle = MultiTarget;
+
+	// This ability fires when the unit takes damage
+	EventListener = new class'X2AbilityTrigger_EventListener';
+	EventListener.ListenerData.Deferral = ELD_OnStateSubmitted;
+	EventListener.ListenerData.EventID = 'UnitTakeEffectDamage';
+	EventListener.ListenerData.EventFn = class'XComGameState_Ability'.static.AbilityTriggerEventListener_Self;
+	EventListener.ListenerData.Filter = eFilter_Unit;
+	Template.AbilityTriggers.AddItem(EventListener);
+
+	Template.bSkipFireAction = true;
+	Template.bShowActivation = true;
+	Template.bFrameEvenWhenUnitIsHidden = true;
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+
+	return Template;
+}
+
+
+static function X2AbilityTemplate CreatePoisonImmunity()
+{
+	local X2AbilityTemplate Template;
+	local X2AbilityTrigger_UnitPostBeginPlay Trigger;
+	local X2Effect_DamageImmunity DamageImmunity;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, 'ILB_PoisonImmunity');
+	Template.IconImage = "img:///UILibrary_PerkIcons.UIPerk_immunities";
+
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Neutral;
+
+	Template.AbilityToHitCalc = default.DeadEye;
+
+	Template.AbilityTargetStyle = default.SelfTarget;
+
+	Trigger = new class'X2AbilityTrigger_UnitPostBeginPlay';
+	Template.AbilityTriggers.AddItem(Trigger);
+
+	// Build the immunities
+	DamageImmunity = new class'X2Effect_DamageImmunity';
+	DamageImmunity.BuildPersistentEffect(1, true, true, true);
+	DamageImmunity.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage,,,Template.AbilitySourceName);
+	DamageImmunity.ImmuneTypes.AddItem('Poison');
+	DamageImmunity.ImmuneTypes.AddItem(class'X2Item_DefaultDamageTypes'.default.ParthenogenicPoisonType);
+
+	Template.AddTargetEffect(DamageImmunity);
+
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+
+	return Template;
 }
 
 static function X2AbilityTemplate AidProtocolRefund()
