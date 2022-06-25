@@ -1,12 +1,11 @@
-// This is an Unreal Script
-
-class ILB_DefaultSitreps extends X2StrategyElement
+class ILB_DefaultSitreps extends X2SitRep 
 	dependson(X2SitRepTemplate)
 	config(GameData);
 
 static function array<X2DataTemplate> CreateTemplates()
 {
 	local array<X2DataTemplate> Sitreps;
+	local X2DataTemplate CurrentItem;
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_HeavilyArmored','BlastPadding')); // ADVENT Crackdown: Hokmah Cadre
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_Shadowstep','Shadowstep')); // ADVENT Crackdown: Binah Cadre
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_ReturnFire','IncendiaryRounds'));  // ADVENT Crackdown:  Chesed Cadre
@@ -18,6 +17,10 @@ static function array<X2DataTemplate> CreateTemplates()
 	Sitreps.AddItem(CreateForceLevelIncreaseByNEffectTemplate(Sitreps, 2, 'ILB_Sitrep_PlusTwoForceLevel'));
 	Sitreps.AddItem(CreateForceLevelIncreaseByNEffectTemplate(Sitreps, 3, 'ILB_Sitrep_PlusThreeForceLevel'));
 	
+	foreach Sitreps(CurrentItem){
+		`LOG("found sitrep/effect: " $ CurrentItem.DataName);
+	}
+
 	return Sitreps;
 }
 
@@ -50,17 +53,16 @@ static function name GetRandomForceLevelIncreaseSitrep(){
 	return '';
 }
 
-static function array<name> CrackdownSitreps(){
-	local X2DataTemplate Template;
+static function array<name> CrackdownSitreps()
+{
 	local array<name> Sitreps;
-	local array<X2DataTemplate> Templates;
-	Templates = CreateTemplates();
-
-	foreach Templates(Template){
-		Sitreps.AddItem(Template.DataName);
-	}
+	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_HeavilyArmored');
+	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_Shadowstep');
+	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_PoisonClouds');
+	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_ReturnFire');
 	return Sitreps;
 }
+
 static function X2SitRepEffectTemplate CreateForceLevelIncreaseByNEffectTemplate(out array<X2DataTemplate> Sitreps, int ForceLevelChange, name SitrepName)
 {
 	local X2SitRepEffect_ModifyForceLevel Template;

@@ -242,6 +242,7 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	local array<name> SitrepList;
 	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
+	
 	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
 
 
@@ -261,6 +262,7 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'Terror', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'Retaliation', GeneratedMission);
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ChosenRetaliation', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ProtectDevice', GeneratedMission);//todo: double check sitrep ID
 
 		MissionState = XComGameState_MissionSite(SourceObject);
@@ -309,6 +311,7 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		}
 
 	}
+
 	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
 
 
@@ -384,7 +387,7 @@ static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_Mi
 }
 
 static function bool IsRetaliation(string MissionFamily){
-	return MissionFamily == "Terror" || MissionFamily == "Retaliation";
+	return MissionFamily == "Terror" || MissionFamily == "Retaliation" || MissionFamily == "ChosenRetaliation";
 }
 
 static function name GrabRandomCrackdownSitrep(){
