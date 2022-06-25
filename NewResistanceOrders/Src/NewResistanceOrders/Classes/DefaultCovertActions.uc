@@ -7,7 +7,22 @@ static function array<X2DataTemplate> CreateTemplates()
 {
 	local array<X2DataTemplate> CovertActions;
 	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_SpawnAiTheft', 'ILB_Reward_SparkMission', 'ResCard_StealSparkCore'));
+	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_SwarmDefenseForSupplies', 'ILB_Reward_SwarmDefenseForSupplies', 'ResCard_RescueUpperCrustContacts'));
+	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_SwarmDefenseForResistanceContact', 'ILB_Reward_SwarmDefenseForResistanceContact', 'ResCard_RescueFriendlyPolitician'));
+	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_CouncilBounties', 'ILB_Reward_NeutralizeFieldCommanderMission', 'ResCard_CouncilBounties'));
+
+	//narratives
+	CovertActions.AddItem(CreateNarrative('CovertActionNarrative_ResCard_StealSparkCore'));
+	CovertActions.AddItem(CreateNarrative('CovertActionNarrative_ResCard_RescueFriendlyPolitician'));
+	CovertActions.AddItem(CreateNarrative('CovertActionNarrative_ResCard_RescueUpperCrustContacts'));
+	CovertActions.AddItem(CreateNarrative('CovertActionNarrative_ResCard_CouncilBounties'));
 	return CovertActions;
+}
+
+static function X2DataTemplate CreateNarrative(name NarrativeName){
+	local X2CovertActionNarrativeTemplate Template;
+	`CREATE_X2TEMPLATE(class'X2CovertActionNarrativeTemplate', Template, NarrativeName);
+	return Template;
 }
 
 static function X2DataTemplate CreateGeneralCovertActionWithRewardTemplate(name TemplateName, name RewardName, name EnablingResCard)
@@ -20,7 +35,6 @@ static function X2DataTemplate CreateGeneralCovertActionWithRewardTemplate(name 
 	Template.OverworldMeshPath = "UI_3D.Overwold_Final.CovertAction";
 	Template.Narratives.AddItem(name("CovertActionNarrative_" $ EnablingResCard));
 	Template.bCanNeverBeRookie = true;
-
 
 	Template.Slots.AddItem(CreateDefaultSoldierSlot('CovertActionSoldierStaffSlot'));
 	Template.Slots.AddItem(CreateDefaultSoldierSlot('CovertActionSoldierStaffSlot'));

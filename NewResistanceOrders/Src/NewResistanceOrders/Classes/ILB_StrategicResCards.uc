@@ -11,22 +11,132 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions;
 		// Disadvantageous mission sitreps?  -2 turns to complete, +1 force level, +1 squad size, no starting concealment
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_StealSparkCore'));
 		Techs.AddItem(CreateBrazenCollection());
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BrazenRecruitment')); 
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueRichPerson')); // swarm mission grants you supplies
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BrazenRecruitment')); //
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_CouncilBounties')); //
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_PoweredArmorHeist')); //
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueUpperCrustContacts')); // swarm mission grants you supplies
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueFriendlyPolitician')); // swarm mission grants you res contact
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueFriendlyRetinue')); // res contacts mission, just grants you the soldiers and a heavy weapon
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_AcquirePowerSource')); // Recover supply mission
+		Techs.AddItem(CreateLabsToCommsRepurposing());
 
+		Techs.AddItem(CreateXenobiologicalFieldResearch());
 		Techs.AddItem(CreateRadioFreeLily());
 		Techs.AddItem(CreateNotoriousSmugglers());
 		Techs.AddItem(CreateGrndlPowerDeal());
+		Techs.AddItem(CreateLeachPsionicLeylines());
 		// Techs.AddItem(RemotelyChargedBackpacks());
 		// Techs.AddItem(RemotelyChargedSparks());
 		// Techs.AddItem(CreateChargedPsionics()); // adds Teleportation and Blink to templars + psions; costs 5 power.
-		// Techs.AddItem(CreateLeylinePowerSource()); // adds power at cost of 15% chance crackdown; also, crackdowns have a 50% chance of including Psionic Storm sitrep.  
+		
 		return Techs;
 	}
+	static function X2DataTemplate CreateLeachPsionicLeylines()
+	{
+		local X2StrategyCardTemplate Template;
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_LeachPsionicLeylines');
+		Template.Category = "ResistanceCard";
+		Template.OnActivatedFn = ActivateLeach;
+		Template.OnDeactivatedFn = DeactivateLeach;
+		//todo: Chryssalid/Faceless buff
+		return Template;
+	}
+//---------------------------------------------------------------------------------------
+static function ActivateLeach(XComGameState NewGameState, StateObjectReference InRef, optional bool bReactivate = false)
+{
+	local XComGameState_HeadquartersXCom XComHQ;
 
+	XComHQ = GetNewXComHQState(NewGameState);
+
+	// Add a research bonus for each lab already created, then set the flag so it will work for all future labs built
+	XComHQ.BonusPowerProduced += 4;
+	XComHQ.HandlePowerOrStaffingChange(NewGameState);
+}
+//---------------------------------------------------------------------------------------
+static function DeactivateLeach(XComGameState NewGameState, StateObjectReference InRef)
+{
+	local XComGameState_HeadquartersXCom XComHQ;
+
+	XComHQ = GetNewXComHQState(NewGameState);
+	XComHQ.BonusPowerProduced -= 4;
+	XComHQ.HandlePowerOrStaffingChange(NewGameState);
+}
+
+	static function X2DataTemplate CreateXenobiologicalFieldResearch()
+	{
+		local X2StrategyCardTemplate Template;
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_XenobiologicalFieldResearch');
+		Template.Category = "ResistanceCard";
+		Template.OnActivatedFn = ActivateXenobiology;
+		Template.OnDeactivatedFn = DeactivateXenobiology;
+		Template.GetAbilitiesToGrantFn = GrantXenobiologyChryssalidAndFacelessBuff;
+		return Template;
+	}
+//---------------------------------------------------------------------------------------
+static function ActivateXenobiology(XComGameState NewGameState, StateObjectReference InRef, optional bool bReactivate = false)
+{
+	local XComGameState_HeadquartersXCom XComHQ;
+
+	XComHQ = GetNewXComHQState(NewGameState);
+
+	// Add a research bonus for each lab already created, then set the flag so it will work for all future labs built
+	XComHQ.ResearchEffectivenessPercentIncrease += 30;
+	XComHQ.HandlePowerOrStaffingChange(NewGameState);
+}
+
+	static function GrantXenobiologyChryssalidAndFacelessBuff(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{				
+		local bool IsChryssalid;
+		local bool IsFaceless;
+		IsChryssalid = InStr(UnitState.GetMyTemplateName(), "Chryssalid") >= 0; 
+		IsFaceless = InStr(UnitState.GetMyTemplateName(), "Faceless") >= 0;
+
+		if (IsChryssalid || IsFaceless)
+		{
+			AbilitiesToGrant.AddItem( 'ILB_FasterSavages' ); 
+		}
+	}
+
+//---------------------------------------------------------------------------------------
+static function DeactivateXenobiology(XComGameState NewGameState, StateObjectReference InRef)
+{
+	local XComGameState_HeadquartersXCom XComHQ;
+
+	XComHQ = GetNewXComHQState(NewGameState);
+	XComHQ.ResearchEffectivenessPercentIncrease -= 30;
+	XComHQ.HandlePowerOrStaffingChange(NewGameState);
+}
+
+	static function X2DataTemplate CreateLabsToCommsRepurposing()
+	{
+		local X2StrategyCardTemplate Template;
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_LabToCommsRepurposing');
+		Template.Category = "ResistanceCard";
+		Template.OnActivatedFn = ActivateLabsToComms;
+		Template.OnDeactivatedFn = DeactivateLabsToComms;
+
+		return Template;
+}
+//---------------------------------------------------------------------------------------
+static function ActivateLabsToComms(XComGameState NewGameState, StateObjectReference InRef, optional bool bReactivate = false)
+{
+	local XComGameState_HeadquartersXCom XComHQ;
+
+	XComHQ = GetNewXComHQState(NewGameState);
+
+	// Add a research bonus for each lab already created, then set the flag so it will work for all future labs built
+	XComHQ.ResearchEffectivenessPercentIncrease -= 30;
+	XComHQ.BonusCommCapacity += 3;
+	XComHQ.HandlePowerOrStaffingChange(NewGameState);
+}
+//---------------------------------------------------------------------------------------
+static function DeactivateLabsToComms(XComGameState NewGameState, StateObjectReference InRef)
+{
+	local XComGameState_HeadquartersXCom XComHQ;
+
+	XComHQ = GetNewXComHQState(NewGameState);
+	XComHQ.ResearchEffectivenessPercentIncrease += 30;
+	XComHQ.BonusCommCapacity -= 3;
+	XComHQ.HandlePowerOrStaffingChange(NewGameState);
+}
 
 	static function X2DataTemplate CreateGrndlPowerDeal(){
 		local X2StrategyCardTemplate Template;

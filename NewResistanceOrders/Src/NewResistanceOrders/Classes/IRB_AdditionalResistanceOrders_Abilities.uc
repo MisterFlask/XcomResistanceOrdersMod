@@ -57,11 +57,81 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(ExtraMeleeDamage());
 	Templates.AddItem(PistolShotsDealPoisonPassive());
 	Templates.AddItem(AidProtocolRefund());
+	//Templates.AddItem(SiphonLifeEffect());
 
 	// now, enemy abilities
 	Templates.AddItem(BrutePoison());
 	Templates.AddItem(CreatePoisonImmunity());
+	Templates.AddItem(CreateChryssalidAndFacelessBuff());
+	Templates.AddItem(CreateLotsOfShieldingBuff());
 	return Templates;
+}
+
+// Perk name:		Pyromaniac
+// Perk effect:		Your fire attacks deal +1 damage, and your burn effects deal +1 damage per turn. You get a free incendiary grenade on each mission.
+// Localized text:	"Your fire attacks deal +1 damage, and your burn effects deal +1 damage per turn. You get a free incendiary grenade on each mission."
+// Config:			(AbilityName="XMBExample_Pyromaniac")
+static function X2AbilityTemplate Turbocharged()
+{
+	local XMBEffect_BonusDamageByDamageType Effect;
+	local X2AbilityTemplate Template;
+	local XMBEffect_AddUtilityItem ItemEffect;
+
+	Effect = new class'XMBEffect_BonusDamageByDamageType';
+	Effect.EffectName = 'Turbocharged';
+	Effect.RequiredDamageTypes.AddItem('electric');
+	Effect.DamageBonus = 2;
+
+	// Create the template using a helper function
+	Template = Passive('ILB_Turbocharged', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);
+
+	return Template;
+}
+
+
+
+static function X2AbilityTemplate CreateLotsOfShieldingBuff()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_PersistentStatChange Effect;
+	local X2Condition_MapProperty Condition;
+
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_LotsOfShielding',"img:///UILibrary_PerkIcons.UIPerk_andromedon_robotbattlesuit", true, none);
+
+	//DEFENSE
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'LotsOfShielding';
+	Effect.BuildPersistentEffect(1, true, false, false);
+	Effect.AddPersistentStatChange(eStat_ShieldHP, 12);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+	
+	return Template;
+}
+
+static function X2AbilityTemplate CreateChryssalidAndFacelessBuff()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_PersistentStatChange Effect;
+	local X2Condition_MapProperty Condition;
+
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_FasterSavages',"img:///UILibrary_PerkIcons.UIPerk_andromedon_robotbattlesuit", true, none);
+
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'Faster';
+	Effect.BuildPersistentEffect(1, true, false, false);
+	Effect.AddPersistentStatChange(eStat_Defense, 15);
+	Effect.AddPersistentStatChange(eStat_Mobility, 3);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+	
+	return Template;
 }
 
 
@@ -147,6 +217,28 @@ static function X2AbilityTemplate CreatePoisonImmunity()
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 
 	return Template;
+}
+
+static function X2AbilityTemplate SiphonLifeEffect(){
+	/*
+	local X2Effect_ApplyMedikitHeal Effect;
+	local XMBCondition_AbilityName AbilityNameCondition;
+
+	Effect = new class'X2Effect_ApplyMedikitHeal';
+	Effect.PerUseHP = 2000; // heal to full
+	
+	Effect.EffectName = 'SkullminingHeal';
+	Effect.TriggeredEvent = 'SkullMiningHeal';
+
+	// The bonus only applies to standard shots
+	AbilityNameCondition = new class'XMBCondition_AbilityName';
+	AbilityNameCondition.IncludeAbilityNames.AddItem('SKULLJACKAbility');
+	AbilityNameCondition.IncludeAbilityNames.AddItem('SKULLMINEAbility');
+	Effect.AbilityTargetConditions.AddItem(AbilityNameCondition);
+	*/
+	// Create the template using a helper function
+	//return Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
+
 }
 
 static function X2AbilityTemplate AidProtocolRefund()

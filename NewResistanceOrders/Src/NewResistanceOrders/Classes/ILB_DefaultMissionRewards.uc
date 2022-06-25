@@ -8,20 +8,48 @@ static function array<X2DataTemplate> CreateTemplates()
 	local array<X2DataTemplate> Templates;
 	
 	Templates.AddItem(CreateSparkRewardTemplate());
-	Templates.AddItem(CreateSparkMissionRewardTemplate());
 
+	Templates.AddItem(CreateSparkMissionRewardTemplate());
 	Templates.AddItem(CreateSwarmDefenseMissionReward_GrantsSupplies());
 	Templates.AddItem(CreateSwarmDefenseMissionReward_GrantsResistanceContact());
+	Templates.AddItem(CreateCouncilBountyMissionReward_GrantsSupplies());
 
-	// gather survivors mission!
-	// extract supplies?
-	// eliminate field commander!  We have a proposition for you.
-	// Kill this guy, we give you some of our finest in heavy armaments.
-	// see PlayerState.SetSquadConcealment(true);
-	// 
+	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_RescueRichPerson'));
+	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_RescueFriendlyPolitician'));
+	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_StealSparkCore'));
+	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_CouncilBounties'));
 	return Templates;
 }
 
+static function X2DataTemplate CreateMissionFlavorTextTemplate(name TemplateName){
+	local X2DataTemplate Template;
+	`CREATE_X2TEMPLATE(class'X2MissionFlavorTextTemplate', Template, TemplateName);
+
+	return Template;
+}
+static function X2DataTemplate CreateCouncilBountyMissionReward_GrantsSupplies()
+{
+	local X2RewardTemplate Template;
+
+	`CREATE_X2Reward_TEMPLATE(Template, 'ILB_Reward_CouncilBounties');
+
+	Template.GiveRewardFn = GiveCouncilBountiesReward;
+	Template.GetRewardStringFn = GetMissionRewardString;
+
+	return Template;
+}
+
+
+function GiveCouncilBountiesReward(
+XComGameState NewGameState,
+XComGameState_Reward RewardState,
+optional StateObjectReference AuxRef,
+optional bool bOrder = false,
+optional int OrderHours = -1){
+	GiveRiskyMissionReward(NewGameState, RewardState, 'ILB_Sitrep_TougherFieldCommander', 
+	 'Reward_Supplies', 'NeutralizeFieldCommander', 
+	 false, 'ILB_CouncilBounties', AuxRef);
+}
 static function X2DataTemplate CreateSparkMissionRewardTemplate()
 {
 	local X2RewardTemplate Template;
@@ -59,16 +87,23 @@ static function X2RewardTemplate CreateSwarmDefenseMissionReward_GrantsResistanc
 	return Template;
 }
 
-
 function GiveSwarmDefenseForSuppliesMission(
 XComGameState NewGameState,
 XComGameState_Reward RewardState,
 optional StateObjectReference AuxRef,
 optional bool bOrder = false,
 optional int OrderHours = -1){
-	GiveRiskyMissionReward(NewGameState, RewardState, 'ShowOfForce',
+	GiveRiskyMissionReward(NewGameState, RewardState, '',
 	 'Reward_Supplies', 'SwarmDefense', 
-	 false, AuxRef);
+	 false, 'ILB_RescueRichPerson', AuxRef);
+}
+
+public function name GrabRandomCrackdownSitrep(){
+	return class'X2DownloadableContentInfo_NewResistanceOrders'.static.GrabRandomCrackdownSitrep();
+}
+
+public function name GetForceLevelSitrep(){
+	return class'ILB_DefaultSitreps'.static.GetRandomForceLevelIncreaseSitrep();//0-3
 }
 
 function GiveSwarmDefenseForResistanceContactMission(
@@ -77,7 +112,7 @@ XComGameState_Reward RewardState,
 optional StateObjectReference AuxRef,
 optional bool bOrder = false,
 optional int OrderHours = -1){
-	GiveRiskyMissionReward(NewGameState, RewardState, 'ShowOfForce', 'Reward_ResistanceContact', 'SwarmDefense', false, AuxRef);
+	GiveRiskyMissionReward(NewGameState, RewardState, '', 'Reward_ResistanceContact', 'SwarmDefense', true, 'ILB_RescueFriendlyPolitician', AuxRef);
 }
 
 function GiveSparkCoreHeistReward(
@@ -86,7 +121,7 @@ XComGameState_Reward RewardState,
 optional StateObjectReference AuxRef,
 optional bool bOrder = false,
 optional int OrderHours = -1){
-	GiveRiskyMissionReward(NewGameState, RewardState, 'ShowOfForce', 'ILB_Reward_Spark', 'Recover', false, AuxRef);
+	GiveRiskyMissionReward(NewGameState, RewardState, GetForceLevelSitrep(), 'ILB_Reward_Spark', 'Recover', true, 'ILB_StealSparkCore', AuxRef);
 }
 
 function GiveRiskyMissionReward(
@@ -96,6 +131,7 @@ name NegativeSitrepName,
 name NewRewardName,
 name MissionFamilyName,
 bool ReplaceExistingReward,
+name FlavorTextTemplateName,
 optional StateObjectReference AuxRef,
 optional bool bOrder = false,
 optional int OrderHours = -1)
@@ -109,42 +145,86 @@ optional int OrderHours = -1)
 	local array<XComGameState_Reward> MissionRewards;
 	local float MissionDuration;
 	local StateObjectReference RegionRef;
-
-	`LOG("Generating possibly-risky mission reward");
+	local XComGameState_WorldRegion localRegion;
+	local X2MissionFlavorTextTemplate FlavorTextTemplate;
+	local XComParcelManager ParcelMgr;
+	ParcelMgr = `PARCELMGR;
+	`LOG("Generating possibly-risky mission reward ; a mission with its own reward of : " $ NewRewardName);
 
 	RegionRef = ChooseRandomRegion(NewGameState);
 
 	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
-	RegionState = XComGameState_WorldRegion(`XCOMHISTORY.GetGameStateForObjectID(RegionRef.ObjectID));	
-
-	MissionRewards.Length = 0;
-	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate(NewRewardName));
-	MissionRewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
-	MissionRewardState.GenerateReward(NewGameState);
-	//NewGameState.AddStateObject(MissionRewardState);
-	MissionRewards.AddItem(MissionRewardState);
+	//RegionState = XComGameState_WorldRegion(`XCOMHISTORY.GetGameStateForObjectID(RegionRef.ObjectID));	
+	
 
 	MissionState = XComGameState_MissionSite(NewGameState.CreateStateObject(class'XComGameState_MissionSite'));
+	MissionState.Region = RegionRef;
+
+	localRegion = XComGameState_WorldRegion(`XCOMHISTORY.GetGameStateForObjectID(RegionRef.ObjectID));
+	if(localRegion != none){
+		MissionState.Continent = localRegion.GetContinent().GetReference();
+	}
 	//NewGameState.AddStateObject(MissionState);
 
-	MissionSource = X2MissionSourceTemplate(StratMgr.FindStrategyElementTemplate('MissionSource_GuerillaOp'));
+	// MissionSource = X2MissionSourceTemplate(StratMgr.FindStrategyElementTemplate('MissionSource_GuerillaOp'));
+	// `LOG("Finished generating missionState and missionSource");
+
+	//MissionDuration = float((default.MissionMinDuration + `SYNC_RAND_STATIC(default.MissionMaxDuration - default.MissionMinDuration + 1)) * 3600);
 	
-	MissionDuration = float((default.MissionMinDuration + `SYNC_RAND_STATIC(default.MissionMaxDuration - default.MissionMinDuration + 1)) * 3600);
+	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate(NewRewardName));
+	MissionRewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
+
+	`LOG("Created reward, now generating");
+
+	MissionRewardState.GenerateReward(NewGameState, , RegionRef);
+	//NewGameState.AddStateObject(MissionRewardState);
+
+	//MissionState.BuildMission(MissionSource, RegionState.GetRandom2DLocationInRegion(), RegionState.GetReference(), MissionRewards, true, true, , , , , false);
+	//MissionState.BuildMission(MissionSource, RegionState.GetRandom2DLocationInRegion(), RegionState.GetReference(), MissionRewards, true, true, , MissionDuration);
+
+	// so once more we set mission data.  In this case, by excluding every mission family EXCEPT the desired one
+	//SetMissionData(MissionRewards[0].GetMyTemplate(), bUseSpecifiedLevelSeed, LevelSeedOverride);
+	//SetMissionData(name MissionFamily, XComGameState_MissionSite MissionState, X2RewardTemplate MissionReward, XComGameState NewGameState, bool bUseSpecifiedLevelSeed, int LevelSeedOverride)
+	`LOG("Setting mission data using " $ MissionFamilyName $ ": " $ MissionState $ ": " $ RewardTemplate.DataName);
+	MissionState.Source = 'MissionSource_ILBOptional';
+	class'MissionGenerator'.static.SetMissionData(MissionFamilyName, MissionState, RewardTemplate, NewGameState, false, 0);
 	
-	if (ReplaceExistingReward)
-	{
-		MissionRewards.Length = 0;
+	MissionState.Available = true;
+	MissionState.Expiring = true;
+	
+	MissionState.TimerStartDateTime = `STRATEGYRULES.GameTime;
+	MissionState.TimeUntilDespawn  = 500000.0;
+	MissionState.SetProjectedExpirationDateTime(MissionState.TimerStartDateTime);
+
+	//todo: redo sitreps so that they don't reflect the OLD mission family
+	//MissionState.GeneratedMission.Plot = MissionState.SelectPlotDefinition(MissionState.GeneratedMission.Mission, MissionState.GeneratedMission.Biome.strType);
+	//MissionState.GeneratedMission.Biome = ParcelMgr.GetBiomeDefinition(MissionState.GeneratedMission.Biome.strType);
+	`LOG("FINISHED Setting mission data using " $ MissionFamilyName $ ": " $ MissionState $ ": " $ RewardTemplate.DataName);
+	//MissionState.Rewards.AddItem(MissionRewardState);
+	
+	MissionState.PickPOI(NewGameState);
+	
+	if (NegativeSitrepName != ''){
+		MissionState.GeneratedMission.SitReps.AddItem(NegativeSitrepName);
 	}
 
-	MissionState.BuildMission(MissionSource, RegionState.GetRandom2DLocationInRegion(), RegionState.GetReference(), MissionRewards, true, true, , MissionDuration);
-	MissionState.PickPOI(NewGameState);
-
-	MissionState.GeneratedMission.Mission.MissionFamily = string(MissionFamilyName);
-	MissionState.GeneratedMission.SitReps.AddItem(NegativeSitrepName);
-
-	RewardState.RewardObjectReference = MissionState.GetReference();
+	//RewardState.RewardObjectReference = MissionState.GetReference();
 	`LOG("FINISHED generating possibly-risky mission reward");
+	
+	MissionState.Rewards.AddItem(MissionRewardState.GetReference());
+	
+	if (MissionSource.bIntelHackRewards)
+	{
+		MissionState.PickIntelOptions();
+	}
+
+	FlavorTextTemplate = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager().GetMissionFlavorText(MissionState, , FlavorTextTemplateName);
+	MissionState.SuccessText = FlavorTextTemplate.CouncilSpokesmanSuccessText[0];
+	MissionState.FailureText = FlavorTextTemplate.CouncilSpokesmanFailureText[0];
 }
+
+
+
 
 ///////////////STEAL SPARK REWARD TEMPLATE FOLLOWS////////////////////////////////////////
 static function X2DataTemplate CreateSparkRewardTemplate()

@@ -87,8 +87,31 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Techs.AddItem(CreateGrantRookiesPermaHp());
 		Techs.AddItem(CreateCheaperSoldiersWithBeatdown());
 		Techs.AddItem(CreateDawnMachines());
+		Techs.AddItem(CreateRemoteSuperchargers());
 
 		return Techs;
+	}
+
+	static function X2DataTemplate CreateRemoteSuperchargers(){
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_RemoteSuperchargers');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantRemoteSuperchargers;
+		return Template; 
+	}
+	static function GrantRemoteSuperchargers(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom){
+			return;
+		}
+		AbilitiesToGrant.AddItem('ILB_Turbocharged');
+		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'arcthrower')){
+			AbilitiesToGrant.AddItem( 'MZArcElectrocute' ); 
+		}
+		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'gremlin')){
+			AbilitiesToGrant.AddItem( 'MZChainingJolt' ); 
+		}
 	}
 	
 	static function X2DataTemplate CreateCityTravelPapersTemplate()

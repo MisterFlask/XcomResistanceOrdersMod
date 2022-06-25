@@ -75,6 +75,12 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\NewResistanceOrders\Classes\IRB_UIBlackMarketScreenListener.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\MissionGenerator.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\MissionSource_ILBOptionalMissionSource.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\MZ_Effect_AddSevenWeapon.uc">
       <SubType>Content</SubType>
     </Content>
