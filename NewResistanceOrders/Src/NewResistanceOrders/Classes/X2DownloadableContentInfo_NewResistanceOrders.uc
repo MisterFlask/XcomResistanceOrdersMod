@@ -97,10 +97,19 @@ exec function VerifyPlayableCards()
 	local XComGameState_StrategyCard CurrentCard;
 	local array<X2DataTemplate> RelevantRewardTemplates;
 	local X2DataTemplate DataTemplate;
+	local X2SitRepTemplate SitRepTemplate;
+	local X2SitRepEffectTemplate SitRepEffectTemplate;
 	// templates for rewards
 	
 	local X2StrategyElementTemplateManager TemplateManager;
 	local X2RewardTemplate RewardTemplate;
+	local name TemplateName;
+	local array<X2DataTemplate> AllSitrepEffectTemplates;
+	local array<X2DataTemplate> AllSitRepTemplates;
+
+	AllSitRepTemplates = class'ILB_DefaultSitrepsParent'.static.CreateTemplates();
+	AllSitrepEffectTemplates = class'ILB_DefaultSitreps'.static.CreateTemplates();
+
 	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	RelevantRewardTemplates = class'ILB_DefaultMissionRewards'.static.CreateTemplates();
 	History = `XCOMHISTORY;
@@ -131,6 +140,41 @@ exec function VerifyPlayableCards()
 			`LOG("ERROR:  Reward template display name empty for " $ RewardTemplate.DataName);
 		}
 	}
+	`LOG("checking all sitrep effects... ");
+
+	foreach AllSitrepEffectTemplates(DataTemplate){
+		SitRepEffectTemplate = X2SitRepEffectTemplate(DataTemplate);
+		`LOG("checking sitrep effect: " $ SitRepEffectTemplate.DataName);
+
+		if (SitRepEffectTemplate.FriendlyName == ""){
+			`LOG("ERROR: Reward template display name empty for " $ SitRepEffectTemplate.DataName);
+		}	
+	}
+	`LOG("checking all sitreps... ");
+
+	foreach AllSitRepTemplates(DataTemplate){
+		SitRepTemplate = X2SitRepTemplate(DataTemplate);
+		`LOG("checking sitrep: " $ SitRepTemplate.DataName);
+
+		if (SitRepTemplate.FriendlyName == ""){
+			`LOG("ERROR: Reward template display name empty for " $ SitRepTemplate.DataName);
+		}
+		if (SitRepTemplate.NegativeEffects.Length  == 0){
+			`LOG("ERROR: Sitrep template negative effects is empty for " $ SitRepTemplate.DataName);
+		}
+
+		foreach SitRepTemplate.NegativeEffects(TemplateName){
+			`LOG("Checking on sitrep effect owned by current sitrep (named above)... " $ TemplateName);
+
+			SitRepEffectTemplate = class'X2SitRepEffectTemplateManager'.static.GetSitRepEffectTemplateManager().FindSitRepEffectTemplate ( TemplateName ) ;
+			if (SitRepEffectTemplate == none){
+				`LOG("ERROR:  Sitrep effect is not initialized for SitRepEffectTemplate " $ TemplateName);
+			}
+		}
+
+	}
+
+
 }
 
 exec function ActivateAllCards()
@@ -331,9 +375,10 @@ static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_Mi
 	
 
 
-	if (IsResCardActive('ResCard_RadioFreeLily') && IsRetaliation(MissionFamily)){
-			`LOG("Adding plus one force level sitrep due to retaliation + Radio Free Lily");
-			GeneratedMission.SitReps.AddItem('ILB_Sitrep_PlusOneForceLevel');
+	if (IsResCardActive('ResCard_RadioFreeLily') && IsRetaliation(MissionFamily))
+	{
+		`LOG("Adding plus one force level sitrep due to retaliation + Radio Free Lily");
+		GeneratedMission.SitReps.AddItem('ILB_Sitrep_PlusOneForceLevel');
 	}
 
 	if (MissionSource == 'MissionSource_GuerillaOp' 
@@ -372,7 +417,7 @@ static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_Mi
 		if (CrackdownRoll < PercentageCrackdownChance)
 		{
 		
-			CrackdownSitrepAdded= GrabRandomCrackdownSitrep();
+			CrackdownSitrepAdded = GrabRandomCrackdownSitrep();
 			`LOG("Added crackdown " $ CrackdownSitrepAdded $ " to mission " $ GeneratedMission.Mission.MissionFamily $ ":" $ GeneratedMission.BattleOpName);
 			GeneratedMission.SitReps.AddItem(CrackdownSitrepAdded);
 		}
