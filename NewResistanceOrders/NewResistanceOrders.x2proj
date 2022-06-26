@@ -48,6 +48,9 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_DefaultMissionRewards.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_DefaultSitrepsParent.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_DefaultSitreps.uc">
       <SubType>Content</SubType>
     </Content>

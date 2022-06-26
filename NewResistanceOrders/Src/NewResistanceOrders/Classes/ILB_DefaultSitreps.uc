@@ -1,5 +1,4 @@
-class ILB_DefaultSitreps extends X2SitRep 
-	dependson(X2SitRepTemplate)
+class ILB_DefaultSitreps extends X2SitRepEffect
 	config(GameData);
 
 static function array<X2DataTemplate> CreateTemplates()
@@ -10,8 +9,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_Shadowstep','Shadowstep')); // ADVENT Crackdown: Binah Cadre
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_ReturnFire','IncendiaryRounds'));  // ADVENT Crackdown:  Chesed Cadre
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_PoisonClouds','ILB_PoisonImmunity', 'ILB_BrutePoison'));  //ADVENT Crackdown:  Netzah Cadre
-	
-	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_TougherFieldCommander','BlastPadding', 'ILB_LotsOfShielding'));  //ADVENT Crackdown:  Netzah Cadre
+	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_TougherFieldCommander','BlastPadding', 'ILB_LotsOfShielding', 'AdvGeneralM1'));  //TODO: Fix so that it works for M2 and M3 also
 
 	Sitreps.AddItem(CreateForceLevelIncreaseByNEffectTemplate(Sitreps, 1, 'ILB_Sitrep_PlusOneForceLevel'));
 	Sitreps.AddItem(CreateForceLevelIncreaseByNEffectTemplate(Sitreps, 2, 'ILB_Sitrep_PlusTwoForceLevel'));
@@ -22,14 +20,6 @@ static function array<X2DataTemplate> CreateTemplates()
 	}
 
 	return Sitreps;
-}
-
-static function X2SitRepTemplate GetBlankSitrepWithSameNamedSitrepEffect(name SitRepName){
-	local X2SitRepTemplate Template;
-	`CREATE_X2TEMPLATE(class'X2SitRepTemplate', Template, SitRepName);
-	Template.bNegativeEffect = true;
-	Template.NegativeEffects.AddItem(SitRepName);
-	return Template;
 }
 
 
@@ -67,11 +57,10 @@ static function X2SitRepEffectTemplate CreateForceLevelIncreaseByNEffectTemplate
 {
 	local X2SitRepEffect_ModifyForceLevel Template;
 
-	`CREATE_X2TEMPLATE(class'X2SitRepEffect_ModifyForceLevel', Template, SitrepName);
+	`CREATE_X2TEMPLATE(class'X2SitRepEffect_ModifyForceLevel', Template, name(SitrepName $ "_Effect"));
 
 	Template.ForceLevelModification = ForceLevelChange;
 	Template.MaxForceLevel = 20;
-	Sitreps.AddItem(GetBlankSitrepWithSameNamedSitrepEffect(SitrepName));
 
 	return Template;
 }
@@ -80,19 +69,19 @@ static function X2SitRepEffectTemplate GrantAlienTeamAbilitySitrep(out array<X2D
 {
 	local X2SitRepEffect_GrantAbilities Template;
 
-	`CREATE_X2TEMPLATE(class'X2SitRepEffect_GrantAbilities', Template, SitrepName);
+	`CREATE_X2TEMPLATE(class'X2SitRepEffect_GrantAbilities', Template, name(SitrepName $ "_Effect"));
 	
-	Template.AbilityTemplateNames.AddItem(AbilityName);
 	Template.GrantToSoldiers = false;
-	if (SpecificTemplateThisAppliesTo != ''){
-		Template.CharacterTemplateNames.AddItem(SpecificTemplateThisAppliesTo);
-	}
 	Template.Teams.AddItem(eTeam_Alien);
+
+	Template.AbilityTemplateNames.AddItem(AbilityName);
 	if (SecondaryAbilityName != ''){
 		Template.AbilityTemplateNames.AddItem(SecondaryAbilityName);
 	}
-
-	Sitreps.AddItem(GetBlankSitrepWithSameNamedSitrepEffect(SitrepName));
+	
+	if (SpecificTemplateThisAppliesTo != ''){
+		Template.CharacterTemplateNames.AddItem(SpecificTemplateThisAppliesTo);
+	}
 	return Template;
 }
 
