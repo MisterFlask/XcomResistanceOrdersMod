@@ -22,5 +22,6 @@ static function X2SitRepTemplate CreateNegativeSitrepMatchingName(name TemplateN
 	`CREATE_X2TEMPLATE(class'X2SitRepTemplate', Template, TemplateName);
 	Template.NegativeEffects.AddItem(name(TemplateName $ "_Effect"));
 	Template.bNegativeEffect = true;
+	Template.ValidMissionFamilies.AddItem("NONE"); // this is a dummy value intended to prevent spawning randomly
 	return Template;
 }

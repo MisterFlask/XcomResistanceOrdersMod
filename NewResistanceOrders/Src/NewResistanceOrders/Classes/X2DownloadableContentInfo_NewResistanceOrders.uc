@@ -99,6 +99,7 @@ exec function VerifyPlayableCards()
 	local X2DataTemplate DataTemplate;
 	local X2SitRepTemplate SitRepTemplate;
 	local X2SitRepEffectTemplate SitRepEffectTemplate;
+	local X2SitRepEffect_GrantAbilities SitRepGrantingAbilities;
 	// templates for rewards
 	
 	local X2StrategyElementTemplateManager TemplateManager;
@@ -147,8 +148,19 @@ exec function VerifyPlayableCards()
 		`LOG("checking sitrep effect: " $ SitRepEffectTemplate.DataName);
 
 		if (SitRepEffectTemplate.FriendlyName == ""){
-			`LOG("ERROR: Reward template display name empty for " $ SitRepEffectTemplate.DataName);
+			`LOG("ERROR: Sitrep Effect template FriendlyName name empty for " $ SitRepEffectTemplate.DataName);
 		}	
+
+		SitRepGrantingAbilities = X2SitRepEffect_GrantAbilities(SitRepEffectTemplate);
+		if (SitRepGrantingAbilities != none){
+			`LOG("CHecking abilities of sitrep grant-abilities effect " $ SitRepGrantingAbilities.DataName);
+			if (SitRepGrantingAbilities.AbilityTemplateNames.Length == 0){
+				`LOG("ERROR:  No abilities set for sitrep template");
+			}else{
+				PrintAbilities(SitRepGrantingAbilities.AbilityTemplateNames);
+			}
+		}
+
 	}
 	`LOG("checking all sitreps... ");
 
@@ -171,10 +183,28 @@ exec function VerifyPlayableCards()
 				`LOG("ERROR:  Sitrep effect is not initialized for SitRepEffectTemplate " $ TemplateName);
 			}
 		}
-
 	}
 
 
+}
+
+// prints out if all the abilities exist nad what they ares
+static function PrintAbilities(array<name> AbilityNames){
+	local name TemplateName;
+	local X2AbilityTemplate AbilityTemplate;
+	local X2AbilityTemplateManager AbilityTemplateManager;
+
+	AbilityTemplateManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
+	
+	foreach AbilityNames(TemplateName){
+		AbilityTemplate = AbilityTemplateManager.FindAbilityTemplate(TemplateName);
+		if (AbilityTemplate != none)
+		{	
+			`LOG("Successfully verified : " $ TemplateName);
+		}else{
+			`LOG("COULD NOT verify: " $ TemplateName);
+		}
+	}
 }
 
 exec function ActivateAllCards()
@@ -284,12 +314,14 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	local XComGameState NewGameState;
 	local name CurrentSitrepName;
 	local array<name> SitrepList;
+	local XComGameStateHistory CachedHistory;
+
 	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
 	
-	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
-
-
+	//NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
+	CachedHistory = `XCOMHISTORY;
+	NewGameState = CachedHistory.GetGameStateFromHistory();
 	If (`HQGAME  != none && `HQPC != None && `HQPRES != none) // we're in strategy
 	{
 		//todo: random chance
@@ -356,10 +388,9 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 
 	}
 
-	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
-
-
+	//`GAMERULES.SubmitGameState(NewGameState);
 }
+
 
 static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_MissionSite MissionState, out GeneratedMissionData GeneratedMission){
 	local int PercentageCrackdownChance;
@@ -430,6 +461,29 @@ static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_Mi
 	}
 
 }
+/*
+
+	static function PrintEffectsOfAbilitySitrep(array<name> SitReps){
+		foreach class'X2SitreptemplateManager'.static.IterateEffects(class'X2SitRepEffect_GrantAbilities', SitRepEffect, SitReps)
+		{
+			SitRepEffect.GetAbilitiesToGrant(self, GrantedAbilityNames);
+			for (i = 0; i < GrantedAbilityNames.Length; ++i)
+			{
+				AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate(GrantedAbilityNames[i]);
+				if( AbilityTemplate != none &&
+					(!AbilityTemplate.bUniqueSource || arrData.Find('TemplateName', AbilityTemplate.DataName) == INDEX_NONE) &&
+				   AbilityTemplate.ConditionsEverValidForUnit(self, false) )
+				{
+					Data = EmptyData;
+					Data.TemplateName = AbilityTemplate.DataName;
+					Data.Template = AbilityTemplate;
+					arrData.AddItem(Data);
+				}
+			}
+		}
+	
+	}
+	*/
 
 static function bool IsRetaliation(string MissionFamily){
 	return MissionFamily == "Terror" || MissionFamily == "Retaliation" || MissionFamily == "ChosenRetaliation";

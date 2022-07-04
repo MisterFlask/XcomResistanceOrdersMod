@@ -7,7 +7,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	local X2DataTemplate CurrentItem;
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_HeavilyArmored','BlastPadding')); // ADVENT Crackdown: Hokmah Cadre
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_Shadowstep','Shadowstep')); // ADVENT Crackdown: Binah Cadre
-	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_ReturnFire','IncendiaryRounds'));  // ADVENT Crackdown:  Chesed Cadre
+	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_ReturnFire','ReturnFire'));  // ADVENT Crackdown:  Chesed Cadre //TODO: Replace with return-fire-for-primaries
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_AdventCrackdown_PoisonClouds','ILB_PoisonImmunity', 'ILB_BrutePoison'));  //ADVENT Crackdown:  Netzah Cadre
 	Sitreps.AddItem(GrantAlienTeamAbilitySitrep(Sitreps, 'ILB_Sitrep_TougherFieldCommander','BlastPadding', 'ILB_LotsOfShielding', 'AdvGeneralM1'));  //TODO: Fix so that it works for M2 and M3 also
 
@@ -49,7 +49,7 @@ static function array<name> CrackdownSitreps()
 	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_HeavilyArmored');
 	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_Shadowstep');
 	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_PoisonClouds');
-	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_ReturnFire');
+	// Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_ReturnFire');
 	return Sitreps;
 }
 
