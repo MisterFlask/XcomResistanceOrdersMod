@@ -100,12 +100,14 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		Template.GetAbilitiesToGrantFn = GrantRemoteSuperchargers;
 		return Template; 
 	}
+
 	static function GrantRemoteSuperchargers(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
 		AbilitiesToGrant.AddItem('ILB_Turbocharged');
+
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'arcthrower')){
 			AbilitiesToGrant.AddItem( 'MZArcElectrocute' ); 
 		}
@@ -1177,7 +1179,6 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sniper_rifle') )
 		{
-			AbilitiesToGrant.AddItem( 'LongWatch' );
 			AbilitiesToGrant.AddItem( 'Sentinel' );
 		}
 	}

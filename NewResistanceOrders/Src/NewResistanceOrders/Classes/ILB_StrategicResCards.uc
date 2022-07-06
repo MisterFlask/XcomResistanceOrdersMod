@@ -18,16 +18,15 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions;
 		Techs.AddItem(CreateNotoriousSmugglers());
 		Techs.AddItem(CreateGrndlPowerDeal());
 		Techs.AddItem(CreateLeachPsionicLeylines());
-		// Techs.AddItem(RemotelyChargedBackpacks());
-		// Techs.AddItem(RemotelyChargedSparks());
-		// Techs.AddItem(CreateChargedPsionics()); // adds Teleportation and Blink to templars + psions; costs 5 power.
 
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_CouncilBounties')); //
 		// Techs.AddItem(CreateBlankResistanceOrder('ResCard_PoweredArmorHeist')); //
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueUpperCrustContacts')); // swarm mission grants you supplies
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueFriendlyPolitician')); // swarm mission grants you res contact
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_StealSparkCore'));
-		
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_ItsAboutSendingAMessage'));
+
+
 		return Techs;
 	}
 	static function X2DataTemplate CreateLeachPsionicLeylines()
