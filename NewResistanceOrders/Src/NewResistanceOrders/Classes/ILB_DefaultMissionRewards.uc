@@ -13,11 +13,13 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(CreateSwarmDefenseMissionReward_GrantsSupplies());
 	Templates.AddItem(CreateSwarmDefenseMissionReward_GrantsResistanceContact());
 	Templates.AddItem(CreateCouncilBountyMissionReward_GrantsSupplies());
+	Templates.AddItem(CreateMissionReward_ItsAboutSendingAMessage());
 
 	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_RescueRichPerson'));
 	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_RescueFriendlyPolitician'));
 	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_StealSparkCore'));
 	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_CouncilBounties'));
+	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_ItsAboutSendingAMessage'));
 	return Templates;
 }
 
@@ -27,6 +29,7 @@ static function X2DataTemplate CreateMissionFlavorTextTemplate(name TemplateName
 
 	return Template;
 }
+
 static function X2DataTemplate CreateCouncilBountyMissionReward_GrantsSupplies()
 {
 	local X2RewardTemplate Template;
@@ -39,6 +42,40 @@ static function X2DataTemplate CreateCouncilBountyMissionReward_GrantsSupplies()
 	return Template;
 }
 
+static function X2DataTemplate CreateMissionReward_ItsAboutSendingAMessage()
+{
+	local X2RewardTemplate Template;
+
+	`CREATE_X2Reward_TEMPLATE(Template, 'ILB_Reward_ItsAboutSendingAMessage');
+
+	Template.GiveRewardFn = GiveSendingAMessageReward;
+	Template.GetRewardStringFn = GetMissionRewardString;
+
+	return Template;
+}
+
+
+function GiveSendingAMessageReward(
+XComGameState NewGameState,
+XComGameState_Reward RewardState,
+optional StateObjectReference AuxRef,
+optional bool bOrder = false,
+optional int OrderHours = -1){
+
+	local XComGameState_Reward MissionRewardState;
+
+	MissionRewardState = BuildMissionItemReward(NewGameState, 'LightPlatedArmor');
+	GiveRiskyMissionRewardWithDefinedReward(NewGameState,
+		RewardState,
+		'',
+		MissionRewardState,
+		'Neutralize',
+		false,
+		'ILB_ItsAboutSendingAMessage',
+		AuxRef,
+		bOrder,
+		OrderHours);
+}
 
 function GiveCouncilBountiesReward(
 XComGameState NewGameState,
@@ -426,4 +463,28 @@ static function StateObjectReference CreateSparkSoldier(XComGameState NewGameSta
 	NewSparkState.bNeedsNewClassPopup = false;
 
 	return NewSparkState.GetReference();	
+}
+function XComGameState_Reward BuildMissionItemReward(XComGameState NewGameState, Name TemplateName)
+{
+	local X2RewardTemplate RewardTemplate;
+	local XComGameState_Reward RewardState;
+	local X2StrategyElementTemplateManager StratMgr;
+	local X2ItemTemplateManager ItemMgr;
+	local X2ItemTemplate ItemTemplate;
+	local XComGameState_Item ItemState;
+
+	// create the item reward
+	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+
+	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate('Reward_Item'));
+	RewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
+	NewGameState.AddStateObject(RewardState); // Is this correct?
+
+	ItemMgr = class'X2ItemTemplateManager'.static.GetItemTemplateManager();
+	ItemTemplate = ItemMgr.FindItemTemplate(TemplateName);
+	ItemState = ItemTemplate.CreateInstanceFromTemplate(NewGameState);
+	NewGameState.AddStateObject(ItemState); // Is this correct?
+	RewardState.RewardObjectReference = ItemState.GetReference();
+
+	return RewardState;
 }

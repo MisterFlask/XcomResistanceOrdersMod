@@ -54,7 +54,7 @@ static protected function EventListenerReturn StrategyMapMissionSiteSelected(Obj
 	MissionUI = HQPres.Spawn(class'UIMission_ResCardCovertOpMission', HQPres);
 	MissionUI.MissionRef = MissionSite.GetReference();
 	HQPres.ScreenStack.Push(MissionUI);
-
+	return ELR_NoInterrupt;
 }
 
 static function EventListenerReturn PostEndOfMonth(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
@@ -65,11 +65,13 @@ static function EventListenerReturn PostEndOfMonth(Object EventData, Object Even
 	`LOG("hit the post-end-of-month listener; adding necessary covert actions to all factions");
 	
 	AddCovertActionToFactionConditionalOnResCard(NewGameState, 'ILB_CovertAction_SpawnAiTheft', 'Faction_Skirmishers', 'ResCard_StealSparkCore');
+	AddCovertActionToFactionConditionalOnResCard(NewGameState, 'ILB_CovertAction_ItsAboutSendingAMessage', 'Faction_Reapers', 'ResCard_ItsAboutSendingAMessage');
 	AddCovertActionToFactionConditionalOnResCard(NewGameState, 'ILB_CovertAction_SwarmDefenseForSupplies', 'Faction_Templars', 'ResCard_RescueUpperCrustContacts');
 	AddCovertActionToFactionConditionalOnResCard(NewGameState, 'ILB_CovertAction_SwarmDefenseForResistanceContact', 'Faction_Reapers', 'ResCard_RescueFriendlyPolitician');
 	AddCovertActionToFactionConditionalOnResCard(NewGameState, 'ILB_CovertAction_CouncilBounties', 'Faction_Reapers', 'ResCard_CouncilBounties');
 
 	`XCOMGAME.GameRuleset.SubmitGameState(NewGameState);
+	return ELR_NoInterrupt;
 
 }
 
@@ -82,7 +84,7 @@ static function EventListenerReturn AllowActionToSpawnRandomly(Object EventData,
 	Template = X2CovertActionTemplate(Tuple.Data[1].o);
 	`LOG("Checking on if " $ Template.DataName $ " is disallowed from spawning randomly due to rule that nothing starting with ILB_ spawns randomly.");//todo: hack
 
-	if (InStr(string(Template.DataName), "ILB_") != -1) //todo: this is a hack
+	if (InStr(string(Template.DataName), "ILB_") != -1) //todo: this is a hack, but baaaasically suffices for our purposes
 	{
 		`LOG("Forbidding " $ Template.DataName $ " from spawning randomly due to rule that nothing starting with ILB_ spawns randomly.");//todo: hack
 		Tuple.Data[0].b = false;
