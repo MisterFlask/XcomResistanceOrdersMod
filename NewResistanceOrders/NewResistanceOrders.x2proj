@@ -87,6 +87,9 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\NewResistanceOrders\Classes\MZ_Effect_AddSevenWeapon.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\UIMission_ResCardCovertOpMission.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\X2DownloadableContentInfo_NewResistanceOrders.uc">
       <SubType>Content</SubType>
     </Content>

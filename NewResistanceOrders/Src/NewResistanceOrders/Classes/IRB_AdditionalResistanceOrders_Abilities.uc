@@ -103,7 +103,7 @@ static function X2AbilityTemplate CreateLotsOfShieldingBuff()
 	Effect = new class'X2Effect_PersistentStatChange';
 	Effect.EffectName = 'LotsOfShielding';
 	Effect.BuildPersistentEffect(1, true, false, false);
-	Effect.AddPersistentStatChange(eStat_ShieldHP, 12);
+	Effect.AddPersistentStatChange(eStat_ShieldHP, 4); //todo: config
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.
@@ -164,6 +164,7 @@ static function X2AbilityTemplate BrutePoison()
 
 	MultiTarget = new class'X2AbilityMultiTarget_Radius';
     MultiTarget.bUseWeaponRadius = true;
+	MultiTarget.fTargetRadius = 15; // Should work?
 	MultiTarget.bExcludeSelfAsTargetIfWithinRadius = false;
 	Template.AbilityMultiTargetStyle = MultiTarget;
 

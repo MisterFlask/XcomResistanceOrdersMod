@@ -48,8 +48,8 @@ static function array<name> CrackdownSitreps()
 	local array<name> Sitreps;
 	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_HeavilyArmored');
 	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_Shadowstep');
-	Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_PoisonClouds');
-	// Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_ReturnFire');
+	// Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_PoisonClouds'); // TODO: Fix the fact that this doesn't actually make a poison cloud?
+	// Sitreps.AddItem('ILB_Sitrep_AdventCrackdown_ReturnFire');//TODO: Replace with primary weapon perk
 	return Sitreps;
 }
 

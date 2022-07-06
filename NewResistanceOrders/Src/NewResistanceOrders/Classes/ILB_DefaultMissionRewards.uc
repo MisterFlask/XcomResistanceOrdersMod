@@ -46,9 +46,31 @@ XComGameState_Reward RewardState,
 optional StateObjectReference AuxRef,
 optional bool bOrder = false,
 optional int OrderHours = -1){
-	GiveRiskyMissionReward(NewGameState, RewardState, 'ILB_Sitrep_TougherFieldCommander', 
-	 'Reward_Supplies', 'NeutralizeFieldCommander', 
-	 false, 'ILB_CouncilBounties', AuxRef);
+
+	local X2RewardTemplate RewardTemplate;
+	local XComGameState_Reward MissionRewardState;
+	local X2StrategyElementTemplateManager StratMgr;
+	local name NewRewardName;
+
+	NewRewardName = 'Reward_Supplies';
+
+	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+
+	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate(NewRewardName));
+	MissionRewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
+	MissionRewardState.Quantity = 121;
+	MissionRewardState.GenerateReward(NewGameState, , ChooseRandomRegion());
+
+	GiveRiskyMissionRewardWithDefinedReward(NewGameState,
+		RewardState,
+		'ILB_Sitrep_TougherFieldCommander',
+		MissionRewardState,
+		'NeutralizeFieldCommander',
+		false,
+		'ILB_CouncilBounties',
+		AuxRef,
+		bOrder,
+		OrderHours);
 }
 static function X2DataTemplate CreateSparkMissionRewardTemplate()
 {
@@ -205,7 +227,7 @@ optional int OrderHours = -1){
 	//SetMissionData(MissionRewards[0].GetMyTemplate(), bUseSpecifiedLevelSeed, LevelSeedOverride);
 	//SetMissionData(name MissionFamily, XComGameState_MissionSite MissionState, X2RewardTemplate MissionReward, XComGameState NewGameState, bool bUseSpecifiedLevelSeed, int LevelSeedOverride)
 	`LOG("Setting mission data using " $ MissionFamilyName $ ": ");
-	MissionState.Source = 'MissionSource_GuerillaOp';
+	MissionState.Source = 'MissionSource_ILBOptional';
 	class'MissionGenerator'.static.SetMissionData(MissionFamilyName, MissionState, MissionSpecificRewardState.GetMyTemplate(), NewGameState, false, 0);
 	
 	MissionState.Available = true;
@@ -231,10 +253,8 @@ optional int OrderHours = -1){
 	
 	MissionState.Rewards.AddItem(MissionSpecificRewardState.GetReference());
 	
-	if (MissionSource.bIntelHackRewards)
-	{
-		MissionState.PickIntelOptions();
-	}
+	//doing this always for our missions
+	MissionState.PickIntelOptions();
 
 	FlavorTextTemplate = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager().GetMissionFlavorText(MissionState, , FlavorTextTemplateName);
 	MissionState.SuccessText = FlavorTextTemplate.CouncilSpokesmanSuccessText[0];

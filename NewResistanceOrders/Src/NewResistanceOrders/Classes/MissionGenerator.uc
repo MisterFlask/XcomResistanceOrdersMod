@@ -12,7 +12,6 @@ static function SetMissionData(name MissionFamily, XComGameState_MissionSite Mis
 	local string Biome, MapName;
 	// LWOTC vars
 	local XComHeadquartersCheatManager CheatManager;
-	local X2MissionSourceTemplate MissionSource;
 	local PlotDefinition SelectedPlotDef;
 	local PlotTypeDefinition PlotTypeDef;
 	local array<name> SourceSitReps;
@@ -59,26 +58,6 @@ static function SetMissionData(name MissionFamily, XComGameState_MissionSite Mis
 		SitRepNames.AddItem(CheatManager.ForceSitRepTemplate);
 		CheatManager.ForceSitRepTemplate = '';
 	}
-	else if (!MissionState.bForceNoSitRep)
-	{
-		// No cheats, add SitReps from the Mission Source
-		MissionSource = MissionState.GetMissionSource();
-
-		if (MissionSource.GetSitrepsFn != none)
-		{
-			SourceSitReps = MissionSource.GetSitrepsFn(MissionState);
-
-			foreach SourceSitReps(SitRepName)
-			{
-				if (MissionState.GeneratedMission.SitReps.Find(SitRepName) == INDEX_NONE)
-				{
-					MissionState.GeneratedMission.SitReps.AddItem(SitRepName);
-					SitRepNames.AddItem(SitRepName);
-				}
-			}
-		}
-	}
-	// End LWOTC additions
 
 	MissionState.GeneratedMission.MissionQuestItemTemplate = MissionMgr.ChooseQuestItemTemplate(MissionState.Source, MissionReward, MissionState.GeneratedMission.Mission, (MissionState.DarkEvent.ObjectID > 0));
 

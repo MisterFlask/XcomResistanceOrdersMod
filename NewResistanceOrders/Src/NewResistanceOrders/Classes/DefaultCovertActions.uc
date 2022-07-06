@@ -9,7 +9,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_SpawnAiTheft', 'ILB_Reward_SparkMission', 'ResCard_StealSparkCore'));
 	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_SwarmDefenseForSupplies', 'ILB_Reward_SwarmDefenseForSupplies', 'ResCard_RescueUpperCrustContacts'));
 	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_SwarmDefenseForResistanceContact', 'ILB_Reward_SwarmDefenseForResistanceContact', 'ResCard_RescueFriendlyPolitician'));
-	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_CouncilBounties', 'ILB_Reward_NeutralizeFieldCommanderMission', 'ResCard_CouncilBounties'));
+	CovertActions.AddItem(CreateGeneralCovertActionWithRewardTemplate('ILB_CovertAction_CouncilBounties', 'ILB_Reward_CouncilBounties', 'ResCard_CouncilBounties'));
 
 	//narratives
 	CovertActions.AddItem(CreateNarrative('CovertActionNarrative_ResCard_StealSparkCore'));

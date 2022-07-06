@@ -29,6 +29,7 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 	Template.AddCHEvent('ResearchCompleted', OnResearchCompleted, ELD_Immediate, 99);
 	Template.AddCHEvent('PostEndOfMonth', PostEndOfMonth, ELD_OnStateSubmitted, 99);
 	Template.AddCHEvent('AllowActionToSpawnRandomly', AllowActionToSpawnRandomly, ELD_Immediate, 99);
+	Template.AddCHEvent('StrategyMapMissionSiteSelected', StrategyMapMissionSiteSelected, ELD_Immediate, 99);
 
 	Template.RegisterInStrategy = true;
 
@@ -36,6 +37,26 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 
 	return Template;
 }
+
+
+static protected function EventListenerReturn StrategyMapMissionSiteSelected(Object EventData, Object EventSource, XComGameState GameState, Name EventID, Object CallbackData)
+{
+
+	local XComHQPresentationLayer HQPres;
+	local UIMission MissionUI;
+	local XComGameState_MissionSite MissionSite;
+
+		
+	MissionSite = XComGameState_MissionSite(EventSource);
+
+	HQPres = `HQPRES;
+
+	MissionUI = HQPres.Spawn(class'UIMission_ResCardCovertOpMission', HQPres);
+	MissionUI.MissionRef = MissionSite.GetReference();
+	HQPres.ScreenStack.Push(MissionUI);
+
+}
+
 static function EventListenerReturn PostEndOfMonth(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {
 	local XComGameState NewGameState;
@@ -155,6 +176,12 @@ static function EventListenerReturn BlackMarketResetListener(Object EventData, O
 	if (IsResistanceOrderActive('ResCard_MachineBuffsIfAridClimate')){
 		AddItemToBlackMarket('CorpseAdventMEC', 5, default.FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
+
+	if (IsResistanceOrderActive('ResCard_BrazenRecruitment')){
+		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData, 10); // todo: configs
+		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData);
+
+	}
 	
 	if (IsResistanceOrderActive('ResCard_MeatMarket')){
 		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData);
@@ -217,7 +244,7 @@ static function AddItemToBlackMarket(
 
 	// base game cost is 70
 	static function AddGeneratedSoldierToBlackMarket(
-		Object EventData, Object EventSource, XComGameState NewGameState, Name Event, Object CallbackData){
+		Object EventData, Object EventSource, XComGameState NewGameState, Name Event, Object CallbackData, optional int SoldierSupplyCostOverride = -1){
 		local X2StrategyElementTemplateManager StratMgr;
 		local X2ItemTemplateManager ItemTemplateMgr;
 		local XComGameState_BlackMarket MarketState;
@@ -251,11 +278,16 @@ static function AddItemToBlackMarket(
 			ForSaleItem.RewardRef = RewardState.GetReference();
 
 			ForSaleItem.Title = RewardState.GetRewardString();
-			if (IsModActive('LongWarOfTheChosen')){
+			if (SoldierSupplyCostOverride != -1){
+				ForSaleItem.Cost = GetForSaleItemCostInSupply(SoldierSupplyCostOverride); 
+			}
+			else if (IsModActive('LongWarOfTheChosen')){
 				ForSaleItem.Cost = GetForSaleItemCostInSupply(default.SOLDIER_COST_IN_SUPPLY_LWOTC); 
 			}else{
 				ForSaleItem.Cost = GetForSaleItemCostInSupply(default.SOLDIER_COST_IN_SUPPLY); 
 			}
+
+
 			ForSaleItem.Desc = "The Meat Market giveth; and the Meat Market taketh away.";
 			ForSaleItem.Image = RewardState.GetRewardImage();
 			ForSaleItem.CostScalars = class'XComGameState_BlackMarket'.default.GoodsCostScalars;

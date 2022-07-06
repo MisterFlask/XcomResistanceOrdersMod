@@ -1,22 +1,36 @@
 class MissionSource_ILBOptionalMissionSource extends X2StrategyElement_DefaultMissionSources;
 
-static function X2DataTemplate CreateCouncilTemplate()
+static function array<X2DataTemplate> CreateTemplates()
+{
+	local array<X2DataTemplate> MissionSources;
+	MissionSources.AddItem(CreateIlbOptionalTemplate());
+	return MissionSources;
+}
+
+static function X2DataTemplate CreateIlbOptionalTemplate()
 {
 	local X2MissionSourceTemplate Template;
 	local RewardDeckEntry DeckEntry;
+	`LOG("Creating the MissionSource_ILBOptional Mission Source Template");
 
 	`CREATE_X2TEMPLATE(class'X2MissionSourceTemplate', Template, 'MissionSource_ILBOptional');
 	Template.bIncreasesForceLevel = false;
-	Template.bDisconnectRegionOnFail = true;
+	Template.bShowRewardOnPin = true;
+
 	Template.OnSuccessFn = ILBOnSuccess;
 	Template.OnFailureFn = ILBOnFailure;
 	Template.OnExpireFn = ILBOnExpire;
-	Template.OverworldMeshPath = "UI_3D.Overwold_Final.Council_VIP";
-	Template.MissionImage = "img://UILibrary_Common.Councilman_small";
-	Template.GetMissionDifficultyFn = GetCouncilMissionDifficulty;
-	Template.SpawnMissionsFn = SpawnCouncilMission;
-	Template.MissionPopupFn = CouncilPopup;
-	Template.WasMissionSuccessfulFn = OneStrategyObjectiveCompleted;
+
+	Template.DifficultyValue = 1;
+	Template.OverworldMeshPath = "UI_3D.Overwold_Final.GorillaOps";
+	Template.MissionImage = "img:///UILibrary_StrategyImages.X2StrategyMap.Alert_Guerrilla_Ops";
+
+	Template.GetMissionDifficultyFn = GetMissionDifficultyFromMonth;
+	Template.SpawnMissionsFn = SpawnGuerillaOpsMissions;
+	Template.MissionPopupFn = GuerillaOpsPopup;
+
+	Template.WasMissionSuccessfulFn = StrategyObjectivePlusSweepCompleted;
+
 
 	//Template.RewardDeck.AddItem('Reward_None'); /// we do these manually
 	// todo

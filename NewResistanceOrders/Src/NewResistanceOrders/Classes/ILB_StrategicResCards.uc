@@ -9,13 +9,8 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions;
 		
 		// Templates of the form "if condition X, grant soldier perk Y"
 		// Disadvantageous mission sitreps?  -2 turns to complete, +1 force level, +1 squad size, no starting concealment
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_StealSparkCore'));
 		Techs.AddItem(CreateBrazenCollection());
 		Techs.AddItem(CreateBlankResistanceOrder('ResCard_BrazenRecruitment')); //
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_CouncilBounties')); //
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_PoweredArmorHeist')); //
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueUpperCrustContacts')); // swarm mission grants you supplies
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueFriendlyPolitician')); // swarm mission grants you res contact
 		Techs.AddItem(CreateLabsToCommsRepurposing());
 
 		Techs.AddItem(CreateXenobiologicalFieldResearch());
@@ -26,6 +21,12 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions;
 		// Techs.AddItem(RemotelyChargedBackpacks());
 		// Techs.AddItem(RemotelyChargedSparks());
 		// Techs.AddItem(CreateChargedPsionics()); // adds Teleportation and Blink to templars + psions; costs 5 power.
+
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_CouncilBounties')); //
+		// Techs.AddItem(CreateBlankResistanceOrder('ResCard_PoweredArmorHeist')); //
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueUpperCrustContacts')); // swarm mission grants you supplies
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_RescueFriendlyPolitician')); // swarm mission grants you res contact
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_StealSparkCore'));
 		
 		return Techs;
 	}
@@ -218,7 +219,7 @@ static function DeactivateNotoriousSmugglers(XComGameState NewGameState, StateOb
 //---------------------------------------------------------------------------------------
 static function int GetValueNotoriousSmugglers()
 {
-	return 25;
+	return 25; // todo: config
 }
 //---------------------------------------------------------------------------------------
 static function bool BlackMarketCardsCanBePlayed(StateObjectReference InRef, optional XComGameState NewGameState = none)
