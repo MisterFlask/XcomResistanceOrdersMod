@@ -23,10 +23,10 @@ static function array<X2DataTemplate> CreateTemplates()
 }
 
 
-static function name GetRandomForceLevelIncreaseSitrep(){
+static function name GetRandomForceLevelIncreaseSitrep(int maxForceLevel){
 	local int RandomValue;
 
-	RandomValue = Rand(4);
+	RandomValue = Rand(maxForceLevel + 1);
 
 	if (RandomValue == 0){
 		return '';
@@ -40,6 +40,7 @@ static function name GetRandomForceLevelIncreaseSitrep(){
 	if (RandomValue == 3){
 		return 'ILB_Sitrep_PlusThreeForceLevel';
 	}
+
 	return '';
 }
 

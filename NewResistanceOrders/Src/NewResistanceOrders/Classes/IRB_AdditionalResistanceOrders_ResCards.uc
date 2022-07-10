@@ -6,7 +6,11 @@
 // (MAYBE stukov's war perk pack at some point) https://steamcommunity.com/workshop/filedetails/discussion/2728208078/3189112650405981173/
 // NOT USING SHADOW OPS PERK PACK, due to undesired class changes
 
-class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
+class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement config(ResCards);
+
+
+var config int SUPERCHARGER_POWER_DRAIN;
+
 	static function array<X2DataTemplate> CreateTemplates()
 	{		
 		local array<X2DataTemplate> Techs;
@@ -98,14 +102,43 @@ class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement;
 		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_RemoteSuperchargers');
 		Template.Category = "ResistanceCard";
 		Template.GetAbilitiesToGrantFn = GrantRemoteSuperchargers;
+		Template.OnActivatedFn = ActivateSuperchargers;
+		Template.OnDeactivatedFn = DeactivateSuperchargers;
 		return Template; 
 	}
+
+	//---------------------------------------------------------------------------------------
+	static function ActivateSuperchargers(XComGameState NewGameState, StateObjectReference InRef, optional bool bReactivate = false)
+	{
+		local XComGameState_HeadquartersXCom XComHQ;
+
+		XComHQ = GetNewXComHQState(NewGameState);
+
+		XComHQ.BonusPowerProduced -= default.SUPERCHARGER_POWER_DRAIN;
+		XComHQ.HandlePowerOrStaffingChange(NewGameState);
+	}
+	//---------------------------------------------------------------------------------------
+	static function DeactivateSuperchargers(XComGameState NewGameState, StateObjectReference InRef)
+	{
+		local XComGameState_HeadquartersXCom XComHQ;
+
+		XComHQ = GetNewXComHQState(NewGameState);
+		XComHQ.BonusPowerProduced += default.SUPERCHARGER_POWER_DRAIN;
+		XComHQ.HandlePowerOrStaffingChange(NewGameState);
+	}
+
 
 	static function GrantRemoteSuperchargers(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
 	{		
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
+
+		if (IsNegativePower()){
+			`LOG("Negative power output found; not granting supercharger abilities");
+			return;
+		}
+
 		AbilitiesToGrant.AddItem('ILB_Turbocharged');
 
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'arcthrower')){
@@ -575,6 +608,17 @@ static function X2DataTemplate CreateGrantVipsGrenades()
 		BattleData = XComGameState_BattleData(History.GetSingleGameStateObjectForClass(class'XComGameState_BattleData'));
 		MissionState = GetMission(StartState);
 		return MissionState;
+	}
+
+	static function bool IsNegativePower(){
+		local XComGameState NewGameState;
+		local XComGameStateHistory CachedHistory;
+		local XComGameState_HeadquartersXCom XComHQ;
+
+		CachedHistory = `XCOMHISTORY;
+		NewGameState = CachedHistory.GetGameStateFromHistory();
+		XComHQ = GetNewXComHQState(NewGameState);
+		return XComHQ.GetPowerConsumed() > XComHQ.GetPowerProduced();
 	}
 
 	simulated static function XComGameState_MissionSite GetMission(XComGameState StartState)

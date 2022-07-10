@@ -4,9 +4,11 @@ var config int SOLDIER_COST_IN_SUPPLY;
 var config int SOLDIER_COST_IN_SUPPLY_LWOTC;
 var config int SPIDER_SUIT_INTEL_COST;
 var config int EXO_SUIT_INTEL_COST;
-var config int FIVE_MEC_CORPSES_INTEL_COST;
+var config int MEC_CORPSES_INTEL_COST;
 var config int HAZMAT_VEST_INTEL_COST;
 var config int PLATED_VEST_INTEL_COST;
+var config int BRAZEN_RECRUITMENT_CHEAP_SOLDIER_COST;
+var config int BRAZEN_RECRUITMENT_EXPENSIVE_SOLDIER_COST;
 
 static function array<X2DataTemplate> CreateTemplates()
 {
@@ -172,17 +174,16 @@ static function EventListenerReturn BlackMarketResetListener(Object EventData, O
 	}
 	
 	if (IsResistanceOrderActive('ResCard_FirepowerForSparks')){
-		AddItemToBlackMarket('CorpseAdventMEC', 5, default.FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('CorpseAdventMEC', 2, default.MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 
 	if (IsResistanceOrderActive('ResCard_MachineBuffsIfAridClimate')){
-		AddItemToBlackMarket('CorpseAdventMEC', 5, default.FIVE_MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
+		AddItemToBlackMarket('CorpseAdventMEC', 2, default.MEC_CORPSES_INTEL_COST, EventData, EventSource, GameState, Event, CallbackData);
 	}
 
 	if (IsResistanceOrderActive('ResCard_BrazenRecruitment')){
-		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData, 10); // todo: configs
-		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData);
-
+		AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData, default.BRAZEN_RECRUITMENT_CHEAP_SOLDIER_COST);
+		//AddGeneratedSoldierToBlackMarket(EventData, EventSource, GameState, Event, CallbackData, default.BRAZEN_RECRUITMENT_EXPENSIVE_SOLDIER_COST);
 	}
 	
 	if (IsResistanceOrderActive('ResCard_MeatMarket')){

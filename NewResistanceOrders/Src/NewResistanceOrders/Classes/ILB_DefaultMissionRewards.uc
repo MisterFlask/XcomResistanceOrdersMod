@@ -20,13 +20,15 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_StealSparkCore'));
 	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_CouncilBounties'));
 	Templates.AddItem(CreateMissionFlavorTextTemplate('ILB_ItsAboutSendingAMessage'));
+
+	Templates.AddItem(CreateDatapadRewardTemplate());
 	return Templates;
 }
 
 static function X2DataTemplate CreateMissionFlavorTextTemplate(name TemplateName){
-	local X2DataTemplate Template;
+	local X2MissionFlavorTextTemplate Template;
 	`CREATE_X2TEMPLATE(class'X2MissionFlavorTextTemplate', Template, TemplateName);
-
+	Template.bSpecialCondition = true;
 	return Template;
 }
 
@@ -50,6 +52,26 @@ static function X2DataTemplate CreateMissionReward_ItsAboutSendingAMessage()
 
 	Template.GiveRewardFn = GiveSendingAMessageReward;
 	Template.GetRewardStringFn = GetMissionRewardString;
+
+	return Template;
+}
+
+static function X2DataTemplate CreateDatapadRewardTemplate()
+{
+	local X2RewardTemplate Template;
+
+	`CREATE_X2Reward_TEMPLATE(Template, 'Reward_ILBDatapad');
+
+	Template.RewardObjectTemplateName = 'AdventDatapad';
+
+	Template.GenerateRewardFn = class'X2StrategyElement_DefaultRewards'.static.GenerateItemReward;
+	Template.SetRewardFn = class'X2StrategyElement_DefaultRewards'.static.SetItemReward;
+	Template.GiveRewardFn = class'X2StrategyElement_DefaultRewards'.static.GiveItemReward;
+	Template.GetRewardStringFn = class'X2StrategyElement_DefaultRewards'.static.GetItemRewardString;
+	Template.GetRewardImageFn = class'X2StrategyElement_DefaultRewards'.static.GetItemRewardImage;
+	Template.GetBlackMarketStringFn = class'X2StrategyElement_DefaultRewards'.static.GetItemBlackMarketString;
+	Template.GetRewardIconFn = class'X2StrategyElement_DefaultRewards'.static.GetGenericRewardIcon;
+	Template.RewardPopupFn = class'X2StrategyElement_DefaultRewards'.static.ItemRewardPopup;
 
 	return Template;
 }
@@ -182,7 +204,7 @@ public function name GrabRandomCrackdownSitrep(){
 }
 
 public function name GetForceLevelSitrep(){
-	return class'ILB_DefaultSitreps'.static.GetRandomForceLevelIncreaseSitrep();//0-3
+	return class'ILB_DefaultSitreps'.static.GetRandomForceLevelIncreaseSitrep(1); // 0-1
 }
 
 function GiveSwarmDefenseForResistanceContactMission(

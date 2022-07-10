@@ -33,6 +33,11 @@ var config int ILB_VIP_SMOKES;
 var config int ILB_VIP_FRAGS;
 
 var config int ROOKIE_COMBAT_HP_BONUS;
+
+var config int FIELD_COMMANDER_SHIELDING_BUFF;
+
+var config int CHRYSSALID_AND_FACELESS_DEFENSE_BUFF;
+var config int CHRYSSALID_AND_FACELESS_MOBILITY_BUFF;
 	//UltrasonicLure
 /// <summary>
 /// Creates the set of default abilities every unit should have in X-Com 2
@@ -64,6 +69,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(CreatePoisonImmunity());
 	Templates.AddItem(CreateChryssalidAndFacelessBuff());
 	Templates.AddItem(CreateLotsOfShieldingBuff());
+	Templates.AddItem(Turbocharged());
 	return Templates;
 }
 
@@ -79,7 +85,7 @@ static function X2AbilityTemplate Turbocharged()
 
 	Effect = new class'XMBEffect_BonusDamageByDamageType';
 	Effect.EffectName = 'Turbocharged';
-	Effect.RequiredDamageTypes.AddItem('electric');
+	Effect.RequiredDamageTypes.AddItem('Electrical');
 	Effect.DamageBonus = 2;
 
 	// Create the template using a helper function
@@ -103,7 +109,7 @@ static function X2AbilityTemplate CreateLotsOfShieldingBuff()
 	Effect = new class'X2Effect_PersistentStatChange';
 	Effect.EffectName = 'LotsOfShielding';
 	Effect.BuildPersistentEffect(1, true, false, false);
-	Effect.AddPersistentStatChange(eStat_ShieldHP, 4); //todo: config
+	Effect.AddPersistentStatChange(eStat_ShieldHP, default.FIELD_COMMANDER_SHIELDING_BUFF); //todo: config
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.
@@ -124,8 +130,8 @@ static function X2AbilityTemplate CreateChryssalidAndFacelessBuff()
 	Effect = new class'X2Effect_PersistentStatChange';
 	Effect.EffectName = 'Faster';
 	Effect.BuildPersistentEffect(1, true, false, false);
-	Effect.AddPersistentStatChange(eStat_Defense, 15);
-	Effect.AddPersistentStatChange(eStat_Mobility, 3);
+	Effect.AddPersistentStatChange(eStat_Defense, default.CHRYSSALID_AND_FACELESS_DEFENSE_BUFF);
+	Effect.AddPersistentStatChange(eStat_Mobility, default.CHRYSSALID_AND_FACELESS_MOBILITY_BUFF);
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.

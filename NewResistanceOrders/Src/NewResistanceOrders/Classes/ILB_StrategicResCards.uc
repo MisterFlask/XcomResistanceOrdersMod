@@ -1,6 +1,18 @@
 // This is an Unreal Script
 
-class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions;
+class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions config(ResCards);
+
+	var config int BRAZEN_COLLECTION_BONUS;
+	var config int LABS_TO_COMMS_COMMS_BONUS;
+	var config int LABS_TO_COMMS_RESEARCH_PENALTY;
+	var config int XENO_FIELD_RESEARCH_RESEARCH_BONUS;
+	var config int RADIO_FREE_LILY_COMMS_BONUS;
+	var config int GRNDL_POWER_DEAL_POWER_BONUS;
+	var config int LEACH_PSIONIC_LEYLINES_POWER_BONUS;
+	var config int GRNDL_POWER_DEAL_SUPPLY_PENALTY;
+	var config int NOTORIOUS_SMUGGLERS_BLACK_MARKET_DISCOUNT;
+
+
 	static function array<X2DataTemplate> CreateTemplates()
 	{		
 		local array<X2DataTemplate> Techs;
@@ -36,6 +48,7 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions;
 		Template.Category = "ResistanceCard";
 		Template.OnActivatedFn = ActivateLeach;
 		Template.OnDeactivatedFn = DeactivateLeach;
+		Template.CanBeRemovedFn = CanHiddenReservesBeRemoved;
 		//todo: Chryssalid/Faceless buff
 		return Template;
 	}
@@ -47,7 +60,7 @@ static function ActivateLeach(XComGameState NewGameState, StateObjectReference I
 	XComHQ = GetNewXComHQState(NewGameState);
 
 	// Add a research bonus for each lab already created, then set the flag so it will work for all future labs built
-	XComHQ.BonusPowerProduced += 4;
+	XComHQ.BonusPowerProduced += default.LEACH_PSIONIC_LEYLINES_POWER_BONUS;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 //---------------------------------------------------------------------------------------
@@ -56,7 +69,7 @@ static function DeactivateLeach(XComGameState NewGameState, StateObjectReference
 	local XComGameState_HeadquartersXCom XComHQ;
 
 	XComHQ = GetNewXComHQState(NewGameState);
-	XComHQ.BonusPowerProduced -= 4;
+	XComHQ.BonusPowerProduced -= default.LEACH_PSIONIC_LEYLINES_POWER_BONUS;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 
@@ -78,7 +91,7 @@ static function ActivateXenobiology(XComGameState NewGameState, StateObjectRefer
 	XComHQ = GetNewXComHQState(NewGameState);
 
 	// Add a research bonus for each lab already created, then set the flag so it will work for all future labs built
-	XComHQ.ResearchEffectivenessPercentIncrease += 30;
+	XComHQ.ResearchEffectivenessPercentIncrease += default.XENO_FIELD_RESEARCH_RESEARCH_BONUS;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 
@@ -101,7 +114,7 @@ static function DeactivateXenobiology(XComGameState NewGameState, StateObjectRef
 	local XComGameState_HeadquartersXCom XComHQ;
 
 	XComHQ = GetNewXComHQState(NewGameState);
-	XComHQ.ResearchEffectivenessPercentIncrease -= 30;
+	XComHQ.ResearchEffectivenessPercentIncrease -= default.XENO_FIELD_RESEARCH_RESEARCH_BONUS;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 
@@ -112,6 +125,7 @@ static function DeactivateXenobiology(XComGameState NewGameState, StateObjectRef
 		Template.Category = "ResistanceCard";
 		Template.OnActivatedFn = ActivateLabsToComms;
 		Template.OnDeactivatedFn = DeactivateLabsToComms;
+		Template.CanBeRemovedFn = CanRemoveIncreasedResistanceContactsOrder;
 
 		return Template;
 }
@@ -123,8 +137,8 @@ static function ActivateLabsToComms(XComGameState NewGameState, StateObjectRefer
 	XComHQ = GetNewXComHQState(NewGameState);
 
 	// Add a research bonus for each lab already created, then set the flag so it will work for all future labs built
-	XComHQ.ResearchEffectivenessPercentIncrease -= 30;
-	XComHQ.BonusCommCapacity += 3;
+	XComHQ.ResearchEffectivenessPercentIncrease -= default.LABS_TO_COMMS_RESEARCH_PENALTY;
+	XComHQ.BonusCommCapacity += default.LABS_TO_COMMS_COMMS_BONUS;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 //---------------------------------------------------------------------------------------
@@ -133,8 +147,8 @@ static function DeactivateLabsToComms(XComGameState NewGameState, StateObjectRef
 	local XComGameState_HeadquartersXCom XComHQ;
 
 	XComHQ = GetNewXComHQState(NewGameState);
-	XComHQ.ResearchEffectivenessPercentIncrease += 30;
-	XComHQ.BonusCommCapacity -= 3;
+	XComHQ.ResearchEffectivenessPercentIncrease += default.LABS_TO_COMMS_RESEARCH_PENALTY;
+	XComHQ.BonusCommCapacity -= default.LABS_TO_COMMS_COMMS_BONUS;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 
@@ -157,7 +171,7 @@ static function ActivateGrndlPowerCollection(XComGameState NewGameState, StateOb
 	local XComGameState_HeadquartersResistance ResistanceHQ;
 	
 	ResistanceHQ = GetNewResHQState(NewGameState);
-	ResistanceHQ.SupplyDropPercentIncrease -= 20;
+	ResistanceHQ.SupplyDropPercentIncrease -= default.GRNDL_POWER_DEAL_SUPPLY_PENALTY;
 	XComHQ = GetNewXComHQState(NewGameState);
 	XComHQ.PowerOutputBonus += GetValueGrndlPowerCollection();
 	XComHQ.DeterminePowerState();
@@ -171,7 +185,7 @@ static function DeactivateGrndlPowerCollection(XComGameState NewGameState, State
 	local XComGameState_HeadquartersResistance ResistanceHQ;
 	
 	ResistanceHQ = GetNewResHQState(NewGameState);
-	ResistanceHQ.SupplyDropPercentIncrease += 20;
+	ResistanceHQ.SupplyDropPercentIncrease += default.GRNDL_POWER_DEAL_SUPPLY_PENALTY;
 
 	XComHQ = GetNewXComHQState(NewGameState);
 	XComHQ.PowerOutputBonus -= GetValueGrndlPowerCollection();
@@ -182,7 +196,7 @@ static function DeactivateGrndlPowerCollection(XComGameState NewGameState, State
 //---------------------------------------------------------------------------------------
 static function int GetValueGrndlPowerCollection()
 {
-	return 4;
+	return default.GRNDL_POWER_DEAL_POWER_BONUS;
 }
 	
 	static function X2DataTemplate CreateNotoriousSmugglers(){
@@ -218,7 +232,7 @@ static function DeactivateNotoriousSmugglers(XComGameState NewGameState, StateOb
 //---------------------------------------------------------------------------------------
 static function int GetValueNotoriousSmugglers()
 {
-	return 25; // todo: config
+	return default.NOTORIOUS_SMUGGLERS_BLACK_MARKET_DISCOUNT;
 }
 //---------------------------------------------------------------------------------------
 static function bool BlackMarketCardsCanBePlayed(StateObjectReference InRef, optional XComGameState NewGameState = none)
@@ -249,7 +263,7 @@ static function bool BlackMarketCardsCanBePlayed(StateObjectReference InRef, opt
 		local XComGameState_HeadquartersResistance ResistanceHQ;
 
 		ResistanceHQ = GetNewResHQState(NewGameState);
-		ResistanceHQ.SupplyDropPercentIncrease += 20;
+		ResistanceHQ.SupplyDropPercentIncrease += default.BRAZEN_COLLECTION_BONUS;
 	}
 
 	//---------------------------------------------------------------------------------------
@@ -258,7 +272,7 @@ static function bool BlackMarketCardsCanBePlayed(StateObjectReference InRef, opt
 		local XComGameState_HeadquartersResistance ResistanceHQ;
 
 		ResistanceHQ = GetNewResHQState(NewGameState);
-		ResistanceHQ.SupplyDropPercentIncrease -= 20;
+		ResistanceHQ.SupplyDropPercentIncrease -= default.BRAZEN_COLLECTION_BONUS;
 	}
 	
 	
@@ -313,7 +327,7 @@ static function ActivateRadioFreeLily(XComGameState NewGameState, StateObjectRef
 	local XComGameState_HeadquartersXCom XComHQ;
 
 	XComHQ = GetNewXComHQState(NewGameState);
-	XComHQ.BonusCommCapacity += 3;
+	XComHQ.BonusCommCapacity += default.RADIO_FREE_LILY_COMMS_BONUS;
 }
 //---------------------------------------------------------------------------------------
 static function DeactivateRadioFreeLily(XComGameState NewGameState, StateObjectReference InRef)
@@ -321,7 +335,7 @@ static function DeactivateRadioFreeLily(XComGameState NewGameState, StateObjectR
 	local XComGameState_HeadquartersXCom XComHQ;
 
 	XComHQ = GetNewXComHQState(NewGameState);
-	XComHQ.BonusCommCapacity -= 3;
+	XComHQ.BonusCommCapacity -= default.RADIO_FREE_LILY_COMMS_BONUS;
 }
 
 static function X2DataTemplate CreateBlankResistanceOrder(name OrderName)

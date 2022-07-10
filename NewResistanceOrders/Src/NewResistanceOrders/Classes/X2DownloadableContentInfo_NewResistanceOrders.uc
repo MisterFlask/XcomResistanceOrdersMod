@@ -403,8 +403,6 @@ static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_Mi
 	MissionSource = MissionState.GetMissionSource().DataName; // e.g. 'MissionSource_GuerillaOp'
 	MissionFamily = MissionState.GeneratedMission.Mission.MissionFamily;
 	// First: handle retaliation crackdowns
-	
-
 
 	if (IsResCardActive('ResCard_RadioFreeLily') && IsRetaliation(MissionFamily))
 	{
