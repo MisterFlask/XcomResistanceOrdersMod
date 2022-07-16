@@ -49,6 +49,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(Rocketeer());
 	Templates.AddItem(FreeFragGrenades());
 	Templates.AddItem(FreeSmokeGrenades());
+	Templates.AddItem(FreeSmokeGrenadeSingular());
 	Templates.AddItem(FreeUltrasonicLure());
 	Templates.AddItem(ArcticEasyToHack());
 	Templates.AddItem(WitchHunterBuff());
@@ -70,6 +71,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(CreateChryssalidAndFacelessBuff());
 	Templates.AddItem(CreateLotsOfShieldingBuff());
 	Templates.AddItem(Turbocharged());
+	Templates.AddItem(CreateCrackdownAbility_Revenge());
 	return Templates;
 }
 
@@ -145,7 +147,7 @@ static function X2AbilityTemplate BrutePoison()
 {
 	local X2AbilityTemplate						Template;
 	local X2Effect_ApplyWeaponDamage            DamageEffect;
-	local X2AbilityMultiTarget_Radius MultiTarget;
+	local X2AbilityMultiTarget_Cylinder CylinderMultiTarget;
 	local X2AbilityTrigger_EventListener		EventListener;
 	local X2Effect_ApplyPoisonToWorld PoisonEffect;
 
@@ -158,21 +160,17 @@ static function X2AbilityTemplate BrutePoison()
 
 	Template.AbilityToHitCalc = default.DeadEye;
 	Template.AbilityTargetStyle = default.SelfTarget;
-	Template.AbilityShooterConditions.AddItem(default.LivingShooterProperty);
-
-	DamageEffect = new class'X2Effect_ApplyWeaponDamage';
-	DamageEffect.DamageTypes.AddItem('Poison');
-	Template.AddTargetEffect(DamageEffect);
 
 	Template.AddMultiTargetEffect(class'X2StatusEffects'.static.CreatePoisonedStatusEffect());
 	PoisonEffect = new class'X2Effect_ApplyPoisonToWorld';	
+	PoisonEffect.Duration = 3;
 	Template.AddMultiTargetEffect(PoisonEffect);
-
-	MultiTarget = new class'X2AbilityMultiTarget_Radius';
-    MultiTarget.bUseWeaponRadius = true;
-	MultiTarget.fTargetRadius = 15; // Should work?
-	MultiTarget.bExcludeSelfAsTargetIfWithinRadius = false;
-	Template.AbilityMultiTargetStyle = MultiTarget;
+	
+	CylinderMultiTarget = new class'X2AbilityMultiTarget_Cylinder';
+	CylinderMultiTarget.bUseWeaponRadius = true;
+	CylinderMultiTarget.fTargetHeight = 15;//todo: config
+	CylinderMultiTarget.bUseOnlyGroundTiles = true;
+	Template.AbilityMultiTargetStyle = CylinderMultiTarget;
 
 	// This ability fires when the unit takes damage
 	EventListener = new class'X2AbilityTrigger_EventListener';
@@ -271,7 +269,48 @@ static function X2AbilityTemplate AidProtocolRefund()
 	// Create the template using a helper function
 	return Passive('ILB_AidProtocolRefund', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
 }
+static function X2AbilityTemplate SkullminingHeal()
+{
+	local XMBEffect_AbilityCostRefund Effect;
+	local XMBCondition_AbilityName AbilityNameCondition;
+	
+	// Create an effect that will refund the cost of attacks
+	Effect = new class'XMBEffect_AbilityCostRefund';
+	Effect.EffectName = 'SkullminingHeals';
+	Effect.TriggeredEvent = 'SkullminingHeals';
 
+	// The bonus only applies to standard shots
+	AbilityNameCondition = new class'XMBCondition_AbilityName';
+	AbilityNameCondition.IncludeAbilityNames.AddItem('WOTC_APA_AidProtocol');
+	AbilityNameCondition.IncludeAbilityNames.AddItem('AidProtocol');
+	Effect.AbilityTargetConditions.AddItem(AbilityNameCondition);
+
+	// Create the template using a helper function
+	return Passive('ILB_AidProtocolRefund', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
+}
+
+static function X2AbilityTemplate CreateCrackdownAbility_Revenge()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_CoveringFire CoveringEffect;
+
+	Template = PurePassive('ILB_CrackdownRevenge', "img:///UILibrary_XPACK_Common.PerkIcons.str_revenge", false, 'eAbilitySource_Perk', true);
+	CoveringEffect = new class'X2Effect_CoveringFire';
+	CoveringEffect.BuildPersistentEffect(1, true, false, false);
+	CoveringEffect.EffectName = 'RevengeFire';
+	CoveringEffect.DuplicateResponse = eDupe_Ignore;
+	CoveringEffect.AbilityToActivate = 'OverwatchShot';
+	CoveringEffect.GrantActionPoint = 'overwatch';
+	CoveringEffect.MaxPointsPerTurn = 0;	// Infinite
+	CoveringEffect.bDirectAttackOnly = true;
+	CoveringEffect.bPreEmptiveFire = false;
+	CoveringEffect.bOnlyDuringEnemyTurn = true;
+	CoveringEffect.bOnlyWhenAttackMisses = true;
+	CoveringEffect.ActivationPercentChance = 100; //always
+	CoveringEffect.SetDisplayInfo(ePerkBuff_Bonus, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage, , , Template.AbilitySourceName);
+	Template.AddTargetEffect(CoveringEffect);
+	return Template;
+}
 
 //WOTC_APA_AidProtocol version of Multitasking
 
@@ -669,7 +708,24 @@ static function X2AbilityTemplate ArcticEasyToHack()
 
 		return Template;
 	}
-	
+
+	static function X2AbilityTemplate FreeSmokeGrenadeSingular()
+	{
+		local X2AbilityTemplate Template;
+		local XMBEffect_AddUtilityItem ItemEffect;
+
+		ItemEffect = new class'XMBEffect_AddUtilityItem';
+		ItemEffect.DataName = 'SmokeGrenade';
+
+		Template = Passive('ILB_FreeSmokeGrenadeSingular',
+		 "img:///UILibrary_PerkIcons.UIPerk_grenade_smoke", ///todo: verify perk icon
+		  true,
+		   ItemEffect);
+
+		return Template;
+	}
+
+
 	static function X2AbilityTemplate FreeUltrasonicLure()
 	{
 		local X2AbilityTemplate Template;

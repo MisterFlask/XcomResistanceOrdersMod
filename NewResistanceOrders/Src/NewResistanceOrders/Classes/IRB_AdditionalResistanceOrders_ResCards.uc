@@ -337,7 +337,8 @@ var config int SUPERCHARGER_POWER_DRAIN;
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
-		if (DoesSoldierHavePsiRating(UnitState) || DoesSoldierHaveSpecificItem(UnitState,'SustainingSphere') || DoesSoldierHaveArmorOfClass(UnitState,'templar'))
+		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'psiamp')
+			|| DoesSoldierHaveArmorOfClass(UnitState,'templar'))
 		{
 			AbilitiesToGrant.AddItem( 'MZBloodPillar' );
 		}
@@ -973,7 +974,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'grenade_launcher'))
 		{
-			AbilitiesToGrant.AddItem( 'MZFogWall' );
+			AbilitiesToGrant.AddItem( 'ILB_FreeSmokeGrenadeSingular' );
 		}
 	}
 	
@@ -1059,7 +1060,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 
-		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon'))
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sniper_rifle'))
 		{
 			AbilitiesToGrant.AddItem( 'DeepCover' );//https://docs.google.com/spreadsheets/d/11nKVN8Rd4MoIOtBbkmzLkwq7NWb0ZI8Q2VNAD16mFTE/edit#gid=0
 		}
