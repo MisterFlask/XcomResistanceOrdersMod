@@ -816,7 +816,10 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if (IsPlotType("Tunnels_Sewer") || IsPlotType("Tunnels_Subway"))
 		{	
-			AbilitiesToGrant.AddItem( 'Stealth' ); 
+			if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'shotgun')
+				|| DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'assault_rifle')){
+				AbilitiesToGrant.AddItem( 'Stealth' ); 
+			}
 		}
 	}
 	//////// FLASHPOINT for grenadiers
@@ -1036,7 +1039,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		}
 		if(DoesSoldierHaveSpecificItem(UnitState, 'Battlescanner'))
 		{
-			AbilitiesToGrant.AddItem( 'Battlespace' );
+			AbilitiesToGrant.AddItem( 'TargetDefinition' );
 		}
 	}
 
@@ -1058,7 +1061,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon'))
 		{
-			AbilitiesToGrant.AddItem( 'Entrench' );//https://docs.google.com/spreadsheets/d/11nKVN8Rd4MoIOtBbkmzLkwq7NWb0ZI8Q2VNAD16mFTE/edit#gid=0
+			AbilitiesToGrant.AddItem( 'DeepCover' );//https://docs.google.com/spreadsheets/d/11nKVN8Rd4MoIOtBbkmzLkwq7NWb0ZI8Q2VNAD16mFTE/edit#gid=0
 		}
 	}
 	
@@ -1221,7 +1224,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 
-		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'sniper_rifle') )
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'cannon') )
 		{
 			AbilitiesToGrant.AddItem( 'Sentinel' );
 		}
@@ -1242,9 +1245,9 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 			return;
 		}
 
-		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'assault_rifle') ||  DoesSoldierHaveSpecificItem(UnitState, 'BattleScanner'))
+		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'assault_rifle') &&  DoesSoldierHaveSpecificItem(UnitState, 'BattleScanner'))
 		{
-			AbilitiesToGrant.AddItem( 'LongWatch' );
+			AbilitiesToGrant.AddItem( 'EverVigilant' );
 		}
 	}
 	
@@ -1268,29 +1271,6 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		{
 			AbilitiesToGrant.AddItem( 'Shredder' );
 			AbilitiesToGrant.AddItem( 'TakeUnder' );
-		}
-	}
-
-	//TODO: Doesn't work yet
-	static function X2DataTemplate CreateHavanaProtocol()
-	{
-		local X2StrategyCardTemplate Template;
-
-		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_BasiliskDoctrine');
-		Template.Category = "ResistanceCard";
-		Template.GetAbilitiesToGrantFn = GrantHavanaProtocol;
-		return Template; 
-	}
-
-	static function GrantHavanaProtocol(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
-	{		
-		if (UnitState.GetTeam() != eTeam_XCom){
-			return;
-		}
-
-		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'holotargeter'))
-		{
-
 		}
 	}
 	
