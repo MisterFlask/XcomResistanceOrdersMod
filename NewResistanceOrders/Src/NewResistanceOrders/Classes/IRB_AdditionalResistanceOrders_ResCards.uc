@@ -93,7 +93,31 @@ var config int SUPERCHARGER_POWER_DRAIN;
 		Techs.AddItem(CreateDawnMachines());
 		Techs.AddItem(CreateRemoteSuperchargers());
 
+		//Techs.AddItem(CreateSiphonLife());
+
 		return Techs;
+	}
+
+	static function X2DataTemplate CreateSiphonLife(){
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_SiphonLife');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantSiphonLife;
+		return Template; 
+	}
+		
+	static function GrantSiphonLife(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom)
+		{
+			return;
+		}
+
+		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'skulljack'))
+		{
+			AbilitiesToGrant.AddItem('ILB_SiphonLife');
+		}
 	}
 
 	static function X2DataTemplate CreateRemoteSuperchargers(){

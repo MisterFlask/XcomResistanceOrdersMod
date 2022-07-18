@@ -63,10 +63,11 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(ExtraMeleeDamage());
 	Templates.AddItem(PistolShotsDealPoisonPassive());
 	Templates.AddItem(AidProtocolRefund());
-	//Templates.AddItem(SiphonLifeEffect());
+	Templates.AddItem(SiphonLifeEffect());
 
 	// now, enemy abilities
-	Templates.AddItem(BrutePoison());
+	Templates.AddItem(CreateBrutePoison());
+	Templates.AddItem(CreateBrutePoisonWeapon());
 	Templates.AddItem(CreatePoisonImmunity());
 	Templates.AddItem(CreateChryssalidAndFacelessBuff());
 	Templates.AddItem(CreateLotsOfShieldingBuff());
@@ -143,11 +144,11 @@ static function X2AbilityTemplate CreateChryssalidAndFacelessBuff()
 }
 
 
-static function X2AbilityTemplate BrutePoison()
+static function X2AbilityTemplate CreateBrutePoison()
 {
 	local X2AbilityTemplate						Template;
 	local X2Effect_ApplyWeaponDamage            DamageEffect;
-	local X2AbilityMultiTarget_Cylinder CylinderMultiTarget;
+	local X2AbilityMultiTarget_Radius MultiTarget;
 	local X2AbilityTrigger_EventListener		EventListener;
 	local X2Effect_ApplyPoisonToWorld PoisonEffect;
 
@@ -160,17 +161,20 @@ static function X2AbilityTemplate BrutePoison()
 
 	Template.AbilityToHitCalc = default.DeadEye;
 	Template.AbilityTargetStyle = default.SelfTarget;
+	Template.AbilityShooterConditions.AddItem(default.LivingShooterProperty);
+
+	DamageEffect = new class'X2Effect_ApplyWeaponDamage';
+	DamageEffect.DamageTypes.AddItem('Poison');
+	Template.AddTargetEffect(DamageEffect);
 
 	Template.AddMultiTargetEffect(class'X2StatusEffects'.static.CreatePoisonedStatusEffect());
 	PoisonEffect = new class'X2Effect_ApplyPoisonToWorld';	
-	PoisonEffect.Duration = 3;
 	Template.AddMultiTargetEffect(PoisonEffect);
-	
-	CylinderMultiTarget = new class'X2AbilityMultiTarget_Cylinder';
-	CylinderMultiTarget.bUseWeaponRadius = true;
-	CylinderMultiTarget.fTargetHeight = 15;//todo: config
-	CylinderMultiTarget.bUseOnlyGroundTiles = true;
-	Template.AbilityMultiTargetStyle = CylinderMultiTarget;
+
+	MultiTarget = new class'X2AbilityMultiTarget_Radius';
+    MultiTarget.bUseWeaponRadius = true;
+	MultiTarget.bExcludeSelfAsTargetIfWithinRadius = false;
+	Template.AbilityMultiTargetStyle = MultiTarget;
 
 	// This ability fires when the unit takes damage
 	EventListener = new class'X2AbilityTrigger_EventListener';
@@ -185,6 +189,20 @@ static function X2AbilityTemplate BrutePoison()
 	Template.bFrameEvenWhenUnitIsHidden = true;
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
 	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+
+	return Template;
+}
+
+static function X2AbilityTemplate CreateBrutePoisonWeapon()
+{
+	local X2AbilityTemplate Template;
+	local XMBEffect_AddUtilityItem ItemEffect;
+
+	ItemEffect = new class'XMBEffect_AddUtilityItem';
+	ItemEffect.DataName = 'ILB_BrutePoison_WPN'; //TODO: Make this not need wwl as dependency
+
+	// Create the template using a helper function
+	Template = Passive('ILB_GrantBrutePoisonWeapon', "img:///UILibrary_PerkIcons.UIPerk_grenade_flash", true, ItemEffect);
 
 	return Template;
 }
@@ -225,25 +243,42 @@ static function X2AbilityTemplate CreatePoisonImmunity()
 }
 
 static function X2AbilityTemplate SiphonLifeEffect(){
-	/*
+
+	local X2AbilityTemplate Template;
 	local X2Effect_ApplyMedikitHeal Effect;
 	local XMBCondition_AbilityName AbilityNameCondition;
+	local XMBEffect_ConditionalStatChange ShieldingEffect;
 
 	Effect = new class'X2Effect_ApplyMedikitHeal';
-	Effect.PerUseHP = 2000; // heal to full
+	Effect.IncreasedPerUseHP = 20; // heal to full
+	Effect.PerUseHP = 20; // heal to full
 	
-	Effect.EffectName = 'SkullminingHeal';
-	Effect.TriggeredEvent = 'SkullMiningHeal';
-
-	// The bonus only applies to standard shots
 	AbilityNameCondition = new class'XMBCondition_AbilityName';
 	AbilityNameCondition.IncludeAbilityNames.AddItem('SKULLJACKAbility');
 	AbilityNameCondition.IncludeAbilityNames.AddItem('SKULLMINEAbility');
-	Effect.AbilityTargetConditions.AddItem(AbilityNameCondition);
-	*/
-	// Create the template using a helper function
-	//return Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
+	
+	//Template = Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
+	Template = SelfTargetTrigger('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect, 'AbilityActivated');
+	
+	
+	AddTriggerTargetCondition(Template, AbilityNameCondition);
+	//Effect.TriggeredEvent = 'SkullMiningHeal';
 
+	ShieldingEffect = new class'XMBEffect_ConditionalStatChange';
+	ShieldingEffect.EffectName = 'PlusSomeShielding';
+	ShieldingEffect.Conditions.AddItem(AbilityNameCondition);
+
+	// The effect doesn't expire
+	ShieldingEffect.BuildPersistentEffect(1, true, false, false);
+	ShieldingEffect.AddPersistentStatChange(eStat_ShieldHP, 3); //config
+
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+
+	// Create the template using a helper function
+	return Template;
 }
 
 static function X2AbilityTemplate AidProtocolRefund()
@@ -269,26 +304,6 @@ static function X2AbilityTemplate AidProtocolRefund()
 	// Create the template using a helper function
 	return Passive('ILB_AidProtocolRefund', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
 }
-static function X2AbilityTemplate SkullminingHeal()
-{
-	local XMBEffect_AbilityCostRefund Effect;
-	local XMBCondition_AbilityName AbilityNameCondition;
-	
-	// Create an effect that will refund the cost of attacks
-	Effect = new class'XMBEffect_AbilityCostRefund';
-	Effect.EffectName = 'SkullminingHeals';
-	Effect.TriggeredEvent = 'SkullminingHeals';
-
-	// The bonus only applies to standard shots
-	AbilityNameCondition = new class'XMBCondition_AbilityName';
-	AbilityNameCondition.IncludeAbilityNames.AddItem('WOTC_APA_AidProtocol');
-	AbilityNameCondition.IncludeAbilityNames.AddItem('AidProtocol');
-	Effect.AbilityTargetConditions.AddItem(AbilityNameCondition);
-
-	// Create the template using a helper function
-	return Passive('ILB_AidProtocolRefund', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
-}
-
 static function X2AbilityTemplate CreateCrackdownAbility_Revenge()
 {
 	local X2AbilityTemplate Template;
