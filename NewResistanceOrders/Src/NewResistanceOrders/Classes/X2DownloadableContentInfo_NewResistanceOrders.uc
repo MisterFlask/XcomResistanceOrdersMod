@@ -13,6 +13,7 @@ class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableConten
 	config(Abilities);
 
 var config array<name> PISTOL_SKILLS;
+var localized string ConsumableText;
 
 static final function bool IsModActive(name ModName)
 {
@@ -353,7 +354,7 @@ static function string GetSummaryTextExpanded(StateObjectReference InRef)
 	ConsumableString = "";
 	if (class'X2EventListener_Strategy'.default.CONSUMABLE_RESISTANCE_ORDERS.Find(CardState.GetMyTemplateName()) != INDEX_NONE)
 	{
-		ConsumableString = "[CONSUMABLE] ";
+		ConsumableString = default.ConsumableText;
 	}
 
 
