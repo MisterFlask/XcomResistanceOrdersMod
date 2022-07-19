@@ -267,6 +267,7 @@ static event InstallNewCampaign(XComGameState StartState)
 static event OnPostTemplatesCreated(){
 	`LOG("ILB:  Updating Abilities");
 	UpdateAbilities();
+	UpdateResOrderDescriptions();
 }
 
 static function UpdateAbilities()
@@ -294,6 +295,74 @@ static function UpdateAbilities()
 			PistolAbility.AddTargetEffect(PoisonEffect);
 		}
 	}
+}
+
+static function UpdateResOrderDescriptions()
+{
+	local X2StrategyElementTemplateManager		StrategyTemplateMgr;
+	local X2StrategyCardTemplate CardTemplate;
+	local array<Name> TemplateNames;
+	local Name TemplateName;
+	local array<X2DataTemplate> DataTemplates;
+	local X2DataTemplate DataTemplate;
+	local int Difficulty;
+
+	StrategyTemplateMgr	= class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+
+	StrategyTemplateMgr.GetTemplateNames(TemplateNames);
+	
+	foreach TemplateNames(TemplateName)
+	{
+ 		StrategyTemplateMgr.FindDataTemplateAllDifficulties(TemplateName, DataTemplates);
+		foreach DataTemplates(DataTemplate)
+		{
+			CardTemplate = X2StrategyCardTemplate(DataTemplate);
+			if(CardTemplate != none)
+			{
+				CardTemplate.GetSummaryTextFn = GetSummaryTextExpanded;
+			}
+		}
+	}}
+
+static function string GetSummaryTextExpanded(StateObjectReference InRef)
+{
+	local XComGameState_StrategyCard CardState;
+	local X2StrategyCardTemplate CardTemplate;
+	local XGParamTag ParamTag;
+	local X2AbilityTag AbilityTag;
+	local string ConsumableString;
+
+	CardState = GetCardState(InRef);
+
+	if(CardState == none)
+	{
+		return "Error in GetSummaryText function";
+	}
+
+	CardTemplate = CardState.GetMyTemplate();
+
+	if(CardTemplate.GetMutatorValueFn != none)
+	{
+		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
+		ParamTag.IntValue0 = CardTemplate.GetMutatorValueFn();
+	}
+
+	AbilityTag = X2AbilityTag(`XEXPANDCONTEXT.FindTag("Ability"));
+	AbilityTag.ParseObj = CardState;
+
+	ConsumableString = "";
+	if (class'X2EventListener_Strategy'.default.CONSUMABLE_RESISTANCE_ORDERS.Find(CardState.GetMyTemplateName()) != INDEX_NONE)
+	{
+		ConsumableString = "[CONSUMABLE] ";
+	}
+
+
+	return `XEXPAND.ExpandString(ConsumableString $ CardTemplate.SummaryText);
+}
+
+static function XComGameState_StrategyCard GetCardState(StateObjectReference CardRef)
+{
+	return XComGameState_StrategyCard(`XCOMHISTORY.GetGameStateForObjectID(CardRef.ObjectID));
 }
 
 /// <summary>
