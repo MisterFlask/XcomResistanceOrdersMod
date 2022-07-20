@@ -327,7 +327,8 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		//todo: random chance
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'ShowOfForce', 'Recover', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'LootChests', 'Recover', GeneratedMission);
-	
+		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Intel', 'ResCard_BureaucraticInfighting', 'Recover', 30); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
+
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Extract', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Rescue', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Neutralize', GeneratedMission);
@@ -339,7 +340,11 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'Terror', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'Retaliation', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ChosenRetaliation', GeneratedMission);
-		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ProtectDevice', GeneratedMission);//todo: double check sitrep ID
+		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ProtectDevice', GeneratedMission);
+
+		AddSitrepToMissionSourceIfResistanceCardsActive('ResCard_AggressiveOpportunism', 'ILB_DecreaseTimer1Sitrep', 'MissionSource_GuerillaOp', GeneratedMission);
+		AddRewardsToMissionSourceIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ResCard_AggressiveOpportunism', 'MissionSource_GuerillaOp', class'ILB_LootTablePresetReward'.static.BuildMissionItemReward_AggressiveOpportunism(NewGameState)); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
+
 
 		MissionState = XComGameState_MissionSite(SourceObject);
 
@@ -351,7 +356,6 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 			`LOG("ERROR: Could not find mission state for mission id " $ GeneratedMission.MissionID);
 		}
 			
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Intel', 'ResCard_BureaucraticInfighting', 'Recover', 30); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
 
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Supplies', 'ResCard_YouOweMe', 'Extract', 40); 
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Supplies', 'ResCard_YouOweMe', 'SwarmDefense', 40);
@@ -507,6 +511,35 @@ GeneratedMissionData MissionStruct, name MissionFamilyId)
 	return MissionStruct.Mission.MissionFamily == string(MissionFamilyId);
 }
 
+static function AddSitrepToMissionSourceIfResistanceCardsActive(XComGameState_MissionSite MissionState, name ResCard,
+name Sitrep, name RequiredMissionSource,out GeneratedMissionData GeneratedMission)
+{
+	local name MissionSource;
+	local string LwVariantOfMissionSourceAsString;
+	MissionSource = MissionState.GetMissionSource();
+	LwVariantOfMissionSourceAsString = string(RequiredMissionSource) $ "_LW"; //todo: specialty check for LWOTC
+
+
+	if (GeneratedMission.SitReps.Find(Sitrep) != -1){
+		`LOG("Sitrep already exists on mission, skipping: " $ Sitrep);
+		// Sitrep is already there! TODO: Verify this logic works.
+		return;
+	}
+
+	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
+	{
+		if (string(RequiredMissionSource) == MissionSource
+			|| LwVariantOfMissionFamilyAsString == MissionSource)
+		{
+			GeneratedMission.SitReps.AddItem(Sitrep);
+			`LOG("Mission family was satisfied: " $ RequiredMissionSource $ " for " $ ResCard );
+
+			return;
+		}
+		`LOG("Mission family needed to have been " $ RequiredMissionSource $ " for " $ ResCard $ " but was " $ MissionSource);
+	}
+}
+
 
 static function AddSitrepToMissionFamilyIfResistanceCardsActive(name ResCard,
 name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMission)
@@ -534,7 +567,6 @@ name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMissio
 	}
 }
 
-//AlienDataPad 
 static function AddRewardsToMissionFamilyIfResistanceCardActive(XComGameState NewGameState, XComGameState_MissionSite MissionState, GeneratedMissionData GeneratedMission, name RewardId, name ResCard, name RequiredMissionFamily, int Quantity)
 {
 	local string LwVariantOfMissionFamilyAsString;
@@ -577,6 +609,35 @@ static function AddRewardsToMissionFamilyIfResistanceCardActive(XComGameState Ne
 		}
 		`LOG("Mission family needed to have been " $ RequiredMissionFamily $ " for " $ ResCard $ " but was " $ GeneratedMission.Mission.MissionFamily);
 	}
+}
+
+static function AddRewardsToMissionSourceIfResistanceCardActive(XComGameState NewGameState, XComGameState_MissionSite MissionState, GeneratedMissionData GeneratedMission, name ResCard, name RequiredMissionSource, XComGameState_Reward RewardState)
+{
+	local string LwVariantOfMissionFamilyAsString;
+	local XComGameState_HeadquartersResistance ResHQ;
+	local X2StrategyElementTemplateManager TemplateManager;
+	local name MissionSource;
+	MissionSource = MissionState.GetMissionSource();
+	LwVariantOfMissionFamilyAsString = string(RequiredMissionSource) $ "_LW";
+
+	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
+	
+	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
+	{
+		if (string(RequiredMissionSource) == MissionSource
+			|| LwVariantOfMissionSourceAsString == MissionSource)
+		{
+			`LOG("Resistance card IS active for current mission: " $ ResCard $ "  | "  $ RequiredMissionFamily);
+			
+			MissionState.Rewards.AddItem(RewardState.GetReference());
+			`Log("Added reward template due to resistance card to mission!  " $ RewardId);
+				
+			return;
+		}
+		`LOG("Mission family needed to have been " $ RequiredMissionFamily $ " for " $ ResCard $ " but was " $ GeneratedMission.Mission.MissionFamily);
+	}
+
 
 
 }

@@ -242,6 +242,8 @@ static function X2AbilityTemplate CreatePoisonImmunity()
 	return Template;
 }
 
+
+// Heal soldier after skulljack used
 static function X2AbilityTemplate SiphonLifeEffect(){
 
 	local X2AbilityTemplate Template;
@@ -260,7 +262,6 @@ static function X2AbilityTemplate SiphonLifeEffect(){
 	//Template = Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
 	Template = SelfTargetTrigger('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect, 'AbilityActivated');
 	
-	
 	AddTriggerTargetCondition(Template, AbilityNameCondition);
 	//Effect.TriggeredEvent = 'SkullMiningHeal';
 
@@ -271,7 +272,6 @@ static function X2AbilityTemplate SiphonLifeEffect(){
 	// The effect doesn't expire
 	ShieldingEffect.BuildPersistentEffect(1, true, false, false);
 	ShieldingEffect.AddPersistentStatChange(eStat_ShieldHP, 3); //config
-
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.

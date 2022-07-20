@@ -486,6 +486,7 @@ static function StateObjectReference CreateSparkSoldier(XComGameState NewGameSta
 
 	return NewSparkState.GetReference();	
 }
+
 function XComGameState_Reward BuildMissionItemReward(XComGameState NewGameState, Name TemplateName)
 {
 	local X2RewardTemplate RewardTemplate;

@@ -15,6 +15,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Sitreps.AddItem(CreateForceLevelIncreaseByNEffectTemplate(Sitreps, 2, 'ILB_Sitrep_PlusTwoForceLevel'));
 	Sitreps.AddItem(CreateForceLevelIncreaseByNEffectTemplate(Sitreps, 3, 'ILB_Sitrep_PlusThreeForceLevel'));
 	
+	Sitreps.AddItem(CreateDecreaseTimerEffect1Template());
 	foreach Sitreps(CurrentItem){
 		`LOG("found sitrep/effect: " $ CurrentItem.DataName);
 	}
@@ -22,6 +23,19 @@ static function array<X2DataTemplate> CreateTemplates()
 	return Sitreps;
 }
 
+static function X2SitRepEffectTemplate CreateDecreaseTimerEffect1Template()
+{
+	local X2SitRepEffect_ModifyKismetVariable Template;
+
+	`CREATE_X2TEMPLATE(class'X2SitRepEffect_ModifyKismetVariable', Template, 'ILB_DecreaseTimer1Effect');
+
+	Template.VariableNames.AddItem("Timer.DefaultTurns");
+	Template.VariableNames.AddItem("Timer.LengthDelta");
+	Template.VariableNames.AddItem("Mission.TimerLengthDelta"); 
+	Template.ValueAdjustment = -1; 
+
+	return Template;
+}
 
 static function name GetRandomForceLevelIncreaseSitrep(int maxForceLevel){
 	local int RandomValue;

@@ -93,7 +93,7 @@ var config int SUPERCHARGER_POWER_DRAIN;
 		Techs.AddItem(CreateDawnMachines());
 		Techs.AddItem(CreateRemoteSuperchargers());
 
-		//Techs.AddItem(CreateSiphonLife());
+		Techs.AddItem(CreateSiphonLife());
 
 		return Techs;
 	}

@@ -24,6 +24,9 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Config\XComGameBoard.ini">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Config\XComGameCore.ini">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Config\XComGameData.ini">
       <SubType>Content</SubType>
     </Content>
@@ -55,6 +58,9 @@ tags= war of the chosen, gameplay, resistance orders</Description>
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_HeavyWeapons.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_LootTablePresetReward.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_Reward_Squaddie.uc">
