@@ -13,8 +13,19 @@ static function array<X2DataTemplate> CreateTemplates()
 	Sitreps.AddItem(CreateNegativeSitrepMatchingName('ILB_Sitrep_PlusOneForceLevel')); 
 	Sitreps.AddItem(CreateNegativeSitrepMatchingName('ILB_Sitrep_PlusTwoForceLevel')); 
 	Sitreps.AddItem(CreateNegativeSitrepMatchingName('ILB_Sitrep_PlusThreeForceLevel')); 
+	Sitreps.AddItem(CreateAggressiveOpportunismSitrep());
 
 	return Sitreps;
+}
+
+static function X2SitRepTemplate CreateAggressiveOpportunismSitrep(){
+	
+	local X2SitRepTemplate  Template;
+	`CREATE_X2TEMPLATE(class'X2SitRepTemplate', Template, 'ILB_DecreaseTimer1Sitrep');
+	Template.NegativeEffects.AddItem('ILB_DecreaseTimer1Effect');
+	Template.bNegativeEffect = true;
+	Template.ValidMissionFamilies.AddItem("NONE"); // this is a dummy value intended to prevent spawning randomly
+	return Template;
 }
 
 static function X2SitRepTemplate CreateNegativeSitrepMatchingName(name TemplateName){

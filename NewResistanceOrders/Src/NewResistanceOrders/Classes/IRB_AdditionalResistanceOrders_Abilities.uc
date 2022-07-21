@@ -574,9 +574,6 @@ static function X2AbilityTemplate AridFastUnit()
 	local X2AbilityTemplate Template;
 	local X2Effect_PersistentStatChange Effect;
 	local X2Condition_MapProperty Condition;
-	
-	// Create a condition that only applies the stat change when in the Tundra biome
-
 
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_DawnMachines',"img:///UILibrary_PerkIcons.UIPerk_andromedon_robotbattlesuit", true, none);
