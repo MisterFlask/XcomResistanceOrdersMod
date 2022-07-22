@@ -93,8 +93,8 @@ var config int SUPERCHARGER_POWER_DRAIN;
 		Techs.AddItem(CreateDawnMachines());
 		Techs.AddItem(CreateRemoteSuperchargers());
 
-		Techs.AddItem(CreateSiphonLife());
-		Techs.AddItem(CreateBlankResistanceOrder('ResCard_AggressiveOpportunism'));
+		//Techs.AddItem(CreateSiphonLife());
+		//Techs.AddItem(CreateBlankResistanceOrder('ResCard_AggressiveOpportunism'));
 
 		return Techs;
 	}
