@@ -13,6 +13,16 @@ class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableConten
 	config(Abilities);
 
 var config array<name> PISTOL_SKILLS;
+var localized string ConsumableText;
+
+var localized array<ResistanceCardConfigValues> ResistanceCardConfigs;
+
+
+struct ResistanceCardConfigValues{
+	var name ResCardName;
+	var string StringValue1;
+	var string StringValue2;
+};
 
 static final function bool IsModActive(name ModName)
 {
@@ -267,6 +277,243 @@ static event InstallNewCampaign(XComGameState StartState)
 static event OnPostTemplatesCreated(){
 	`LOG("ILB:  Updating Abilities");
 	UpdateAbilities();
+	UpdateResOrderDescriptions();
+	UpdateResistanceCardConfigs();
+}
+
+
+static function UpdateResistanceCardConfigs(){
+	//Costs 4 avenger power; only functions when not at power deficit. All soldiers' electric abilities deal 2 extra damage. 
+	ResistanceCardConfigs.Add(ResCardConf('ResCard_RemoteSuperchargers', -1, -1));
+	//Gain +20% research speed.  Chryssalids and Faceless are both faster and harder to hit
+	ResistanceCardConfigs.Add(ResCardConf('ResCard_XenobiologicalFieldResearch', -1, -1));
+	//Lose 15% research speed.  Gain +3 resistance contacts
+	ResistanceCardConfigs.Add(ResCardConf('ResCard_LabToCommsRepurposing', -1, -1));
+	//Gain +4 avenger power.  Guerilla Ops and Council missions have a +15% chance of an ADVENT crackdown sitrep
+	ResistanceCardConfigs.Add(ResCardConf('ResCard_LeachPsionicLeylines', -1, -1));
+	// ResCard_RescueUpperCrustContacts
+	//Grants a monthly covert action that spawns a Swarm Defense Recover VIP mission.  This mission rewards 75-125 supply on completion instead of its typical reward.
+	// ResCard_StealSparkCore
+	//"Grants a monthly covert action that spawns a Recover Item mission with an increased force level of between 0 and 1.  This mission rewards a Spark instead of its typical reward on completion."
+	// ResCard_BrazenRecruitment
+	/// "There is a +15% chance of an ADVENT crackdown..."
+	//ResCard_BrazenCollection
+	//Gain +25% extra supplies from drops.   There is a +15% chance of an ADVENT crackdown sitrep on all guerilla ops and council missions.
+	// ResCard_GrndlPowerDeal
+	//Gain +5 Avenger power.   Also, gain -25% supplies from supply drops."
+	// ResCard_NotoriousSmugglers
+	//Black Market goods are at a 25% discount.  There is a +15% chance of an ADVENT crackdown on all guerilla ops and council missions
+	/*
+[ResCard_RadioFreeLily X2StrategyCardTemplate]
+DisplayName="Radio Free Lily"
+SummaryText="You gain +2 resistance contacts.  Retaliations are at +1 force level."
+	*/
+	/*
+[ResCard_CouncilBounties X2StrategyCardTemplate]
+DisplayName="Council Bounties"
+SummaryText="Grants a monthly covert action that spawns a Neutralize Field Commander mission.  The field commander is tougher on this mission.  This mission rewards 75-125 supply on completion."
+	*/
+	/*
+	ResCard_PowerCellRepurposing
+	Successfully securing UFOs grants the Avenger 2 additional power PERMANENTLY, as well as a random heavy weapon.  Destroy Device missions grant an additional 15 Elereum."
+	*/
+	/*
+	ResCard_SupplyRaidsForHacks
+	"Successful Hack missions generate a Supply Raid and grant 30 additional intel"
+	*/
+	/*
+	ResCard_EducatedVandalism
+	Destroy Object and Sabotage Transmitter missions grant additional 15 alien alloys on completion
+	*/
+	/*
+	ResCard_IncitePowerVacuum
+	Neutralize VIP and Neutralize Field Commander missions both reduce the Avatar counter by 14 days apiece.
+	*/
+	/*
+[ResCard_YouOweMe X2StrategyCardTemplate]
+SummaryText="Recover Resistance Operative missions and Extract VIP missions grant an extra 40 supply on successful completion."
+
+[ResCard_MassivePopularity X2StrategyCardTemplate]
+SummaryText="Gain a promotable Rookie on successful completion of a Retaliation mission."
+
+[ResCard_TunnelRats X2StrategyCardTemplate]
+SummaryText="Missions in the Sewers or Subways allow each soldier with a shotgun or assault rifle to reenter concealment once per mission, as per the Conceal ability."
+
+[ResCard_ForgedPapers X2StrategyCardTemplate]
+SummaryText="Missions in Small Towns allow each soldier to reenter concealment once per mission, as per the Conceal ability.  If you have at least 3 Skirmisher cards active, this also applies to City Centers."
+
+[ResCard_FlashpointForGrenadiers X2StrategyCardTemplate]
+SummaryText="Grenade launchers make flashbangs deal 2 Fire damage in addition to their regular effects."
+
+[ResCard_HexHunterForMindShields X2StrategyCardTemplate]
+SummaryText="Your soldiers with a Mind Shield gain the Witch Hunter perk (additional 2 passive damage vs. psionic enemies.)"
+
+[ResCard_NeedlepointForPistols X2StrategyCardTemplate]
+SummaryText="Pistol shots poison their targets."
+
+[ResCard_AntimimeticScalesForVests X2StrategyCardTemplate]
+SummaryText="Your soldiers wearing a Nanoscale Vest start combat with Phantom (start combat concealed)."
+
+[ResCard_AntimimeticScalesForVestsII X2StrategyCardTemplate]
+SummaryText="Your soldiers wearing a Nanoscale Vest start combat with Shadowstep (cannot be targeted by reaction fire)."
+
+[ResCard_MultitaskingForGremlins X2StrategyCardTemplate]
+SummaryText="Aid Protocol for GREMLIN users refunds its action."
+
+[ResCard_SmokerForLaunchers X2StrategyCardTemplate]
+SummaryText="Grenade Launchers grant a free smoke grenade."
+
+[ResCard_CombatDrugsForMedikit X2StrategyCardTemplate]
+SummaryText="Soldiers carrying Medikits AND smoke grenades gain the Combat Drugs perk, which makes smoke grenades improve the aim of units inside the cloud."
+
+[ResCard_FlamerForCannon X2StrategyCardTemplate]
+SummaryText="Your cannon-carrying soldiers gain a single-use flamethrower."
+
+[ResCard_BattlespaceForBattleScanners X2StrategyCardTemplate]
+SummaryText="Your soldiers carrying a battle scanner start combat with the Target Definition perk (enemies remain visible after leaving line of sight)."
+
+[ResCard_PistolForEntrench X2StrategyCardTemplate]
+SummaryText="Your sniper rifle-carrying soldiers gain Deep Cover (any turn you don't attack, hunker down automatically.)"
+
+[ResCard_BladesGrantShellbust X2StrategyCardTemplate]
+SummaryText="Your sword or knife-carrying soldiers gain Shellbust Stab (massive armor shred melee attack)"
+
+[ResCard_Mindtaker X2StrategyCardTemplate]
+SummaryText="Skulljacks allow two Skullmining uses per combat (if it's unlocked).  Biological enemies have -70% hack defense."
+
+
+[ResCard_QuickpatchForMedikit X2StrategyCardTemplate]
+DisplayName="Quickpatch Protocol"
+SummaryText="Soldiers with a healing item can use it as a free action."
+QuoteText="I was on this project before it got cancelled.  High Command deemed it more cost-effective to simply replace the dead troops."
+QuoteTextAuthor="Betos"
+
+[ResCard_BureaucraticInfighting X2StrategyCardTemplate]
+SummaryText="Loot Crates and Show of Force sitreps are guaranteed for item recovery missions.  They also provide an extra 30 intel on successful completion."
+
+[ResCard_SafetyFirst X2StrategyCardTemplate]
+SummaryText="You can purchase a Plated Vest from the Black Market at a fee each month.  Also, Plated Vests grant 1 ablative shielding each combat."
+
+[ResCard_CleanupDetail X2StrategyCardTemplate]
+SummaryText="You can purchase a Hazmat Vest from the Black Market at a fee each month.  Also, such vests grant 1 ablative shielding each combat."
+
+[ResCard_MeatMarket X2StrategyCardTemplate]
+SummaryText="You get a choice of three additional mercenaries to hire from the Black Market each month.  They cost Supplies rather than Intel."
+
+[ResCard_ResUnitIfMoreThanOneNoob X2StrategyCardTemplate]
+SummaryText="Gain a bonus Resistance soldier at the beginning of each combat where you're fielding two or more soldiers of Squaddie rank or lower."
+
+[ResCard_ResUnitIfRetaliation X2StrategyCardTemplate]
+SummaryText="Gain a bonus Resistance soldier at the beginning of each Retaliation mission."
+
+[ResCard_AdventUnitIfLessThanFullSquad X2StrategyCardTemplate]
+SummaryText="Gain a bonus ADVENT soldier at the beginning of each mission where you're fielding fewer than six soldiers."
+
+[ResCard_MabExploit X2StrategyCardTemplate]
+SummaryText="In Tundra climates, all MECs and Turrets have -70% hack defense."
+
+[ResCard_MachineBuffsIfAridClimate X2StrategyCardTemplate]
+SummaryText="In non-Arid climates, your mechanical units gain +4 shielding.  In Arid climates, your mechanical units gain +3 mobility and +8 shielding.  Only applies to mechanical units that cannot take cover.  You can purchase MEC wrecks in the Black Market."
+
+[ResCard_SendInTheNextWave X2StrategyCardTemplate]
+SummaryText="Your recruits cost 15.  Rookies and Squaddies gain the Beatdown perk (deal a small amount of melee damage, but stun for a turn)"
+
+[ResCard_OberonExploit X2StrategyCardTemplate]
+SummaryText="ADVENT turrets lose -70% hack defense."
+
+[ResCard_PracticalOccultism X2StrategyCardTemplate]
+SummaryText="Your Reapers can cloak themselves for an HP cost, and can also teleport to anywhere within squadsight, also with an HP cost."
+
+[ResCard_BetterMelee X2StrategyCardTemplate]
+SummaryText="Your soldiers all deal +1 melee damage.  Additionally, they have an increased likelihood to bleed out rather than die outright."
+
+[ResCard_Promethium X2StrategyCardTemplate]
+SummaryText="Flamethrower-based abilities deal 2 more damage.  Additionally, flamethrower-based abilities gain another charge.  (This also applies to fire-based chemthrower abilities.)"
+
+[ResCard_GrantRookiesPermaHp X2StrategyCardTemplate]
+SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANENT +2 max HP (once per rookie)."
+
+	*/
+
+	return ResistanceCardConfigs;
+}
+
+static function ResCardConf(name ResCardId, int intValue1, int intValue2 = -1){
+	local var ResistanceCardConfigValues;
+	ResistanceCardConfigValues.StringValue1 = string(intValue1);
+	ResistanceCardConfigValues.StringValue2 = string(intValue2);
+	return ResistanceCardConfigValues;
+}
+
+static function UpdateResOrderDescriptions()
+{
+	local X2StrategyElementTemplateManager		StrategyTemplateMgr;
+	local X2StrategyCardTemplate CardTemplate;
+	local array<Name> TemplateNames;
+	local Name TemplateName;
+	local array<X2DataTemplate> DataTemplates;
+	local X2DataTemplate DataTemplate;
+	local int Difficulty;
+
+	StrategyTemplateMgr	= class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
+
+	StrategyTemplateMgr.GetTemplateNames(TemplateNames);
+
+	foreach TemplateNames(TemplateName)
+	{
+ 		StrategyTemplateMgr.FindDataTemplateAllDifficulties(TemplateName, DataTemplates);
+		foreach DataTemplates(DataTemplate)
+		{
+			CardTemplate = X2StrategyCardTemplate(DataTemplate);
+			if(CardTemplate != none)
+			{
+				CardTemplate.GetSummaryTextFn = GetSummaryTextExpanded;
+			}
+		}
+	}}
+
+static function string GetSummaryTextExpanded(StateObjectReference InRef)
+{
+	local XComGameState_StrategyCard CardState;
+	local X2StrategyCardTemplate CardTemplate;
+	local XGParamTag ParamTag;
+	local X2AbilityTag AbilityTag;
+	local string ConsumableString;
+
+	CardState = GetCardState(InRef);
+
+	if(CardState == none)
+	{
+		return "Error in GetSummaryText function";
+	}
+
+	CardTemplate = CardState.GetMyTemplate();
+
+	if(CardTemplate.GetMutatorValueFn != none)
+	{
+		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
+		ParamTag.IntValue0 = CardTemplate.GetMutatorValueFn();
+		
+		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
+		ParamTag.IntValue1 = CardTemplate.GetMutatorValueFn();
+	}
+
+	AbilityTag = X2AbilityTag(`XEXPANDCONTEXT.FindTag("Ability"));
+	AbilityTag.ParseObj = CardState;
+
+	ConsumableString = "";
+	if (class'X2EventListener_Strategy'.default.CONSUMABLE_RESISTANCE_ORDERS.Find(CardState.GetMyTemplateName()) != INDEX_NONE)
+	{
+		ConsumableString = default.ConsumableText;
+	}
+
+
+	return `XEXPAND.ExpandString(ConsumableString $ CardTemplate.SummaryText);
+}
+
+static function XComGameState_StrategyCard GetCardState(StateObjectReference CardRef)
+{
+	return XComGameState_StrategyCard(`XCOMHISTORY.GetGameStateForObjectID(CardRef.ObjectID));
 }
 
 static function UpdateAbilities()

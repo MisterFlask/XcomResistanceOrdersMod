@@ -34,6 +34,7 @@ tags= war of the chosen, gameplay, resistance orders</Description>
       <SubType>Content</SubType>
     </Content>
     <Content Include="Localization\XComGame.int" />
+    <Content Include="Localization\NewResistanceOrders.int" />
     <Content Include="ModPreview.jpg" />
     <Content Include="ReadMe.txt" />
     <Content Include="Src\LW_Tuple\Classes\LWTuple.uc">
@@ -175,6 +176,9 @@ tags= war of the chosen, gameplay, resistance orders</Description>
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\NewResistanceOrders\Classes\XMBEffect_Extended.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\X2EventListener_Strategy.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\NewResistanceOrders\Classes\XMBEffect_GrantReserveActionPoint.uc">
