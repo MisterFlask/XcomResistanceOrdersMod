@@ -38,6 +38,8 @@ var config int FIELD_COMMANDER_SHIELDING_BUFF;
 
 var config int CHRYSSALID_AND_FACELESS_DEFENSE_BUFF;
 var config int CHRYSSALID_AND_FACELESS_MOBILITY_BUFF;
+
+var config int AVENGER_SUPERCHARGER_ELECTRIC_DAMAGE_BUFF;
 	//UltrasonicLure
 /// <summary>
 /// Creates the set of default abilities every unit should have in X-Com 2
@@ -89,7 +91,7 @@ static function X2AbilityTemplate Turbocharged()
 	Effect = new class'XMBEffect_BonusDamageByDamageType';
 	Effect.EffectName = 'Turbocharged';
 	Effect.RequiredDamageTypes.AddItem('Electrical');
-	Effect.DamageBonus = 2;
+	Effect.DamageBonus = default.AVENGER_SUPERCHARGER_ELECTRIC_DAMAGE_BUFF;
 
 	// Create the template using a helper function
 	Template = Passive('ILB_Turbocharged', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect);

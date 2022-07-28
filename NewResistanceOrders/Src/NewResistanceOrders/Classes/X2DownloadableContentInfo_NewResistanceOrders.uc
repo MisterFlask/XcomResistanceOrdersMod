@@ -15,14 +15,14 @@ class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableConten
 var config array<name> PISTOL_SKILLS;
 var localized string ConsumableText;
 
-var localized array<ResistanceCardConfigValues> ResistanceCardConfigs;
-
-
 struct ResistanceCardConfigValues{
 	var name ResCardName;
+	var string StringValue0;
 	var string StringValue1;
-	var string StringValue2;
 };
+
+
+
 
 static final function bool IsModActive(name ModName)
 {
@@ -278,59 +278,97 @@ static event OnPostTemplatesCreated(){
 	`LOG("ILB:  Updating Abilities");
 	UpdateAbilities();
 	UpdateResOrderDescriptions();
-	UpdateResistanceCardConfigs();
 }
 
 
-static function UpdateResistanceCardConfigs(){
+static function array<ResistanceCardConfigValues> GetResistanceCardConfigs(){
+	local array<ResistanceCardConfigValues> ResistanceCardConfigs;
+
 	//Costs 4 avenger power; only functions when not at power deficit. All soldiers' electric abilities deal 2 extra damage. 
-	ResistanceCardConfigs.Add(ResCardConf('ResCard_RemoteSuperchargers', -1, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RemoteSuperchargers', class'IRB_AdditionalResistanceOrders_ResCards'.default.SUPERCHARGER_POWER_DRAIN, class'IRB_AdditionalResistanceOrders_Abilities'.default.AVENGER_SUPERCHARGER_ELECTRIC_DAMAGE_BUFF));// 
 	//Gain +20% research speed.  Chryssalids and Faceless are both faster and harder to hit
-	ResistanceCardConfigs.Add(ResCardConf('ResCard_XenobiologicalFieldResearch', -1, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_XenobiologicalFieldResearch', class'ILB_StrategicResCards'.default.XENO_FIELD_RESEARCH_RESEARCH_BONUS, -1));
 	//Lose 15% research speed.  Gain +3 resistance contacts
-	ResistanceCardConfigs.Add(ResCardConf('ResCard_LabToCommsRepurposing', -1, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_LabToCommsRepurposing', class'ILB_StrategicResCards'.default.LABS_TO_COMMS_COMMS_BONUS, class'ILB_StrategicResCards'.default.LABS_TO_COMMS_RESEARCH_PENALTY));
 	//Gain +4 avenger power.  Guerilla Ops and Council missions have a +15% chance of an ADVENT crackdown sitrep
-	ResistanceCardConfigs.Add(ResCardConf('ResCard_LeachPsionicLeylines', -1, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_LeachPsionicLeylines', class'ILB_StrategicResCards'.default.LEACH_PSIONIC_LEYLINES_POWER_BONUS, 15));
 	// ResCard_RescueUpperCrustContacts
 	//Grants a monthly covert action that spawns a Swarm Defense Recover VIP mission.  This mission rewards 75-125 supply on completion instead of its typical reward.
+	
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RescueUpperCrustContacts', 75, 125));
+	
 	// ResCard_StealSparkCore
 	//"Grants a monthly covert action that spawns a Recover Item mission with an increased force level of between 0 and 1.  This mission rewards a Spark instead of its typical reward on completion."
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_StealSparkCore', 0, 1));
+	
 	// ResCard_BrazenRecruitment
 	/// "There is a +15% chance of an ADVENT crackdown..."
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BrazenRecruitment',15,-1));
+
 	//ResCard_BrazenCollection
 	//Gain +25% extra supplies from drops.   There is a +15% chance of an ADVENT crackdown sitrep on all guerilla ops and council missions.
+	
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BrazenCollection',class'ILB_StrategicResCards'.default.BRAZEN_COLLECTION_BONUS, -1));
+
 	// ResCard_GrndlPowerDeal
 	//Gain +5 Avenger power.   Also, gain -25% supplies from supply drops."
-	// ResCard_NotoriousSmugglers
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrndlPowerDeal',class'ILB_StrategicResCards'.default.GRNDL_POWER_DEAL_POWER_BONUS, class'ILB_StrategicResCards'.default.GRNDL_POWER_DEAL_SUPPLY_PENALTY));
+
+	// 
 	//Black Market goods are at a 25% discount.  There is a +15% chance of an ADVENT crackdown on all guerilla ops and council missions
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_NotoriousSmugglers',class'ILB_StrategicResCards'.default.NOTORIOUS_SMUGGLERS_BLACK_MARKET_DISCOUNT, class'ILB_StrategicResCards'.default.GRNDL_POWER_DEAL_SUPPLY_PENALTY));
+
 	/*
 [ResCard_RadioFreeLily X2StrategyCardTemplate]
 DisplayName="Radio Free Lily"
 SummaryText="You gain +2 resistance contacts.  Retaliations are at +1 force level."
+
 	*/
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RadioFreeLily',class'ILB_StrategicResCards'.default.RADIO_FREE_LILY_COMMS_BONUS, 1));
+
 	/*
 [ResCard_CouncilBounties X2StrategyCardTemplate]
 DisplayName="Council Bounties"
 SummaryText="Grants a monthly covert action that spawns a Neutralize Field Commander mission.  The field commander is tougher on this mission.  This mission rewards 75-125 supply on completion."
 	*/
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_CouncilBounties', 75, 125));
+
 	/*
 	ResCard_PowerCellRepurposing
 	Successfully securing UFOs grants the Avenger 2 additional power PERMANENTLY, as well as a random heavy weapon.  Destroy Device missions grant an additional 15 Elereum."
 	*/
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_PowerCellRepurposing', 2, 15)); //todo
+
 	/*
 	ResCard_SupplyRaidsForHacks
 	"Successful Hack missions generate a Supply Raid and grant 30 additional intel"
 	*/
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_SupplyRaidsForHacks', 30, -1)); //todo
+
 	/*
 	ResCard_EducatedVandalism
 	Destroy Object and Sabotage Transmitter missions grant additional 15 alien alloys on completion
 	*/
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_EducatedVandalism', 15, -1)); //todo
+
 	/*
 	ResCard_IncitePowerVacuum
 	Neutralize VIP and Neutralize Field Commander missions both reduce the Avatar counter by 14 days apiece.
 	*/
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_IncitePowerVacuum', 14, -1)); //todo
+
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_YouOweMe', 40, -1)); //todo
+
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_HexHunterForMindShields', 2, -1));
+
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', 70, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', 2, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', 2, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BureaucraticInfighting', 30, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', 70, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', 1, -1));
 	/*
-[ResCard_YouOweMe X2StrategyCardTemplate]
+[ X2StrategyCardTemplate]
 SummaryText="Recover Resistance Operative missions and Extract VIP missions grant an extra 40 supply on successful completion."
 
 [ResCard_MassivePopularity X2StrategyCardTemplate]
@@ -347,33 +385,6 @@ SummaryText="Grenade launchers make flashbangs deal 2 Fire damage in addition to
 
 [ResCard_HexHunterForMindShields X2StrategyCardTemplate]
 SummaryText="Your soldiers with a Mind Shield gain the Witch Hunter perk (additional 2 passive damage vs. psionic enemies.)"
-
-[ResCard_NeedlepointForPistols X2StrategyCardTemplate]
-SummaryText="Pistol shots poison their targets."
-
-[ResCard_AntimimeticScalesForVests X2StrategyCardTemplate]
-SummaryText="Your soldiers wearing a Nanoscale Vest start combat with Phantom (start combat concealed)."
-
-[ResCard_AntimimeticScalesForVestsII X2StrategyCardTemplate]
-SummaryText="Your soldiers wearing a Nanoscale Vest start combat with Shadowstep (cannot be targeted by reaction fire)."
-
-[ResCard_MultitaskingForGremlins X2StrategyCardTemplate]
-SummaryText="Aid Protocol for GREMLIN users refunds its action."
-
-[ResCard_SmokerForLaunchers X2StrategyCardTemplate]
-SummaryText="Grenade Launchers grant a free smoke grenade."
-
-[ResCard_CombatDrugsForMedikit X2StrategyCardTemplate]
-SummaryText="Soldiers carrying Medikits AND smoke grenades gain the Combat Drugs perk, which makes smoke grenades improve the aim of units inside the cloud."
-
-[ResCard_FlamerForCannon X2StrategyCardTemplate]
-SummaryText="Your cannon-carrying soldiers gain a single-use flamethrower."
-
-[ResCard_BattlespaceForBattleScanners X2StrategyCardTemplate]
-SummaryText="Your soldiers carrying a battle scanner start combat with the Target Definition perk (enemies remain visible after leaving line of sight)."
-
-[ResCard_PistolForEntrench X2StrategyCardTemplate]
-SummaryText="Your sniper rifle-carrying soldiers gain Deep Cover (any turn you don't attack, hunker down automatically.)"
 
 [ResCard_BladesGrantShellbust X2StrategyCardTemplate]
 SummaryText="Your sword or knife-carrying soldiers gain Shellbust Stab (massive armor shred melee attack)"
@@ -438,11 +449,11 @@ SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANEN
 	return ResistanceCardConfigs;
 }
 
-static function ResCardConf(name ResCardId, int intValue1, int intValue2 = -1){
-	local var ResistanceCardConfigValues;
-	ResistanceCardConfigValues.StringValue1 = string(intValue1);
-	ResistanceCardConfigValues.StringValue2 = string(intValue2);
-	return ResistanceCardConfigValues;
+static function ResistanceCardConfigValues ResCardConf(name ResCardId, int intValue1, int intValue2 = -1){
+	local ResistanceCardConfigValues Values;
+	Values.StringValue0 = string(intValue1);
+	Values.StringValue1 = string(intValue2);
+	return Values;
 }
 
 static function UpdateResOrderDescriptions()
@@ -472,6 +483,21 @@ static function UpdateResOrderDescriptions()
 		}
 	}}
 
+	static function ResistanceCardConfigValues GetResistanceCardConfigsForResCard(name ResCardName, array<ResistanceCardConfigValues> AllPossibleCards){
+		local array<ResistanceCardConfigValues> Configs;
+		local ResistanceCardConfigValues Current;
+
+		Current.ResCardName = '';
+		foreach Configs(Current){
+			if (ResCardName == Current.ResCardName){
+				return Current;
+			}
+		}
+
+		return Current;
+
+	}
+
 static function string GetSummaryTextExpanded(StateObjectReference InRef)
 {
 	local XComGameState_StrategyCard CardState;
@@ -479,6 +505,9 @@ static function string GetSummaryTextExpanded(StateObjectReference InRef)
 	local XGParamTag ParamTag;
 	local X2AbilityTag AbilityTag;
 	local string ConsumableString;
+	local array<ResistanceCardConfigValues> Configs;
+	local ResistanceCardConfigValues CurrentConfig;
+	Configs = GetResistanceCardConfigs();
 
 	CardState = GetCardState(InRef);
 
@@ -488,15 +517,21 @@ static function string GetSummaryTextExpanded(StateObjectReference InRef)
 	}
 
 	CardTemplate = CardState.GetMyTemplate();
-
-	if(CardTemplate.GetMutatorValueFn != none)
+	CurrentConfig=GetResistanceCardConfigsForResCard(CardTemplate.DataName, Configs);
+	if (CurrentConfig.ResCardName != ''){
+		
+		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
+		ParamTag.StrValue0 = CurrentConfig.StringValue0;
+		
+		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
+		ParamTag.StrValue1 = CurrentConfig.StringValue1;
+	} 
+    if(CardTemplate.GetMutatorValueFn != none)
 	{
 		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
 		ParamTag.IntValue0 = CardTemplate.GetMutatorValueFn();
-		
-		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
-		ParamTag.IntValue1 = CardTemplate.GetMutatorValueFn();
 	}
+
 
 	AbilityTag = X2AbilityTag(`XEXPANDCONTEXT.FindTag("Ability"));
 	AbilityTag.ParseObj = CardState;
