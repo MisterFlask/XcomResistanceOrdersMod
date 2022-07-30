@@ -69,13 +69,15 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(SiphonLifeEffect());
 	Templates.AddItem(GrapplingHookGrantsOneTurnBuffsEffect());
 
+	Templates.AddItem(SonicLureBonusEffect('ILB_SonicLureDamageBuff', "img:///UILibrary_PerkIcons.UIPerk_ace_hole", 1)); // bonus damage
+	Templates.AddItem(Turbocharged());
+
 	// now, enemy abilities
 	Templates.AddItem(CreateBrutePoison());
 	Templates.AddItem(CreateBrutePoisonWeapon());
 	Templates.AddItem(CreatePoisonImmunity());
 	Templates.AddItem(CreateChryssalidAndFacelessBuff());
 	Templates.AddItem(CreateLotsOfShieldingBuff());
-	Templates.AddItem(Turbocharged());
 	Templates.AddItem(CreateCrackdownAbility_Revenge());
 	return Templates;
 }
@@ -736,6 +738,44 @@ static function X2AbilityTemplate EasyToHackMindgorger()
 }
 
 
+static function X2AbilityTemplate SonicLureBonusEffect(
+name TemplateName,
+ string IconImage,
+  int BonusDamage) {
+	local X2AbilityTemplate						Template;
+	local X2AbilityTargetStyle                  TargetStyle;
+	local X2AbilityTrigger						Trigger;
+	local Grimy_Effect_BonusWeaponDamage	MixEffect;
+	local Grimy_BonusItemCharges		AmmoEffect;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, TemplateName);
+
+	// Icon Properties
+	Template.IconImage = IconImage;
+
+	Template.AbilitySourceName = 'eAbilitySource_Perk';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_NeverShow;
+	Template.Hostility = eHostility_Neutral;
+
+	Template.AbilityToHitCalc = default.DeadEye;
+
+	TargetStyle = new class'X2AbilityTarget_Self';
+	Template.AbilityTargetStyle = TargetStyle;
+
+	Trigger = new class'X2AbilityTrigger_UnitPostBeginPlay';
+	Template.AbilityTriggers.AddItem(Trigger);
+
+	MixEffect = new class'ILB_Grimy_BonusDamage_Effect';
+	MixEffect.BuildPersistentEffect(1, true, true, true);
+	MixEffect.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage,,,Template.AbilitySourceName);
+	MixEffect.Bonus = BonusDamage;
+	MixEffect.WeaponNames = 'SonicLure'; //todo: verify
+	Template.AddTargetEffect(MixEffect);
+
+	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;
+
+	return Template;
+}
 
 
 // Perk name:		Mab Exploit

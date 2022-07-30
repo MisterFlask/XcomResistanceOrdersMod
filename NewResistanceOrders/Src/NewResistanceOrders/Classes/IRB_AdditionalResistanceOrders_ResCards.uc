@@ -1204,6 +1204,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		if(DoesSoldierHaveGremlin(UnitState) )
 		{
 			AbilitiesToGrant.AddItem( 'ILB_FreeUltrasonicLure' );
+			AbilitiesToGrant.AddItem('ILB_SonicLureDamageBuff');
 		}
 	}
 	
