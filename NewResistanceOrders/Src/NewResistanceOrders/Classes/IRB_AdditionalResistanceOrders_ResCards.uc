@@ -93,12 +93,33 @@ var config int SUPERCHARGER_POWER_DRAIN;
 		Techs.AddItem(CreateDawnMachines());
 		Techs.AddItem(CreateRemoteSuperchargers());
 
-		//Techs.AddItem(CreateSiphonLife());
-		//Techs.AddItem(CreateBlankResistanceOrder('ResCard_AggressiveOpportunism'));
+		Techs.AddItem(CreateSiphonLife());
+		Techs.AddItem(CreateBlankResistanceOrder('ResCard_AggressiveOpportunism'));
+		Techs.AddItem(CreateOdmGear());
 
 		return Techs;
 	}
 
+	static function X2DataTemplate CreateOdmGear(){
+	
+		local X2StrategyCardTemplate Template;
+
+		`CREATE_X2TEMPLATE(class'X2StrategyCardTemplate', Template, 'ResCard_OdmGear');
+		Template.Category = "ResistanceCard";
+		Template.GetAbilitiesToGrantFn = GrantOdmGear;
+		return Template; 
+	}
+	
+	static function GrantOdmGear(XComGameState_Unit UnitState, out array<name> AbilitiesToGrant)
+	{		
+		if (UnitState.GetTeam() != eTeam_XCom)
+		{
+			return;
+		}
+
+		AbilitiesToGrant.AddItem('ILB_OdmGear');
+
+	}
 	static function X2DataTemplate CreateSiphonLife(){
 		local X2StrategyCardTemplate Template;
 

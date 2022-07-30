@@ -66,6 +66,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(PistolShotsDealPoisonPassive());
 	Templates.AddItem(AidProtocolRefund());
 	Templates.AddItem(SiphonLifeEffect());
+	Templates.AddItem(GrapplingHookGrantsOneTurnBuffsEffect());
 
 	// now, enemy abilities
 	Templates.AddItem(CreateBrutePoison());
@@ -244,6 +245,56 @@ static function X2AbilityTemplate CreatePoisonImmunity()
 	return Template;
 }
 
+// -1 to all grappling hook cooldowns.  Using a grappling hook grants +4 mobility and 30 dodge for the turn.
+static function X2AbilityTemplate GrapplingHookGrantsOneTurnBuffsEffect(){
+
+	local X2AbilityTemplate Template;
+	local XMBEffect_ConditionalStatChange DodgeEffect;
+	local XMBEffect_ConditionalStatChange MobilityEffect;
+	local XMBCondition_AbilityName AbilityNameCondition;
+	local X2Effect_ReduceCooldowns ReduceCooldownsEffect;
+
+	// the grappling-hook is the ability that has to have been deployed
+	AbilityNameCondition = new class'XMBCondition_AbilityName';
+	AbilityNameCondition.IncludeAbilityNames.AddItem('SkirmisherGrapple');
+	AbilityNameCondition.IncludeAbilityNames.AddItem('Grapple');
+	AbilityNameCondition.IncludeAbilityNames.AddItem('GrapplePowered');
+	
+
+	// Create an effect that ticks down the grappling hook cooldown(s).
+	ReduceCooldownsEffect = new class'X2Effect_ReduceCooldowns';
+	ReduceCooldownsEffect.AbilitiesToTick.AddItem('SkirmisherGrapple');
+	ReduceCooldownsEffect.AbilitiesToTick.AddItem('Grapple');
+	ReduceCooldownsEffect.AbilitiesToTick.AddItem('GrapplePowered');
+	ReduceCooldownsEffect.Amount = 1;
+
+
+	DodgeEffect = new class'XMBEffect_ConditionalStatChange';
+	DodgeEffect.EffectName = 'PlusDodge';
+	DodgeEffect.BuildPersistentEffect(1, false, false, false); // 1 turn
+	DodgeEffect.AddPersistentStatChange(eStat_Dodge, 35); //config
+	
+	//Template = Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
+	Template = SelfTargetTrigger('ILB_OdmGear', "img:///UILibrary_PerkIcons.UIPerk_command", true, DodgeEffect, 'AbilityActivated');
+	AddTriggerTargetCondition(Template, AbilityNameCondition);
+
+	MobilityEffect = new class'XMBEffect_ConditionalStatChange';
+	MobilityEffect.EffectName = 'PlusMobility';
+	
+	// The effect expires next turn
+	MobilityEffect.BuildPersistentEffect(1, false, false, false);
+	MobilityEffect.AddPersistentStatChange(eStat_Mobility, 4); //config
+
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, MobilityEffect);
+	AddSecondaryEffect(Template, ReduceCooldownsEffect);
+
+	// Create the template using a helper function
+	return Template;
+}
+
 static function X2AbilityTemplate SiphonLifeEffect(){
 
 	local X2AbilityTemplate Template;
@@ -254,22 +305,21 @@ static function X2AbilityTemplate SiphonLifeEffect(){
 	Effect = new class'X2Effect_ApplyMedikitHeal';
 	Effect.IncreasedPerUseHP = 20; // heal to full
 	Effect.PerUseHP = 20; // heal to full
-	
+
 	AbilityNameCondition = new class'XMBCondition_AbilityName';
 	AbilityNameCondition.IncludeAbilityNames.AddItem('SKULLJACKAbility');
 	AbilityNameCondition.IncludeAbilityNames.AddItem('SKULLMINEAbility');
 	
 	//Template = Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
 	Template = SelfTargetTrigger('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect, 'AbilityActivated');
-	
-	
 	AddTriggerTargetCondition(Template, AbilityNameCondition);
+	AddTriggerTargetCondition(Template, default.HitCondition);
 	//Effect.TriggeredEvent = 'SkullMiningHeal';
 
 	ShieldingEffect = new class'XMBEffect_ConditionalStatChange';
 	ShieldingEffect.EffectName = 'PlusSomeShielding';
 	ShieldingEffect.Conditions.AddItem(AbilityNameCondition);
-
+	
 	// The effect doesn't expire
 	ShieldingEffect.BuildPersistentEffect(1, true, false, false);
 	ShieldingEffect.AddPersistentStatChange(eStat_ShieldHP, 3); //config

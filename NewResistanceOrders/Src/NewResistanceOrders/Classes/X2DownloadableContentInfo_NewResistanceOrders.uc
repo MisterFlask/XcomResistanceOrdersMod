@@ -522,8 +522,6 @@ static function string GetSummaryTextExpanded(StateObjectReference InRef)
 		
 		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
 		ParamTag.StrValue0 = CurrentConfig.StringValue0;
-		
-		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
 		ParamTag.StrValue1 = CurrentConfig.StringValue1;
 	} 
     if(CardTemplate.GetMutatorValueFn != none)
