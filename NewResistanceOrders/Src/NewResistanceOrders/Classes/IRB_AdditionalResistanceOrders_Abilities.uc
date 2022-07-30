@@ -56,6 +56,7 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(ArcticEasyToHack());
 	Templates.AddItem(WitchHunterBuff());
 	Templates.AddItem(EasyToHack());
+	Templates.AddItem(EasyToHackMindgorger());
 	Templates.AddItem(AridFastUnit());
 	Templates.AddItem(PlatedVestShielding());
 	Templates.AddItem(HazmatShielding());
@@ -696,6 +697,36 @@ static function X2AbilityTemplate EasyToHack()
 	Effect.BuildPersistentEffect(1, true, false, false);
 
 	Effect.AddPersistentStatChange(eStat_HackDefense, default.HACK_DEFENSE_DEBUFF, MODOP_PostMultiplication);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+}
+
+// Perk name:		Oberon Exploit
+// Perk effect:		-30% hack defense
+// Localized text:	"You gain <Ability:+Defense/> Defense and <Ability:+Mobility/> Mobility in cold climates."
+// Config:			(AbilityName="XMBExample_ArcticWarrior")
+static function X2AbilityTemplate EasyToHackMindgorger()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_PersistentStatChange Effect;
+	local X2Condition_MapProperty Condition;
+	
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_EasyToHackMindgorger', "img:///UILibrary_PerkIcons.UIPerk_hack", true, none);
+
+	// Create a persistent stat change effect
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'EasyToHack';
+	Effect.BuffCategory = ePerkBuff_Penalty;
+
+	// The effect doesn't expire
+	Effect.BuildPersistentEffect(1, true, false, false);
+
+	Effect.AddPersistentStatChange(eStat_HackDefense, default.HACK_DEFENSE_DEBUFF_MINDGORGER, MODOP_PostMultiplication);
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
 	// of battle, but only if it meets the condition.

@@ -261,7 +261,7 @@ var config int SUPERCHARGER_POWER_DRAIN;
 		if (UnitState.GetTeam() != eTeam_XCom)
 		{
 			if (!UnitState.IsRobotic()){
-				AbilitiesToGrant.AddItem('ILB_EasyToHack');
+				AbilitiesToGrant.AddItem('ILB_EasyToHackMindgorger');
 			}
 			return;
 		}
@@ -907,7 +907,8 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		if (UnitState.GetTeam() != eTeam_XCom){
 			return;
 		}
-		if(DoesSoldierHaveMindShield(UnitState))
+
+		if(DoesSoldierHaveSpecificItem(UnitState, 'Battlescanner'))
 		{
 			AbilitiesToGrant.AddItem( 'ILB_WitchHunter' ); 
 		}

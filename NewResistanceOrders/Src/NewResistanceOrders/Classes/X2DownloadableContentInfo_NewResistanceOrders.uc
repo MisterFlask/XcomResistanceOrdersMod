@@ -274,6 +274,11 @@ static event InstallNewCampaign(XComGameState StartState)
 {
 }
 
+
+exec function RunOnPostTemplatesCreated(){
+	OnPostTemplatesCreated();
+}
+
 static event OnPostTemplatesCreated(){
 	`LOG("ILB:  Updating Abilities");
 	UpdateAbilities();
@@ -289,7 +294,7 @@ static function array<ResistanceCardConfigValues> GetResistanceCardConfigs(){
 	//Gain +20% research speed.  Chryssalids and Faceless are both faster and harder to hit
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_XenobiologicalFieldResearch', class'ILB_StrategicResCards'.default.XENO_FIELD_RESEARCH_RESEARCH_BONUS, -1));
 	//Lose 15% research speed.  Gain +3 resistance contacts
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_LabToCommsRepurposing', class'ILB_StrategicResCards'.default.LABS_TO_COMMS_COMMS_BONUS, class'ILB_StrategicResCards'.default.LABS_TO_COMMS_RESEARCH_PENALTY));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_LabToCommsRepurposing', class'ILB_StrategicResCards'.default.LABS_TO_COMMS_RESEARCH_PENALTY, class'ILB_StrategicResCards'.default.LABS_TO_COMMS_COMMS_BONUS));
 	//Gain +4 avenger power.  Guerilla Ops and Council missions have a +15% chance of an ADVENT crackdown sitrep
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_LeachPsionicLeylines', class'ILB_StrategicResCards'.default.LEACH_PSIONIC_LEYLINES_POWER_BONUS, 15));
 	// ResCard_RescueUpperCrustContacts
@@ -308,7 +313,7 @@ static function array<ResistanceCardConfigValues> GetResistanceCardConfigs(){
 	//ResCard_BrazenCollection
 	//Gain +25% extra supplies from drops.   There is a +15% chance of an ADVENT crackdown sitrep on all guerilla ops and council missions.
 	
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BrazenCollection',class'ILB_StrategicResCards'.default.BRAZEN_COLLECTION_BONUS, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BrazenCollection',class'ILB_StrategicResCards'.default.BRAZEN_COLLECTION_BONUS, 15));
 
 	// ResCard_GrndlPowerDeal
 	//Gain +5 Avenger power.   Also, gain -25% supplies from supply drops."
@@ -316,7 +321,7 @@ static function array<ResistanceCardConfigValues> GetResistanceCardConfigs(){
 
 	// 
 	//Black Market goods are at a 25% discount.  There is a +15% chance of an ADVENT crackdown on all guerilla ops and council missions
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_NotoriousSmugglers',class'ILB_StrategicResCards'.default.NOTORIOUS_SMUGGLERS_BLACK_MARKET_DISCOUNT, class'ILB_StrategicResCards'.default.GRNDL_POWER_DEAL_SUPPLY_PENALTY));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_NotoriousSmugglers',class'ILB_StrategicResCards'.default.NOTORIOUS_SMUGGLERS_BLACK_MARKET_DISCOUNT, 15));
 
 	/*
 [ResCard_RadioFreeLily X2StrategyCardTemplate]
@@ -359,14 +364,18 @@ SummaryText="Grants a monthly covert action that spawns a Neutralize Field Comma
 
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_YouOweMe', 40, -1)); //todo
 
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_HexHunterForMindShields', 2, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_HexHunterForMindShields', class'IRB_AdditionalResistanceOrders_Abilities'.ILB_WITCH_HUNTER_PASSIVE_DMG, -1));
 
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', 70, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', 2, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', 2, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', class'IRB_AdditionalResistanceOrders_Abilities'.HACK_DEFENSE_DEBUFF, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', class'IRB_AdditionalResistanceOrders_Abilities'.ILB_PROMETHIUM_FIRE_DMG_BONUS, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', class'IRB_AdditionalResistanceOrders_Abilities'.ROOKIE_COMBAT_HP_BONUS, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BureaucraticInfighting', 30, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', 70, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', 1, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', class'IRB_AdditionalResistanceOrders_Abilities'.HACK_DEFENSE_DEBUFF, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', class'IRB_AdditionalResistanceOrders_Abilities'.ILB_MELEE_DAMAGE_BUFF, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_SendInTheNextWave', 15, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_DawnMachines', class'IRB_AdditionalResistanceOrders_Abilities'.ILB_DAWN_MACHINES_SHIELDS_BUFF, class'IRB_AdditionalResistanceOrders_Abilities'.ILB_DAWN_MACHINES_MOBILITY_BUFF));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MabExploit', class'IRB_AdditionalResistanceOrders_Abilities'.HACK_DEFENSE_DEBUFF_TUNDRA, -1));
+
 	/*
 [ X2StrategyCardTemplate]
 SummaryText="Recover Resistance Operative missions and Extract VIP missions grant an extra 40 supply on successful completion."
@@ -451,6 +460,7 @@ SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANEN
 
 static function ResistanceCardConfigValues ResCardConf(name ResCardId, int intValue1, int intValue2 = -1){
 	local ResistanceCardConfigValues Values;
+	Values.ResCardName = ResCardId;
 	Values.StringValue0 = string(intValue1);
 	Values.StringValue1 = string(intValue2);
 	return Values;
@@ -465,6 +475,8 @@ static function UpdateResOrderDescriptions()
 	local array<X2DataTemplate> DataTemplates;
 	local X2DataTemplate DataTemplate;
 	local int Difficulty;
+
+	`LOG("Updating res order descriptions");
 
 	StrategyTemplateMgr	= class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 
@@ -481,19 +493,19 @@ static function UpdateResOrderDescriptions()
 				CardTemplate.GetSummaryTextFn = GetSummaryTextExpanded;
 			}
 		}
-	}}
+	}
+}
 
 	static function ResistanceCardConfigValues GetResistanceCardConfigsForResCard(name ResCardName, array<ResistanceCardConfigValues> AllPossibleCards){
-		local array<ResistanceCardConfigValues> Configs;
 		local ResistanceCardConfigValues Current;
 
-		Current.ResCardName = '';
-		foreach Configs(Current){
+		foreach AllPossibleCards(Current){
 			if (ResCardName == Current.ResCardName){
 				return Current;
 			}
 		}
 
+		Current.ResCardName = '';
 		return Current;
 
 	}
@@ -519,7 +531,7 @@ static function string GetSummaryTextExpanded(StateObjectReference InRef)
 	CardTemplate = CardState.GetMyTemplate();
 	CurrentConfig=GetResistanceCardConfigsForResCard(CardTemplate.DataName, Configs);
 	if (CurrentConfig.ResCardName != ''){
-		
+		`Log("Observed config for res card: " $ CurrentConfig.ResCardName $ " : " $ CurrentConfig.StringValue0 $ " :  " $ CurrentConfig.StringValue1);
 		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
 		ParamTag.StrValue0 = CurrentConfig.StringValue0;
 		ParamTag.StrValue1 = CurrentConfig.StringValue1;
