@@ -27,7 +27,7 @@ var config int ILB_WITCH_HUNTER_PASSIVE_DMG;
 
 var config float HACK_DEFENSE_DEBUFF;
 var config float HACK_DEFENSE_DEBUFF_TUNDRA;
-
+var config float HACK_DEFENSE_DEBUFF_MINDGORGER;
 var config int ILB_MELEE_DMG_BUFF;
 var config int ILB_VIP_SMOKES;
 var config int ILB_VIP_FRAGS;
@@ -745,8 +745,7 @@ name TemplateName,
 	local X2AbilityTemplate						Template;
 	local X2AbilityTargetStyle                  TargetStyle;
 	local X2AbilityTrigger						Trigger;
-	local Grimy_Effect_BonusWeaponDamage	MixEffect;
-	local Grimy_BonusItemCharges		AmmoEffect;
+	local ILB_Grimy_Effect_BonusWeaponDamage	MixEffect;
 
 	`CREATE_X2ABILITY_TEMPLATE(Template, TemplateName);
 
@@ -765,11 +764,11 @@ name TemplateName,
 	Trigger = new class'X2AbilityTrigger_UnitPostBeginPlay';
 	Template.AbilityTriggers.AddItem(Trigger);
 
-	MixEffect = new class'ILB_Grimy_BonusDamage_Effect';
+	MixEffect = new class'ILB_Grimy_Effect_BonusWeaponDamage';
 	MixEffect.BuildPersistentEffect(1, true, true, true);
 	MixEffect.SetDisplayInfo(ePerkBuff_Passive, Template.LocFriendlyName, Template.GetMyLongDescription(), Template.IconImage,,,Template.AbilitySourceName);
 	MixEffect.Bonus = BonusDamage;
-	MixEffect.WeaponNames = 'SonicLure'; //todo: verify
+	MixEffect.WeaponNames.AddItem('UltrasonicLure'); //todo: verify
 	Template.AddTargetEffect(MixEffect);
 
 	Template.BuildNewGameStateFn = TypicalAbility_BuildGameState;

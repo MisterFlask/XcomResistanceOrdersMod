@@ -58,6 +58,9 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_Grimy_BonusDamage_Effect.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_Grimy_Effect_BonusWeaponDamage.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_HeavyWeapons.uc">
       <SubType>Content</SubType>
     </Content>

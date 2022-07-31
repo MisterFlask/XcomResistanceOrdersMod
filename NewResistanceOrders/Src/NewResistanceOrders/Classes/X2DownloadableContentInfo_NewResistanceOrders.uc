@@ -364,17 +364,17 @@ SummaryText="Grants a monthly covert action that spawns a Neutralize Field Comma
 
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_YouOweMe', 40, -1)); //todo
 
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_HexHunterForMindShields', class'IRB_AdditionalResistanceOrders_Abilities'.ILB_WITCH_HUNTER_PASSIVE_DMG, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_HexHunterForMindShields', class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_WITCH_HUNTER_PASSIVE_DMG, -1));
 
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', class'IRB_AdditionalResistanceOrders_Abilities'.HACK_DEFENSE_DEBUFF, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', class'IRB_AdditionalResistanceOrders_Abilities'.ILB_PROMETHIUM_FIRE_DMG_BONUS, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', class'IRB_AdditionalResistanceOrders_Abilities'.ROOKIE_COMBAT_HP_BONUS, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', class'IRB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_PROMETHIUM_FIRE_DMG_BONUS, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', class'IRB_AdditionalResistanceOrders_Abilities'.default.ROOKIE_COMBAT_HP_BONUS, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BureaucraticInfighting', 30, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', class'IRB_AdditionalResistanceOrders_Abilities'.HACK_DEFENSE_DEBUFF, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', class'IRB_AdditionalResistanceOrders_Abilities'.ILB_MELEE_DAMAGE_BUFF, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', class'IRB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_MINDGORGER, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_MELEE_DMG_BUFF, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_SendInTheNextWave', 15, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_DawnMachines', class'IRB_AdditionalResistanceOrders_Abilities'.ILB_DAWN_MACHINES_SHIELDS_BUFF, class'IRB_AdditionalResistanceOrders_Abilities'.ILB_DAWN_MACHINES_MOBILITY_BUFF));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MabExploit', class'IRB_AdditionalResistanceOrders_Abilities'.HACK_DEFENSE_DEBUFF_TUNDRA, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_DawnMachines', class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_DAWN_MACHINES_SHIELDS_BUFF, class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_DAWN_MACHINES_MOBILITY_BUFF));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MabExploit', class'IRB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_TUNDRA, -1));
 
 	/*
 [ X2StrategyCardTemplate]
