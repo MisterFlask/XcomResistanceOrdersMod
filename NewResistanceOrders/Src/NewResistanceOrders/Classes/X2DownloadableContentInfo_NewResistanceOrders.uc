@@ -18,9 +18,6 @@ class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableConten
 //
 // This is used in FinalizeUnitAbilitiesForInit() to patch existing
 // abilities for non-XCOM units.
-var config array<name> PrimaryWeaponAbilities;
-var config array<name> SecondaryWeaponAbilities;
-
 var config array<name> PISTOL_SKILLS;
 var localized string ConsumableText;
 
