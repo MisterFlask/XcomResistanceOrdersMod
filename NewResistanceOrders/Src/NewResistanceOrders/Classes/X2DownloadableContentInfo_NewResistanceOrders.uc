@@ -21,9 +21,6 @@ struct ResistanceCardConfigValues{
 	var string StringValue1;
 };
 
-
-
-
 static final function bool IsModActive(name ModName)
 {
     local XComOnlineEventMgr    EventManager;
@@ -398,30 +395,28 @@ SummaryText="Your soldiers with a Mind Shield gain the Witch Hunter perk (additi
 [ResCard_BladesGrantShellbust X2StrategyCardTemplate]
 SummaryText="Your sword or knife-carrying soldiers gain Shellbust Stab (massive armor shred melee attack)"
 
-[ResCard_Mindtaker X2StrategyCardTemplate]
-SummaryText="Skulljacks allow two Skullmining uses per combat (if it's unlocked).  Biological enemies have -70% hack defense."
+// [ResCard_PracticalOccultism X2StrategyCardTemplate]
+// SummaryText="Your Reapers can cloak themselves for an HP cost, and can also teleport to anywhere within squadsight, also with an HP cost."
+
+// [ResCard_BetterMelee X2StrategyCardTemplate]
+// SummaryText="Your soldiers all deal +1 melee damage.  Additionally, they have an increased likelihood to bleed out rather than die outright."
+
+// [ResCard_Promethium X2StrategyCardTemplate]
+// SummaryText="Flamethrower-based abilities deal 2 more damage.  Additionally, flamethrower-based abilities gain another charge.  (This also applies to fire-based chemthrower abilities.)"
+
+// [ResCard_GrantRookiesPermaHp X2StrategyCardTemplate]
+// SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANENT +2 max HP (once per rookie)."
 
 
-[ResCard_QuickpatchForMedikit X2StrategyCardTemplate]
-DisplayName="Quickpatch Protocol"
-SummaryText="Soldiers with a healing item can use it as a free action."
-QuoteText="I was on this project before it got cancelled.  High Command deemed it more cost-effective to simply replace the dead troops."
-QuoteTextAuthor="Betos"
+// 	return ResistanceCardConfigs;
+// }
 
-[ResCard_BureaucraticInfighting X2StrategyCardTemplate]
-SummaryText="Loot Crates and Show of Force sitreps are guaranteed for item recovery missions.  They also provide an extra 30 intel on successful completion."
+// static function ResCardConf(name ResCardId, int intValue1, int intValue2 = -1)
+// {
+// 	local ResistanceCardConfigValues ResistanceCardConfigValues;
 
-[ResCard_SafetyFirst X2StrategyCardTemplate]
-SummaryText="You can purchase a Plated Vest from the Black Market at a fee each month.  Also, Plated Vests grant 1 ablative shielding each combat."
-
-[ResCard_CleanupDetail X2StrategyCardTemplate]
-SummaryText="You can purchase a Hazmat Vest from the Black Market at a fee each month.  Also, such vests grant 1 ablative shielding each combat."
-
-[ResCard_MeatMarket X2StrategyCardTemplate]
-SummaryText="You get a choice of three additional mercenaries to hire from the Black Market each month.  They cost Supplies rather than Intel."
-
-[ResCard_ResUnitIfMoreThanOneNoob X2StrategyCardTemplate]
-SummaryText="Gain a bonus Resistance soldier at the beginning of each combat where you're fielding two or more soldiers of Squaddie rank or lower."
+// 	ResistanceCardConfigValues.StringValue1 = string(intValue1);
+// 	ResistanceCardConfigValues.StringValue2 = string(intValue2);
 
 [ResCard_ResUnitIfRetaliation X2StrategyCardTemplate]
 SummaryText="Gain a bonus Resistance soldier at the beginning of each Retaliation mission."
