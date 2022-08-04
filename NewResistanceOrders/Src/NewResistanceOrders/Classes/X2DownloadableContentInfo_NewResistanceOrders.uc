@@ -11,6 +11,15 @@
 
 class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableContentInfo
 	config(Abilities);
+// Configurable list of abilities that should apply to the primary
+// weapon. This is necessary because character template abilities
+// can't be configured for a weapon slot, but some of those abilities
+// need to be tied to a weapon slot to work.
+//
+// This is used in FinalizeUnitAbilitiesForInit() to patch existing
+// abilities for non-XCOM units.
+var config array<name> PrimaryWeaponAbilities;
+var config array<name> SecondaryWeaponAbilities;
 
 var config array<name> PISTOL_SKILLS;
 var localized string ConsumableText;
@@ -890,4 +899,42 @@ static function AddRewardsToMissionSourceIfResistanceCardActive(XComGameState Ne
 
 
 
+}
+
+
+static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out array<AbilitySetupData> SetupData, optional XComGameState StartState, optional XComGameState_Player PlayerState, optional bool bMultiplayerDisplay){
+		local X2AbilityTemplate AbilityTemplate;
+	local X2AbilityTemplateManager AbilityTemplateMan;
+	local name AbilityName;
+	local AbilitySetupData Data, EmptyData;
+	local X2CharacterTemplate CharTemplate;
+	local int i;
+	local XComGameState_MissionSite MissionState;
+	local XComGameState_BattleData	BattleData;
+	local X2WeaponTemplate PrimaryWeaponTemplate;
+	if (`XENGINE.IsMultiplayerGame()) { return; }
+
+	CharTemplate = UnitState.GetMyTemplate();
+	if (CharTemplate == none)
+		return;
+
+	AbilityTemplateMan = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
+
+
+	// Fix enemy unit abilities that need to be tied to a weapon, since abilities
+	// attached to character templates can't be configured for a particular weapon slot.
+	for (i = 0; i < SetupData.Length; i++)
+	{
+		if (default.PrimaryWeaponAbilities.Find(SetupData[i].TemplateName) != INDEX_NONE && SetupData[i].SourceWeaponRef.ObjectID == 0)
+		{
+			`Log(" >>> Binding ability '" $ SetupData[i].TemplateName $ "' to primary weapon for unit " $ UnitState.GetMyTemplateName());
+			SetupData[i].SourceWeaponRef = UnitState.GetPrimaryWeapon().GetReference();
+		}
+
+		if (default.SecondaryWeaponAbilities.Find(SetupData[i].TemplateName) != INDEX_NONE && SetupData[i].SourceWeaponRef.ObjectID == 0)
+		{
+			`Log(" >>> Binding ability '" $ SetupData[i].TemplateName $ "' to Secondary weapon for unit " $ UnitState.GetMyTemplateName());
+			SetupData[i].SourceWeaponRef = UnitState.GetSecondaryWeapon().GetReference();
+		}	
+	}
 }
