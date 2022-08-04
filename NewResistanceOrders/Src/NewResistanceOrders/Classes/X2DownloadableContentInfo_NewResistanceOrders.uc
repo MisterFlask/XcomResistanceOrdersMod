@@ -919,22 +919,38 @@ static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out a
 		return;
 
 	AbilityTemplateMan = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
-
-
-	// Fix enemy unit abilities that need to be tied to a weapon, since abilities
-	// attached to character templates can't be configured for a particular weapon slot.
-	for (i = 0; i < SetupData.Length; i++)
+	
+	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive('ResCard_BladesGrantShellbust'))
 	{
-		if (default.PrimaryWeaponAbilities.Find(SetupData[i].TemplateName) != INDEX_NONE && SetupData[i].SourceWeaponRef.ObjectID == 0)
-		{
-			`Log(" >>> Binding ability '" $ SetupData[i].TemplateName $ "' to primary weapon for unit " $ UnitState.GetMyTemplateName());
-			SetupData[i].SourceWeaponRef = UnitState.GetPrimaryWeapon().GetReference();
+		if (class'IRB_AdditionalResistanceOrders_ResCards'.static.DoesSoldierHaveSword(UnitState)){
+			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('MZShellbustStab');
+			Data.Template=  AbilityTemplate;
+			Data.TemplateName=AbilityTemplate.DataName;
+			Data.SourceWeaponRef = UnitState.GetSecondaryWeapon().GetReference();
+			SetupData.AddItem(Data);
+			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
 		}
+	}
 
-		if (default.SecondaryWeaponAbilities.Find(SetupData[i].TemplateName) != INDEX_NONE && SetupData[i].SourceWeaponRef.ObjectID == 0)
-		{
-			`Log(" >>> Binding ability '" $ SetupData[i].TemplateName $ "' to Secondary weapon for unit " $ UnitState.GetMyTemplateName());
-			SetupData[i].SourceWeaponRef = UnitState.GetSecondaryWeapon().GetReference();
-		}	
+	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive('ResCard_BasiliskDoctrine'))
+	{
+		if (class'IRB_AdditionalResistanceOrders_ResCards'.static.DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'wristblade')){
+			
+			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('TakeUnder');
+			Data.Template=  AbilityTemplate;
+			Data.TemplateName=AbilityTemplate.DataName;
+			Data.SourceWeaponRef = UnitState.GetSecondaryWeapon().GetReference();
+			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
+			SetupData.AddItem(Data);			
+
+			Data = EmptyData;
+			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('Shredder');
+			Data.Template=  AbilityTemplate;
+			Data.TemplateName=AbilityTemplate.DataName;
+			Data.SourceWeaponRef = UnitState.GetPrimaryWeapon().GetReference();
+			
+			SetupData.AddItem(Data);
+			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
+		}
 	}
 }

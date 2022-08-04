@@ -1111,7 +1111,8 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if(DoesSoldierHaveSword(UnitState))
 		{
-			AbilitiesToGrant.AddItem( 'MZShellbustStab' );
+			// done in DLCInfo
+			//AbilitiesToGrant.AddItem( 'MZShellbustStab' );
 		}
 	}
 	
@@ -1295,8 +1296,9 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 		if(DoesSoldierHaveArmorOfClass(UnitState, 'skirmisher'))
 		{
-			AbilitiesToGrant.AddItem( 'Shredder' );
-			AbilitiesToGrant.AddItem( 'TakeUnder' );
+			//AbilitiesToGrant.AddItem( 'Shredder' );
+			//AbilitiesToGrant.AddItem( 'TakeUnder' );
+			// doing this in DLCInfo since it requires binding to an offensive ability
 		}
 	}
 	
