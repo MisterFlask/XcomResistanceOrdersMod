@@ -473,7 +473,10 @@ static function UpdateResOrderDescriptions()
 		foreach DataTemplates(DataTemplate)
 		{
 			CardTemplate = X2StrategyCardTemplate(DataTemplate);
-			if(CardTemplate != none)
+
+			if(CardTemplate != none 
+			// chosen actions are a subclass of card templates, so we need to check for that
+			&& X2ChosenActionTemplate(DataTemplate) == none)
 			{
 				CardTemplate.GetSummaryTextFn = GetSummaryTextExpanded;
 			}
