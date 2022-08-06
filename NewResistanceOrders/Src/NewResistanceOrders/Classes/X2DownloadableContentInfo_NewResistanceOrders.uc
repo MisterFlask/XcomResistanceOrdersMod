@@ -11,7 +11,13 @@
 
 class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableContentInfo
 	config(Abilities);
-
+// Configurable list of abilities that should apply to the primary
+// weapon. This is necessary because character template abilities
+// can't be configured for a weapon slot, but some of those abilities
+// need to be tied to a weapon slot to work.
+//
+// This is used in FinalizeUnitAbilitiesForInit() to patch existing
+// abilities for non-XCOM units.
 var config array<name> PISTOL_SKILLS;
 var localized string ConsumableText;
 
@@ -483,7 +489,10 @@ static function UpdateResOrderDescriptions()
 		foreach DataTemplates(DataTemplate)
 		{
 			CardTemplate = X2StrategyCardTemplate(DataTemplate);
-			if(CardTemplate != none)
+
+			if(CardTemplate != none 
+			// chosen actions are a subclass of card templates, so we need to check for that
+			&& X2ChosenActionTemplate(DataTemplate) == none)
 			{
 				CardTemplate.GetSummaryTextFn = GetSummaryTextExpanded;
 			}
@@ -929,3 +938,61 @@ static function AddRewardsToMissionSourceIfResistanceCardActive(XComGameState Ne
 
 
 }
+
+
+static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out array<AbilitySetupData> SetupData, optional XComGameState StartState, optional XComGameState_Player PlayerState, optional bool bMultiplayerDisplay){
+		local X2AbilityTemplate AbilityTemplate;
+	local X2AbilityTemplateManager AbilityTemplateMan;
+	local name AbilityName;
+	local AbilitySetupData Data, EmptyData;
+	local X2CharacterTemplate CharTemplate;
+	local int i;
+	local XComGameState_MissionSite MissionState;
+	local XComGameState_BattleData	BattleData;
+	local X2WeaponTemplate PrimaryWeaponTemplate;
+	local XComGameState_Item CurrentBladedWeapon;
+	if (`XENGINE.IsMultiplayerGame()) { return; }
+
+	CharTemplate = UnitState.GetMyTemplate();
+	if (CharTemplate == none)
+		return;
+
+	AbilityTemplateMan = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
+	CurrentBladedWeapon = class'ILB_Utils'.static.GetEquippedBlade(UnitState);
+	if (class'ILB_Utils'.static.IsResistanceOrderActive('ResCard_BladesGrantShellbust'))
+	{
+		if (CurrentBladedWeapon != none){
+			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('ShiningCentaurShieldrenderTechnique');
+			Data.Template=  AbilityTemplate;
+			Data.TemplateName=AbilityTemplate.DataName;
+			Data.SourceWeaponRef = CurrentBladedWeapon.GetReference();
+			SetupData.AddItem(Data);
+			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
+		}
+	}
+
+	if (class'ILB_Utils'.static.IsResistanceOrderActive('ResCard_BasiliskDoctrine'))
+	{
+		if (class'ILB_Utils'.static.DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'wristblade')){
+
+			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
+			if (CurrentBladedWeapon != none){
+				AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('TakeUnder');
+				Data.Template=  AbilityTemplate;
+				Data.TemplateName=AbilityTemplate.DataName;
+				Data.SourceWeaponRef = CurrentBladedWeapon.GetReference();
+				SetupData.AddItem(Data);	
+			}
+
+			Data = EmptyData;
+			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('Shredder');
+			Data.Template=  AbilityTemplate;
+			Data.TemplateName=AbilityTemplate.DataName;
+			Data.SourceWeaponRef = UnitState.GetPrimaryWeapon().GetReference();
+			
+			SetupData.AddItem(Data);
+			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
+		}
+	}
+}
+

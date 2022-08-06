@@ -79,7 +79,102 @@ static function array<X2DataTemplate> CreateTemplates()
 	Templates.AddItem(CreateChryssalidAndFacelessBuff());
 	Templates.AddItem(CreateLotsOfShieldingBuff());
 	Templates.AddItem(CreateCrackdownAbility_Revenge());
+	Templates.AddItem(AddShellbustStab());
 	return Templates;
+}
+
+
+static function X2AbilityTemplate CreateBaseSlashAbility(Name AbilityName = 'MZNonStandardSlash', string IconImage = "img:///UILibrary_PerkIcons.UIPerk_swordSlash", optional bool bAllowBurning=false)
+{
+	local X2AbilityTemplate                 Template;
+	local X2AbilityCost_ActionPoints        ActionPointCost;
+	local X2AbilityToHitCalc_StandardMelee  StandardMelee;
+	local array<name>                       SkipExclusions;
+
+	`CREATE_X2ABILITY_TEMPLATE(Template, AbilityName);
+
+	Template.AbilitySourceName = 'eAbilitySource_Standard';
+	Template.eAbilityIconBehaviorHUD = EAbilityIconBehavior_AlwaysShow;
+	Template.BuildNewGameStateFn = TypicalMoveEndAbility_BuildGameState;
+	Template.BuildVisualizationFn = TypicalAbility_BuildVisualization;
+	Template.BuildInterruptGameStateFn = TypicalMoveEndAbility_BuildInterruptGameState;	
+	Template.CinescriptCameraType = "Ranger_Reaper";
+	Template.IconImage = IconImage;
+	Template.bHideOnClassUnlock = false;
+	Template.ShotHUDPriority = 330;
+	Template.AbilityConfirmSound = "TacticalUI_SwordConfirm";
+
+	ActionPointCost = new class'X2AbilityCost_ActionPoints';
+	ActionPointCost.iNumPoints = 1;
+	ActionPointCost.bConsumeAllPoints = true;
+	Template.AbilityCosts.AddItem(ActionPointCost);
+	
+	StandardMelee = new class'X2AbilityToHitCalc_StandardMelee';
+	Template.AbilityToHitCalc = StandardMelee;
+
+	Template.AbilityTargetStyle = new class'X2AbilityTarget_MovingMelee';
+	Template.TargetingMethod = class'X2TargetingMethod_MeleePath';
+
+	Template.AbilityTriggers.AddItem(default.PlayerInputTrigger);
+	Template.AbilityTriggers.AddItem(new class'X2AbilityTrigger_EndOfMove');
+
+	// Target Conditions
+	Template.AbilityTargetConditions.AddItem(default.LivingHostileTargetProperty);
+	Template.AbilityTargetConditions.AddItem(default.MeleeVisibilityCondition);
+
+	// Shooter Conditions
+	Template.AbilityShooterConditions.AddItem(default.LivingShooterProperty);
+	if ( bAllowBurning)
+	{
+		SkipExclusions.AddItem(class'X2StatusEffects'.default.BurningName);
+		Template.AddShooterEffectExclusions(SkipExclusions);
+	}
+	else
+	{
+		Template.AddShooterEffectExclusions();
+	}
+
+	// No Target Effects - added by the actual ability creation.
+
+	Template.bAllowBonusWeaponEffects = true;
+	Template.bSkipMoveStop = true;
+	
+	// Voice events
+	Template.SourceMissSpeech = 'SwordMiss';
+
+	Template.SuperConcealmentLoss = class'X2AbilityTemplateManager'.default.SuperConcealmentStandardShotLoss;
+	Template.ChosenActivationIncreasePerUse = class'X2AbilityTemplateManager'.default.StandardShotChosenActivationIncreasePerUse;
+	Template.LostSpawnIncreasePerUse = class'X2AbilityTemplateManager'.default.MeleeLostSpawnIncreasePerUse;
+	Template.bFrameEvenWhenUnitIsHidden = true;
+
+	return Template;
+}
+
+// lower-powered version of the regular Shellbust ability; only removes shields, not armor
+static function X2AbilityTemplate AddShellbustStab()
+{
+	local X2AbilityTemplate                 Template;
+	local X2Effect_ApplyWeaponDamage        WeaponDamageEffect;
+	local X2Effect_RemoveEffects			RemoveEffects;
+	local X2AbilityCooldown					Cooldown;
+
+	Template = CreateBaseSlashAbility('ShiningCentaurShieldrenderTechnique', "img:///UILibrary_PerkIcons.UIPerk_damagecover");
+	Template.ShotHUDPriority = 320;
+
+	Cooldown = new class'X2AbilityCooldown';
+	Cooldown.iNumTurns = 4;
+	Template.AbilityCooldown = Cooldown;
+
+	// Damage Effect
+	WeaponDamageEffect = new class'X2Effect_ApplyWeaponDamage';
+	WeaponDamageEffect.bBypassShields = true;
+	WeaponDamageEffect.bIgnoreArmor = true;
+	Template.AddTargetEffect(WeaponDamageEffect);
+
+	RemoveEffects = new class'X2Effect_RemoveEffects';
+	RemoveEffects.EffectNamesToRemove.AddItem(class'X2Effect_EnergyShield'.default.EffectName);
+	Template.AddTargetEffect(RemoveEffects);
+	return Template;
 }
 
 // Perk name:		Pyromaniac
