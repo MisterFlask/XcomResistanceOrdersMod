@@ -912,6 +912,8 @@ static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out a
 	local XComGameState_MissionSite MissionState;
 	local XComGameState_BattleData	BattleData;
 	local X2WeaponTemplate PrimaryWeaponTemplate;
+	local bool IsWeaponInPrimarySlot;
+	local bool IsWeaponInSecondarySlot;
 	if (`XENGINE.IsMultiplayerGame()) { return; }
 
 	CharTemplate = UnitState.GetMyTemplate();
@@ -920,28 +922,40 @@ static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out a
 
 	AbilityTemplateMan = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 	
-	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive('ResCard_BladesGrantShellbust'))
+	if (class'ILB_Utils'.static.IsResistanceOrderActive('ResCard_BladesGrantShellbust'))
 	{
-		if (class'IRB_AdditionalResistanceOrders_ResCards'.static.DoesSoldierHaveSword(UnitState)){
-			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('MZShellbustStab');
+		IsWeaponInPrimarySlot = class'ILB_Utils'.static.DoesSoldierHaveBladeInPrimarySlot(UnitState);
+		IsWeaponInSecondarySlot = class'ILB_Utils'.static.DoesSoldierHaveBladeInSecondarySlot(UnitState);
+		if (class'ILB_Utils'.static.DoesSoldierHaveBladeInPrimaryOrSecondarySlot(UnitState)){
+			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('ShiningCentaurShieldrenderTechnique');
 			Data.Template=  AbilityTemplate;
 			Data.TemplateName=AbilityTemplate.DataName;
-			Data.SourceWeaponRef = UnitState.GetSecondaryWeapon().GetReference();
+			// doing this for the sake of ensuring compatibility with classes that use primary swords
+			if (IsWeaponInSecondarySlot){				
+				Data.SourceWeaponRef = UnitState.GetSecondaryWeapon().GetReference();
+			}else if (IsWeaponInPrimarySlot){
+				Data.SourceWeaponRef = UnitState.GetPrimaryWeapon().GetReference();
+			}
 			SetupData.AddItem(Data);
 			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
 		}
 	}
 
-	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive('ResCard_BasiliskDoctrine'))
+	if (class'ILB_Utils'.static.IsResistanceOrderActive('ResCard_BasiliskDoctrine'))
 	{
-		if (class'IRB_AdditionalResistanceOrders_ResCards'.static.DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'wristblade')){
-			
-			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('TakeUnder');
-			Data.Template=  AbilityTemplate;
-			Data.TemplateName=AbilityTemplate.DataName;
-			Data.SourceWeaponRef = UnitState.GetSecondaryWeapon().GetReference();
+		if (class'ILB_Utils'.static.DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'wristblade')){
+			IsWeaponInPrimarySlot = class'ILB_Utils'.static.DoesSoldierHaveBladeInPrimarySlot(UnitState);
+			IsWeaponInSecondarySlot = class'ILB_Utils'.static.DoesSoldierHaveBladeInSecondarySlot(UnitState);
+		
 			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
-			SetupData.AddItem(Data);			
+			if (IsWeaponInSecondarySlot){
+				AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('TakeUnder');
+				Data.Template=  AbilityTemplate;
+				Data.TemplateName=AbilityTemplate.DataName;
+				Data.SourceWeaponRef = UnitState.GetSecondaryWeapon().GetReference();
+				// This doesn't actually work for the weird skirmisher soldier (wristblade in some other slot), so just not gonna do it.
+				SetupData.AddItem(Data);	
+			}
 
 			Data = EmptyData;
 			AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('Shredder');
@@ -954,3 +968,4 @@ static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out a
 		}
 	}
 }
+
