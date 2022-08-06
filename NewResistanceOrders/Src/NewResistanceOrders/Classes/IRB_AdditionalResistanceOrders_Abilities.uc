@@ -162,6 +162,7 @@ static function X2AbilityTemplate AddShellbustStab()
 	// Damage Effect
 	WeaponDamageEffect = new class'X2Effect_ApplyWeaponDamage';
 	WeaponDamageEffect.bBypassShields = true;
+	WeaponDamageEffect.bIgnoreArmor = true;
 	Template.AddTargetEffect(WeaponDamageEffect);
 
 	RemoveEffects = new class'X2Effect_RemoveEffects';
