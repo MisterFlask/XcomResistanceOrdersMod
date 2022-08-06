@@ -1298,7 +1298,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		{
 			//AbilitiesToGrant.AddItem( 'Shredder' );
 			//AbilitiesToGrant.AddItem( 'TakeUnder' );
-			// doing this in DLCInfo since it requires binding to an offensive ability
+			// doing this in DLCInfo since it requires binding to an offensive item
 		}
 	}
 	
