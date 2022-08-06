@@ -647,12 +647,7 @@ static function X2DataTemplate CreateGrantVipsGrenades()
 	//missionsource=MissionSource_Retaliation
 	static function XComGameState_MissionSite GetMissionData(XComGameState StartState)
 	{
-		local XComGameState_BattleData BattleData;
 		local XComGameState_MissionSite MissionState;
-		local XComGameStateHistory History;
-
-		History = `XCOMHISTORY;
-		BattleData = XComGameState_BattleData(History.GetSingleGameStateObjectForClass(class'XComGameState_BattleData'));
 		MissionState = GetMission(StartState);
 		return MissionState;
 	}
@@ -735,8 +730,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		local XComGameStateHistory History;
 		local XComGameState_HeadquartersXCom XComHQ;
 		local XComGameState_Unit UnitState;
-		local XComGameState_ResistanceFaction FactionState;
-		local int idx, NumWounded, NumDead, NumSquad, NumCaptured;
+		local int idx;
 		local int NumSoldiers;
 		History = `XCOMHISTORY;
 		XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
@@ -778,8 +772,7 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		local XComGameStateHistory History;
 		local XComGameState_HeadquartersXCom XComHQ;
 		local XComGameState_Unit UnitState;
-		local XComGameState_ResistanceFaction FactionState;
-		local int idx, NumWounded, NumDead, NumSquad, NumCaptured;
+		local int idx;
 		local int NumSoldiers;
 		History = `XCOMHISTORY;
 		XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
@@ -1385,10 +1378,8 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 	
 	static function bool DoesSoldierHavePsiRating(XComGameState_Unit UnitState){
 	
-		local XComGameStateHistory History;
 		`assert(UnitState != none);
 
-		History = `XCOMHISTORY;
 		if (UnitState.GetCurrentStat(eStat_PsiOffense) >= 10){
 			return true;
 		}
@@ -1402,8 +1393,6 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		local StateObjectReference ItemRef;
 		local XComGameState_Item ItemState;
 		local X2ArmorTemplate Armor;
-		local name WeaponCat;
-		local name ItemCat;
 		`assert(UnitState != none);
 
 		History = `XCOMHISTORY;

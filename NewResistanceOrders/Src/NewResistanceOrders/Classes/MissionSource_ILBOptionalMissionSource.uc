@@ -10,7 +10,6 @@ static function array<X2DataTemplate> CreateTemplates()
 static function X2DataTemplate CreateIlbOptionalTemplate()
 {
 	local X2MissionSourceTemplate Template;
-	local RewardDeckEntry DeckEntry;
 	`LOG("Creating the MissionSource_ILBOptional Mission Source Template");
 
 	`CREATE_X2TEMPLATE(class'X2MissionSourceTemplate', Template, 'MissionSource_ILBOptional');
@@ -64,10 +63,7 @@ function ILBOnExpire(XComGameState NewGameState, XComGameState_MissionSite Missi
 
 function array<int> GetILBExcludeRewards(XComGameState_MissionSite MissionState)
 {
-	local XComGameStateHistory History;
-	local XComGameState_BattleData BattleData;
 	local array<int> ExcludeIndices;
-	local int idx;
 
 	return ExcludeIndices;
 }
@@ -75,7 +71,6 @@ function array<int> GetILBExcludeRewards(XComGameState_MissionSite MissionState)
 static function bool DidWeCaptureAVip(XComGameState_MissionSite MissionState){
 local XComGameStateHistory History;
 	local XComGameState_BattleData BattleData;
-	local array<int> ExcludeIndices;
 	local int idx;
 
 	History = `XCOMHISTORY;

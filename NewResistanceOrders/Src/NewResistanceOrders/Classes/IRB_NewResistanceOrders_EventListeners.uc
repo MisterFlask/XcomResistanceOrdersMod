@@ -126,14 +126,10 @@ static function EventListenerReturn SetStateFlagForScreenListener(Object EventDa
 
 static function EventListenerReturn OnResearchCompleted(Object EventData, Object EventSource, XComGameState GameState, Name Event, Object CallbackData)
 {
-	local XComGameStateHistory History;
 	local XComGameState_Tech TechState;
-	local XComGameState_HeadquartersXCom XComHQ;
 		
 	`log("On research complete listener HIT for for IRB_AdditionalResistanceOrders_ResCards");
 
-	History = `XCOMHISTORY;
-	XComHQ = XComGameState_HeadquartersXCom(History.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersXCom'));
 	TechState = XComGameState_Tech(EventData); 
 	if (TechState == none)
 	{
@@ -250,19 +246,14 @@ static function AddItemToBlackMarket(
 	static function AddGeneratedSoldierToBlackMarket(
 		Object EventData, Object EventSource, XComGameState NewGameState, Name Event, Object CallbackData, optional int SoldierSupplyCostOverride = -1){
 		local X2StrategyElementTemplateManager StratMgr;
-		local X2ItemTemplateManager ItemTemplateMgr;
 		local XComGameState_BlackMarket MarketState;
 		local XComGameState_Reward RewardState;
 		local X2RewardTemplate RewardTemplate;
-		local XComGameState_Item ItemState;
-		local X2ItemTemplate ItemTemplate;
 		local Commodity ForSaleItem;
-		local int AdditionalSoldierDiscount;
 		//local XComPhotographer_Strategy Photo;	
 
 		//Photo = `GAME.StrategyPhotographer; //TODO: Compilation error with strategy photographer, can skip for now
 
-		AdditionalSoldierDiscount = 20;
 		MarketState = XComGameState_BlackMarket(EventData);
 		StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 
@@ -377,11 +368,8 @@ static function int NumSkirmisherCardsActive(){
 static function int NumCardsActiveOfFaction(name FactionName){
 	local XComGameState_StrategyCard CardState;
 	local StateObjectReference CardRef;
-	local bool bCardPlayed;
 	local XComGameStateHistory History;
 	local XComGameState_ResistanceFaction FactionState;
-	local XComGameState NewGameState;
-	local array<Name> ExclusionList;
 	local int FactionCardsFound;
 	
 	local XComGameState_HeadquartersResistance ResHQ;
@@ -428,11 +416,8 @@ static function int NumCardsActiveOfFaction(name FactionName){
 static function bool IsResistanceOrderActive(name ResistanceOrderName){
 	local XComGameState_StrategyCard CardState;
 	local StateObjectReference CardRef;
-	local bool bCardPlayed;
 	local XComGameStateHistory History;
 	local XComGameState_ResistanceFaction FactionState;
-	local array<Name> ExclusionList;
-	local int NumActionsToAdd;
 	local XComGameState_Continent ContinentState;
 	
 	local XComGameState_HeadquartersResistance ResHQ;

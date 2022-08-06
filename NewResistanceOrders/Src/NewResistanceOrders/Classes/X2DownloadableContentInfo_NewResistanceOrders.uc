@@ -55,15 +55,9 @@ static event OnLoadedSavedGame()
 
 exec function SetCardToActiveInSlot(string cardname, int slot){
 
-	local XComGameStateHistory History;
-	local X2TacticalGameRuleset Rules;
 	local XComGameState_HeadquartersResistance ResHQ;
 	local XComGameState NewGameState;
-	local XComGameState_StrategyCard StrategyCard; 
-	Rules = `TACTICALRULES;
-	History = `XCOMHISTORY;
-	
-	StrategyCard = GetCardByName(cardname);
+	local XComGameState_StrategyCard StrategyCard; 	StrategyCard = GetCardByName(cardname);
 	
 	if (StrategyCard == none){
 		`LOG("Couldn't find strategy card.  Bummer.");
@@ -103,10 +97,6 @@ function XComGameState_StrategyCard GetCardByName(string nam){
 exec function VerifyPlayableCards()
 {
 	local XComGameStateHistory History;
-	local XComGameState NewGameState;
-	local XComGameState_ResistanceFaction FactionState;
-	local XComGameState_StrategyCard CardState;
-	local X2StrategyCardTemplate CurrentTemplate;
 	local XComGameState_StrategyCard CurrentCard;
 	local array<X2DataTemplate> RelevantRewardTemplates;
 	local X2DataTemplate DataTemplate;
@@ -114,7 +104,7 @@ exec function VerifyPlayableCards()
 	local X2SitRepEffectTemplate SitRepEffectTemplate;
 	local X2SitRepEffect_GrantAbilities SitRepGrantingAbilities;
 	// templates for rewards
-	
+	local X2StrategyCardTemplate CurrentTemplate;
 	local X2StrategyElementTemplateManager TemplateManager;
 	local X2RewardTemplate RewardTemplate;
 	local name TemplateName;
@@ -475,7 +465,6 @@ static function UpdateResOrderDescriptions()
 	local Name TemplateName;
 	local array<X2DataTemplate> DataTemplates;
 	local X2DataTemplate DataTemplate;
-	local int Difficulty;
 
 	`LOG("Updating res order descriptions");
 
@@ -569,10 +558,10 @@ static function UpdateAbilities()
 {
 
 	local X2AbilityTemplateManager				AbilityManager;
-	local X2AbilityTemplate						AbilityTemplate, PistolAbility;
+	local X2AbilityTemplate						PistolAbility;
 	local X2Condition_AbilityProperty			AbilityCondition;
 	local name									AbilityName;
-	local X2Effect_PersistentStatChange			PoisonedEffect, PoisonEffect;	
+	local X2Effect_PersistentStatChange			PoisonEffect;	
 	AbilityManager = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 	// Poison Effect
 	AbilityCondition = new class'X2Condition_AbilityProperty';
@@ -603,16 +592,12 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	// todo: look into options for injured soldier sitrep
 	
 	local XComGameState_MissionSite MissionState;
-	local XComGameState_Reward RewardState;
-	local X2RewardTemplate RewardTemplate;
 	local XComGameState_HeadquartersResistance ResHQ;
-	local X2StrategyElementTemplateManager TemplateManager;
 	local XComGameState NewGameState;
 	local name CurrentSitrepName;
 	local array<name> SitrepList;
 	local XComGameStateHistory CachedHistory;
 
-	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
 	
 	//NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
@@ -639,7 +624,7 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ProtectDevice', GeneratedMission);
 
 		AddSitrepToMissionSourceIfResistanceCardsActive(MissionState, 'ResCard_AggressiveOpportunism', 'ILB_DecreaseTimer1Sitrep', 'MissionSource_GuerillaOp', GeneratedMission);
-		AddRewardsToMissionSourceIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ResCard_AggressiveOpportunism', 'MissionSource_GuerillaOp', class'ILB_LootTablePresetReward'.static.BuildMissionItemReward_AggressiveOpportunism(NewGameState)); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
+		// AddRewardsToMissionSourceIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ResCard_AggressiveOpportunism', 'MissionSource_GuerillaOp', class'ILB_LootTablePresetReward'.static.BuildMissionItemReward_AggressiveOpportunism(NewGameState)); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
 
 
 		MissionState = XComGameState_MissionSite(SourceObject);
@@ -911,14 +896,10 @@ static function AddRewardsToMissionFamilyIfResistanceCardActive(XComGameState Ne
 static function AddRewardsToMissionSourceIfResistanceCardActive(XComGameState NewGameState, XComGameState_MissionSite MissionState, GeneratedMissionData GeneratedMission, name ResCard, name RequiredMissionSource, XComGameState_Reward RewardState)
 {
 	local string LwVariantOfMissionSourceAsString;
-	local XComGameState_HeadquartersResistance ResHQ;
-	local X2StrategyElementTemplateManager TemplateManager;
 	local name MissionSource;
 	MissionSource = MissionState.GetMissionSource().DataName;
 	LwVariantOfMissionSourceAsString = string(RequiredMissionSource) $ "_LW";
 
-	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
-	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
 	
 	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
@@ -943,13 +924,8 @@ static function AddRewardsToMissionSourceIfResistanceCardActive(XComGameState Ne
 static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out array<AbilitySetupData> SetupData, optional XComGameState StartState, optional XComGameState_Player PlayerState, optional bool bMultiplayerDisplay){
 		local X2AbilityTemplate AbilityTemplate;
 	local X2AbilityTemplateManager AbilityTemplateMan;
-	local name AbilityName;
 	local AbilitySetupData Data, EmptyData;
 	local X2CharacterTemplate CharTemplate;
-	local int i;
-	local XComGameState_MissionSite MissionState;
-	local XComGameState_BattleData	BattleData;
-	local X2WeaponTemplate PrimaryWeaponTemplate;
 	local XComGameState_Item CurrentBladedWeapon;
 	if (`XENGINE.IsMultiplayerGame()) { return; }
 

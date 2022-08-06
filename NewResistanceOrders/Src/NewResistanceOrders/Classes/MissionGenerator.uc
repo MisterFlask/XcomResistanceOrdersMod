@@ -9,14 +9,9 @@ static function SetMissionData(name MissionFamily, XComGameState_MissionSite Mis
 	local GeneratedMissionData EmptyData;
 	local XComTacticalMissionManager MissionMgr;
 	local XComParcelManager ParcelMgr;
-	local string Biome, MapName;
+	local string Biome;
 	// LWOTC vars
 	local XComHeadquartersCheatManager CheatManager;
-	local PlotDefinition SelectedPlotDef;
-	local PlotTypeDefinition PlotTypeDef;
-	local array<name> SourceSitReps;
-	local name SitRepName;
-	local array<name> SitRepNames;
 	local String AdditionalTag;
 	// End LWOTC vars
 	// Variables for Issue #157
@@ -39,7 +34,6 @@ static function SetMissionData(name MissionFamily, XComGameState_MissionSite Mis
 	//
 	// This block basically adds support for adding SitReps
 	MissionState.GeneratedMission.SitReps.Length = 0;
-	SitRepNames.Length = 0;
 
 	// Add additional required plot objective tags
 	foreach MissionState.AdditionalRequiredPlotObjectiveTags(AdditionalTag)
@@ -48,14 +42,12 @@ static function SetMissionData(name MissionFamily, XComGameState_MissionSite Mis
 	}
 
 	MissionState.GeneratedMission.SitReps = MissionState.GeneratedMission.Mission.ForcedSitreps;
-	SitRepNames = MissionState.GeneratedMission.Mission.ForcedSitreps;
 
 	// Add Forced SitReps from Cheats
 	CheatManager = XComHeadquartersCheatManager(class'WorldInfo'.static.GetWorldInfo().GetALocalPlayerController().CheatManager);
 	if (CheatManager != none && CheatManager.ForceSitRepTemplate != '')
 	{
 		MissionState.GeneratedMission.SitReps.AddItem(CheatManager.ForceSitRepTemplate);
-		SitRepNames.AddItem(CheatManager.ForceSitRepTemplate);
 		CheatManager.ForceSitRepTemplate = '';
 	}
 

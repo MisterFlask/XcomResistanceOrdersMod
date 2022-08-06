@@ -48,7 +48,7 @@ class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards
             || DoesSoldierHaveItemInSecondarySlot(UnitState, 'wristblade');
     }
     
-    static function bool GetEquippedBlade(XComGameState_Unit UnitState){
+    static function XComGameState_Item GetEquippedBlade(XComGameState_Unit UnitState){
         local XComGameState_Item CurrentItem;
         local name CurrentWeaponCat;
         local array<name> BladedWeapons;
@@ -56,7 +56,7 @@ class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards
         BladedWeapons.AddItem('combatknife');
         BladedWeapons.AddItem('wristblade');
 
-        foreach CurrentWeaponCat(BladedWeapons){
+        foreach BladedWeapons(CurrentWeaponCat){
             CurrentItem = GetEquippedWeaponOfCategory(UnitState, CurrentWeaponCat);
             if(CurrentItem != none){
                 return CurrentItem;
@@ -113,27 +113,12 @@ class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards
 		return false;
 	}
 	
-	static function bool DoesSoldierHavePsiRating(XComGameState_Unit UnitState){
-	
-		local XComGameStateHistory History;
-		`assert(UnitState != none);
-
-		History = `XCOMHISTORY;
-		if (UnitState.GetCurrentStat(eStat_PsiOffense) >= 10){
-			return true;
-		}
-
-		return false;
-	}
-
 	static function bool DoesSoldierHaveArmorOfClass(XComGameState_Unit UnitState, name Classification){
 	
 		local XComGameStateHistory History;
 		local StateObjectReference ItemRef;
 		local XComGameState_Item ItemState;
 		local X2ArmorTemplate Armor;
-		local name WeaponCat;
-		local name ItemCat;
 		`assert(UnitState != none);
 
 		History = `XCOMHISTORY;
@@ -235,11 +220,8 @@ class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards
 static function bool IsResistanceOrderActive(name ResistanceOrderName){
 	local XComGameState_StrategyCard CardState;
 	local StateObjectReference CardRef;
-	local bool bCardPlayed;
 	local XComGameStateHistory History;
 	local XComGameState_ResistanceFaction FactionState;
-	local array<Name> ExclusionList;
-	local int NumActionsToAdd;
 	local XComGameState_Continent ContinentState;
 	
 	local XComGameState_HeadquartersResistance ResHQ;

@@ -185,7 +185,6 @@ static function X2AbilityTemplate Turbocharged()
 {
 	local XMBEffect_BonusDamageByDamageType Effect;
 	local X2AbilityTemplate Template;
-	local XMBEffect_AddUtilityItem ItemEffect;
 
 	Effect = new class'XMBEffect_BonusDamageByDamageType';
 	Effect.EffectName = 'Turbocharged';
@@ -204,7 +203,6 @@ static function X2AbilityTemplate CreateLotsOfShieldingBuff()
 {
 	local X2AbilityTemplate Template;
 	local X2Effect_PersistentStatChange Effect;
-	local X2Condition_MapProperty Condition;
 
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_LotsOfShielding',"img:///UILibrary_PerkIcons.UIPerk_andromedon_robotbattlesuit", true, none);
@@ -226,7 +224,6 @@ static function X2AbilityTemplate CreateChryssalidAndFacelessBuff()
 {
 	local X2AbilityTemplate Template;
 	local X2Effect_PersistentStatChange Effect;
-	local X2Condition_MapProperty Condition;
 
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_FasterSavages',"img:///UILibrary_PerkIcons.UIPerk_andromedon_robotbattlesuit", true, none);
@@ -484,7 +481,6 @@ static function X2AbilityTemplate WitchHunterBuff()
 {
 	local X2AbilityTemplate Template;
 	local ILB_X2Effect_WitchHunter Effect;
-	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_WitchHunter', "img:///UILibrary_PerkIcons.UIPerk_sectoid_mindspin", true, none);
@@ -507,9 +503,7 @@ static function X2AbilityTemplate WitchHunterBuff()
 static function X2AbilityTemplate HazmatShielding()
 {
 	local X2AbilityTemplate Template;
-	local X2Effect_PersistentStatChange Effect;
-	local X2Condition_MapProperty Condition;
-	
+	local X2Effect_PersistentStatChange Effect;	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_HazmatShielding', "img:///UILibrary_PerkIcons.UIPerk_item_nanofibervest", true, none);
 
@@ -532,7 +526,6 @@ static function X2AbilityTemplate PlatedVestShielding()
 {
 	local X2AbilityTemplate Template;
 	local X2Effect_PersistentStatChange Effect;
-	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_PlatedShielding',"img:///UILibrary_PerkIcons.UIPerk_item_nanofibervest", true, none);
@@ -590,7 +583,6 @@ static function X2AbilityTemplate IncreaseFlamethrowerDamageAndCharges()
 {
 	local XMBEffect_ConditionalBonus Effect;
 	local XMBEffect_AddAbilityCharges SecondaryEffect;
-	local X2Condition_UnitProperty UnitPropertyCondition;
 	local XMBCondition_AbilityName AbilityNameCondition;
 	local X2AbilityTemplate Template;
 
@@ -661,7 +653,6 @@ static function X2AbilityTemplate RookieHpBuff()
 {
 	local XMBEffect_PermanentStatChange Effect;
 	local X2AbilityTemplate Template;
-	local X2Condition_UnitProperty Condition;
 
 	Effect = new class'XMBEffect_PermanentStatChange';
 	Effect.AddStatChange(eStat_HP, default.ROOKIE_COMBAT_HP_BONUS);
@@ -677,7 +668,6 @@ static function X2AbilityTemplate ExtraMeleeDamage()
 {
 	local XMBEffect_ConditionalBonus Effect;
 	local X2AbilityTemplate Template;
-	local XMBEffect_AddUtilityItem ItemEffect;
 	local XMBCondition_AbilityProperty MeleeOnlyCondition;
 	Effect = new class'XMBEffect_ConditionalBonus';
 	Effect.EffectName = 'Extra Melee Damage';
@@ -704,7 +694,6 @@ static function X2AbilityTemplate ShellbusterMobilityBuff()
 {
 	local X2Effect_PersistentStatChange Effect;
 	local X2AbilityTemplate Template;
-	local XMBEffect_AddUtilityItem ItemEffect;
 	
 	Effect = new class'X2Effect_PersistentStatChange';
 	Effect.EffectName = 'Shellbuster_mobility';
@@ -780,7 +769,6 @@ static function X2AbilityTemplate EasyToHack()
 {
 	local X2AbilityTemplate Template;
 	local X2Effect_PersistentStatChange Effect;
-	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_EasyToHack', "img:///UILibrary_PerkIcons.UIPerk_hack", true, none);
@@ -810,7 +798,6 @@ static function X2AbilityTemplate EasyToHackMindgorger()
 {
 	local X2AbilityTemplate Template;
 	local X2Effect_PersistentStatChange Effect;
-	local X2Condition_MapProperty Condition;
 	
 	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
 	Template = Passive('ILB_EasyToHackMindgorger', "img:///UILibrary_PerkIcons.UIPerk_hack", true, none);

@@ -239,22 +239,15 @@ optional bool bOrder = false,
 optional int OrderHours = -1){
 
 	local XComGameState_MissionSite MissionState;
-	local X2MissionSourceTemplate MissionSource;
-	local array<XComGameState_Reward> MissionRewards;
-	local float MissionDuration;
 	local StateObjectReference RegionRef;
 	local XComGameState_WorldRegion localRegion;
 	local X2MissionFlavorTextTemplate FlavorTextTemplate;
-	local XComParcelManager ParcelMgr;
-	local X2StrategyElementTemplateManager StratMgr;
 	local Vector2D LocVector;
 
-	ParcelMgr = `PARCELMGR;
 	`LOG("Generating possibly-risky mission reward");
 
 	RegionRef = ChooseRandomRegion();
 
-	StratMgr = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	//RegionState = XComGameState_WorldRegion(`XCOMHISTORY.GetGameStateForObjectID(RegionRef.ObjectID));	
 	
 
