@@ -47,6 +47,37 @@ class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards
             || DoesSoldierHaveItemInSecondarySlot(UnitState, 'combatknife')
             || DoesSoldierHaveItemInSecondarySlot(UnitState, 'wristblade');
     }
+    
+    static function bool GetEquippedBlade(XComGameState_Unit UnitState){
+        local XComGameState_Item CurrentItem;
+        local name CurrentWeaponCat;
+        local array<name> BladedWeapons;
+        BladedWeapons.AddItem('sword');
+        BladedWeapons.AddItem('combatknife');
+        BladedWeapons.AddItem('wristblade');
+
+        foreach CurrentWeaponCat(BladedWeapons){
+            CurrentItem = GetEquippedWeaponOfCategory(UnitState, CurrentWeaponCat);
+            if(CurrentItem != none){
+                return CurrentItem;
+            }
+        }
+        return none;
+    }
+    
+    static function XComGameState_Item GetEquippedWeaponOfCategory(XComGameState_Unit UnitState, name WeaponCategory){
+        local XComGameState_Item CurrentItem;
+        local array<XComGameState_Item> ItemList;
+
+        ItemList=  UnitState.GetAllInventoryItems();
+        foreach ItemList(CurrentItem){
+            if(CurrentItem.GetWeaponCategory() == WeaponCategory){
+                return CurrentItem;
+            }
+        }
+
+        return none;
+    }
 
     static function bool DoesSoldierHaveItemInPrimarySlot(XComGameState_Unit UnitState, name Classification){
 
