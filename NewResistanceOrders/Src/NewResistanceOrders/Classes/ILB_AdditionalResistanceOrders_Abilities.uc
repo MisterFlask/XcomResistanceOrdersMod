@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------------------
 //  Copyright (c) 2016 Firaxis Games, Inc. All rights reserved.
 //---------------------------------------------------------------------------------------
-class IRB_AdditionalResistanceOrders_Abilities extends XMBAbility
+class ILB_AdditionalResistanceOrders_Abilities extends XMBAbility
 	config(Abilities);
 var config array<name> FLAMER_SKILLS;
 

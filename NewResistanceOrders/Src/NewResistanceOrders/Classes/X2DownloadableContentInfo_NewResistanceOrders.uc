@@ -283,7 +283,7 @@ static function array<ResistanceCardConfigValues> GetResistanceCardConfigs(){
 	local array<ResistanceCardConfigValues> ResistanceCardConfigs;
 
 	//Costs 4 avenger power; only functions when not at power deficit. All soldiers' electric abilities deal 2 extra damage. 
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RemoteSuperchargers', class'IRB_AdditionalResistanceOrders_ResCards'.default.SUPERCHARGER_POWER_DRAIN, class'IRB_AdditionalResistanceOrders_Abilities'.default.AVENGER_SUPERCHARGER_ELECTRIC_DAMAGE_BUFF));// 
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RemoteSuperchargers', class'ILB_AdditionalResistanceOrders_ResCards'.default.SUPERCHARGER_POWER_DRAIN, class'ILB_AdditionalResistanceOrders_Abilities'.default.AVENGER_SUPERCHARGER_ELECTRIC_DAMAGE_BUFF));// 
 	//Gain +20% research speed.  Chryssalids and Faceless are both faster and harder to hit
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_XenobiologicalFieldResearch', class'ILB_StrategicResCards'.default.XENO_FIELD_RESEARCH_RESEARCH_BONUS, -1));
 	//Lose 15% research speed.  Gain +3 resistance contacts
@@ -357,17 +357,17 @@ SummaryText="Grants a monthly covert action that spawns a Neutralize Field Comma
 
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_YouOweMe', 40, -1)); //todo
 
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_HexHunterForMindShields', class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_WITCH_HUNTER_PASSIVE_DMG, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_HexHunterForMindShields', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_WITCH_HUNTER_PASSIVE_DMG, -1));
 
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', class'IRB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_PROMETHIUM_FIRE_DMG_BONUS, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', class'IRB_AdditionalResistanceOrders_Abilities'.default.ROOKIE_COMBAT_HP_BONUS, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', class'ILB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_PROMETHIUM_FIRE_DMG_BONUS, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', class'ILB_AdditionalResistanceOrders_Abilities'.default.ROOKIE_COMBAT_HP_BONUS, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BureaucraticInfighting', 30, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', class'IRB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_MINDGORGER, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_MELEE_DMG_BUFF, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', class'ILB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_MINDGORGER, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_MELEE_DMG_BUFF, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_SendInTheNextWave', 15, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_DawnMachines', class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_DAWN_MACHINES_SHIELDS_BUFF, class'IRB_AdditionalResistanceOrders_Abilities'.default.ILB_DAWN_MACHINES_MOBILITY_BUFF));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MabExploit', class'IRB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_TUNDRA, -1));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_DawnMachines', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_DAWN_MACHINES_SHIELDS_BUFF, class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_DAWN_MACHINES_MOBILITY_BUFF));
+	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MabExploit', class'ILB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_TUNDRA, -1));
 
 	/*
 [ X2StrategyCardTemplate]
@@ -592,13 +592,11 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	// todo: look into options for injured soldier sitrep
 	
 	local XComGameState_MissionSite MissionState;
-	local XComGameState_HeadquartersResistance ResHQ;
 	local XComGameState NewGameState;
 	local name CurrentSitrepName;
 	local array<name> SitrepList;
 	local XComGameStateHistory CachedHistory;
 
-	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
 	
 	//NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
 	CachedHistory = `XCOMHISTORY;
@@ -783,7 +781,7 @@ static function name GrabRandomCrackdownSitrep(){
 }
 
 static function bool IsResCardActive(name ResCardName){
-	return class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCardName);
+	return class'ILB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCardName);
 }
 
 static function bool IsMissionFamily(
@@ -808,7 +806,7 @@ name Sitrep, name RequiredMissionSource,out GeneratedMissionData GeneratedMissio
 		return;
 	}
 
-	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
+	if (class'ILB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
 		if (string(RequiredMissionSource) == string(MissionSource)
 			|| LwVariantOfMissionSourceAsString == string(MissionSource))
@@ -835,7 +833,7 @@ name Sitrep, name RequiredMissionFamily,out GeneratedMissionData GeneratedMissio
 		return;
 	}
 
-	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
+	if (class'ILB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
 		if (string(RequiredMissionFamily) == GeneratedMission.Mission.MissionFamily
 			|| LwVariantOfMissionFamilyAsString == GeneratedMission.Mission.MissionFamily)
@@ -862,7 +860,7 @@ static function AddRewardsToMissionFamilyIfResistanceCardActive(XComGameState Ne
 	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	ResHQ = class'UIUtilities_Strategy'.static.GetResistanceHQ();
 	
-	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
+	if (class'ILB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
 		if (string(RequiredMissionFamily) == GeneratedMission.Mission.MissionFamily
 			|| LwVariantOfMissionFamilyAsString == GeneratedMission.Mission.MissionFamily)
@@ -901,7 +899,7 @@ static function AddRewardsToMissionSourceIfResistanceCardActive(XComGameState Ne
 	LwVariantOfMissionSourceAsString = string(RequiredMissionSource) $ "_LW";
 
 	
-	if (class'IRB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
+	if (class'ILB_NewResistanceOrders_EventListeners'.static.IsResistanceOrderActive(ResCard))
 	{
 		if (string(RequiredMissionSource) == string(MissionSource)
 			|| LwVariantOfMissionSourceAsString == string(MissionSource))

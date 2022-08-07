@@ -73,16 +73,16 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\NewResistanceOrders\Classes\ILB_X2Effect_WitchHunter.uc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\IRB_AdditionalResistanceOrders_Abilities.uc">
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_AdditionalResistanceOrders_Abilities.uc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\IRB_AdditionalResistanceOrders_ResCards.uc">
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_AdditionalResistanceOrders_ResCards.uc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\IRB_NewResistanceOrders_EventListeners.uc">
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_NewResistanceOrders_EventListeners.uc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\IRB_UIBlackMarketScreenListener.uc">
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_UIBlackMarketScreenListener.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\NewResistanceOrders\Classes\MissionGenerator.uc">

@@ -17,7 +17,7 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions con
 	{		
 		local array<X2DataTemplate> Techs;
 
-		`log("Creating resistance cards for IRB_AdditionalResistanceOrders_ResCards (strategic)");
+		`log("Creating resistance cards for ILB_AdditionalResistanceOrders_ResCards (strategic)");
 		
 		// Templates of the form "if condition X, grant soldier perk Y"
 		// Disadvantageous mission sitreps?  -2 turns to complete, +1 force level, +1 squad size, no starting concealment

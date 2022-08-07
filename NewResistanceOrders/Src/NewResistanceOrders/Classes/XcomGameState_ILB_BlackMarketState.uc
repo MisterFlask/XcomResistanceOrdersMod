@@ -54,7 +54,7 @@ static function HandleBlackMarketScreenOpened(){
 	ILB_BlackMarketState.bPopulatedBlackMarketWithResistanceOrders = true;
 	
 	// HACK: Don't feel like refactoring at the moment.  Just gonna call event listener code as though I were handling the actual bm reset.
-	class'IRB_NewResistanceOrders_EventListeners'.static.BlackMarketResetListener(GetBlackMarketState(NewGameState), none, NewGameState, 'DummyEvent', none);
+	class'ILB_NewResistanceOrders_EventListeners'.static.BlackMarketResetListener(GetBlackMarketState(NewGameState), none, NewGameState, 'DummyEvent', none);
 	`GAMERULES.SubmitGameState(NewGameState);
 }
 

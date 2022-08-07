@@ -1,4 +1,4 @@
-class IRB_NewResistanceOrders_EventListeners extends X2EventListener config(ResCards) ;
+class ILB_NewResistanceOrders_EventListeners extends X2EventListener config(ResCards) ;
 
 var config int SOLDIER_COST_IN_SUPPLY;
 var config int SOLDIER_COST_IN_SUPPLY_LWOTC;
@@ -13,7 +13,7 @@ var config int BRAZEN_RECRUITMENT_EXPENSIVE_SOLDIER_COST;
 static function array<X2DataTemplate> CreateTemplates()
 {
 	local array<X2DataTemplate> Templates;
-	`log("Registering Events template: IRB_AdditionalResistanceOrders_ResCards");
+	`log("Registering Events template: ILB_AdditionalResistanceOrders_ResCards");
 
 
 	Templates.AddItem( AddStrategyListeners() );
@@ -25,7 +25,7 @@ static function array<X2DataTemplate> CreateTemplates()
 static protected function X2EventListenerTemplate AddStrategyListeners()
 {
 	local CHEventListenerTemplate Template;
-	`log("Registering Events: IRB_AdditionalResistanceOrders_ResCards");
+	`log("Registering Events: ILB_AdditionalResistanceOrders_ResCards");
 
 	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForTech');
 	Template.AddCHEvent('ResearchCompleted', OnResearchCompleted, ELD_Immediate, 99);
@@ -36,7 +36,7 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 
 	Template.RegisterInStrategy = true;
 
-	`log("On research complete listener CREATED for IRB_AdditionalResistanceOrders_ResCards");
+	`log("On research complete listener CREATED for ILB_AdditionalResistanceOrders_ResCards");
 
 	return Template;
 }
@@ -108,13 +108,13 @@ static function AddCovertActionToFactionConditionalOnResCard(XComGameState GameS
 static protected function X2EventListenerTemplate AddListenersForBlackMarketReset()
 {
 	local CHEventListenerTemplate Template;
-	`log("Registering Events: IRB_AdditionalResistanceOrders_ResCards");
+	`log("Registering Events: ILB_AdditionalResistanceOrders_ResCards");
 
 	`CREATE_X2TEMPLATE(class'CHEventListenerTemplate', Template, 'ILB_ListenersForBlackMarket');
 	Template.AddCHEvent('BlackMarketGoodsReset', SetStateFlagForScreenListener, ELD_Immediate, 99);
 	Template.RegisterInStrategy = true;
 
-	`log("On research complete listener CREATED for IRB_AdditionalResistanceOrders_ResCards");
+	`log("On research complete listener CREATED for ILB_AdditionalResistanceOrders_ResCards");
 
 	return Template;
 }
@@ -128,7 +128,7 @@ static function EventListenerReturn OnResearchCompleted(Object EventData, Object
 {
 	local XComGameState_Tech TechState;
 		
-	`log("On research complete listener HIT for for IRB_AdditionalResistanceOrders_ResCards");
+	`log("On research complete listener HIT for for ILB_AdditionalResistanceOrders_ResCards");
 
 	TechState = XComGameState_Tech(EventData); 
 	if (TechState == none)

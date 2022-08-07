@@ -1,6 +1,6 @@
 // This is an Unreal Script
 
-class IRB_UIBlackMarketScreenListener extends UIScreenListener;
+class ILB_UIBlackMarketScreenListener extends UIScreenListener;
 
 event OnInit(UIScreen Screen)
 {

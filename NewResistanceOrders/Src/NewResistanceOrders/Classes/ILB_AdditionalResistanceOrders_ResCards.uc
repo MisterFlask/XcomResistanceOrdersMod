@@ -3,11 +3,9 @@
 //[extended perk pack wotc]https://docs.google.com/spreadsheets/d/1wZfTRMWsLDzrJAKO7otuto6o0t0PuzYF6Tv704AkZj0/edit#gid=0
 // wotc abb perk pack
 // mitzuri's perk pack
-// (MAYBE stukov's war perk pack at some point) https://steamcommunity.com/workshop/filedetails/discussion/2728208078/3189112650405981173/
 // NOT USING SHADOW OPS PERK PACK, due to undesired class changes
 
-class IRB_AdditionalResistanceOrders_ResCards extends X2StrategyElement config(ResCards);
-
+class ILB_AdditionalResistanceOrders_ResCards extends X2StrategyElement config(ResCards);
 
 var config int SUPERCHARGER_POWER_DRAIN;
 
@@ -15,7 +13,7 @@ var config int SUPERCHARGER_POWER_DRAIN;
 	{		
 		local array<X2DataTemplate> Techs;
 
-		`log("Creating resistance cards for IRB_AdditionalResistanceOrders_ResCards v2");
+		`log("Creating resistance cards for ILB_AdditionalResistanceOrders_ResCards v2");
 		
 		// Templates of the form "if condition X, grant soldier perk Y"
 		Techs.AddItem(CreateTunnelRatsTemplate());
@@ -216,7 +214,7 @@ var config int SUPERCHARGER_POWER_DRAIN;
 			AbilitiesToGrant.AddItem( 'Stealth' ); 
 		}
 
-		if (IsPlotType("CityCenter")  && class'IRB_NewResistanceOrders_EventListeners'.static.NumSkirmisherCardsActive() >= 3){
+		if (IsPlotType("CityCenter")  && class'ILB_NewResistanceOrders_EventListeners'.static.NumSkirmisherCardsActive() >= 3){
 			AbilitiesToGrant.AddItem( 'Stealth' ); 
 		}
 	}
