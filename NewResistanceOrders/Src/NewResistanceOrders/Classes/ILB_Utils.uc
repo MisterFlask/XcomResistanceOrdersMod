@@ -1,10 +1,29 @@
 class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards);
 
-struct ResistanceCardConfigValues{
-	var name ResCardName;
-	var string StringValue0;
-	var string StringValue1;
-};
+    struct ResistanceCardRewardMod{
+		var name ApplicableMissionFamilyIfAny;
+		var name ApplicableMissionSourceIfAny; //
+        var name RewardApplied; //Reward_Supplies
+        var int	RewardQuantity;
+        var int	RewardVariance;
+    };
+    struct ResistanceCardSitrepMod{
+		var name ApplicableMissionFamilyIfAny;
+		var name ApplicableMissionSourceIfAny; //
+        var name SitrepApplied;
+    };
+    struct ResistanceCardConfigValues{
+        var name ResCardName;
+        var string StringValue0;
+        var string StringValue1;
+        var int Priority; // default is 0; highest priority wins
+        var array<ResistanceCardRewardMod> RewardMods;
+        var array<ResistanceCardSitrepMod> SitrepMods;
+    };
+
+    var config array<ResistanceCardConfigValues> ResistanceCardFlexibleConfigs;
+
+
 	static function bool DoesSoldierHaveRocketLauncher(XComGameState_Unit UnitState){
 		return DoesSoldierHaveSpecificItem(UnitState, 'RocketLauncher');
 	}
@@ -324,10 +343,33 @@ static function XComGameState_HeadquartersResistance GetResistanceHQ()
 	return XComGameState_HeadquartersResistance(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
 }
 
+// This function is criminally inefficient, I am so so sorry
+static function array<ResistanceCardConfigValues> DedupeResistanceCardConfigs(array<ResistanceCardConfigValues> OriginalValues){
+    local ResistanceCardConfigValues CandidateBestCardConfigs;
+    local array<name> CardsAlreadyGrabbed;
+    local ResistanceCardConfigValues Current;
+    local array<ResistanceCardConfigValues> DedupedValues;
+    
+    foreach OriginalValues(Current){
+        // below function grabs the highest-priority card matching the template name
+        CandidateBestCardConfigs = GetResistanceCardConfigsForResCard(Current.ResCardName, OriginalValues);
+        if (CardsAlreadyGrabbed.Find(CandidateBestCardConfigs.ResCardName) == -1){
+            DedupedValues.AddItem(CandidateBestCardConfigs);
+            CardsAlreadyGrabbed.AddItem(CandidateBestCardConfigs.ResCardName);
+        }
+    }
+    
+    return DedupedValues;
+}
 
-
+// returns the HIGHEST-PRIORITY versions of each res card config.
 static function array<ResistanceCardConfigValues> GetResistanceCardConfigs(){
+    local ResistanceCardConfigValues CurrentValue;
 	local array<ResistanceCardConfigValues> ResistanceCardConfigs;
+
+    foreach default.ResistanceCardFlexibleConfigs(CurrentValue){
+        ResistanceCardConfigs.AddItem(CurrentValue);
+    }
 
 	//Costs 4 avenger power; only functions when not at power deficit. All soldiers' electric abilities deal 2 extra damage. 
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RemoteSuperchargers', class'ILB_AdditionalResistanceOrders_ResCards'.default.SUPERCHARGER_POWER_DRAIN, class'ILB_AdditionalResistanceOrders_Abilities'.default.AVENGER_SUPERCHARGER_ELECTRIC_DAMAGE_BUFF));// 
@@ -376,8 +418,8 @@ SummaryText="You gain +2 resistance contacts.  Retaliations are at +1 force leve
 DisplayName="Council Bounties"
 SummaryText="Grants a monthly covert action that spawns a Neutralize Field Commander mission.  The field commander is tougher on this mission.  This mission rewards 75-125 supply on completion."
 	*/
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_CouncilBounties', 75, 125));
-
+	//ResistanceCardConfigs.AddItem(ResCardConf('ResCard_CouncilBounties', 75, 125));
+    // moved to flexible configs
 	/*
 	ResCard_PowerCellRepurposing
 	Successfully securing UFOs grants the Avenger 2 additional power PERMANENTLY, as well as a random heavy weapon.  Destroy Device missions grant an additional 15 Elereum."
@@ -409,7 +451,6 @@ SummaryText="Grants a monthly covert action that spawns a Neutralize Field Comma
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', (1 - class'ILB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF) * 100, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_PROMETHIUM_FIRE_DMG_BONUS, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', class'ILB_AdditionalResistanceOrders_Abilities'.default.ROOKIE_COMBAT_HP_BONUS, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BureaucraticInfighting', 30, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', (1 - class'ILB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_MINDGORGER) * 100, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_MELEE_DMG_BUFF, -1));
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_SendInTheNextWave', 15, -1));
@@ -492,19 +533,34 @@ SummaryText="Flamethrower-based abilities deal 2 more damage.  Additionally, fla
 SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANENT +2 max HP (once per rookie)."
 
 	*/
-
-	return ResistanceCardConfigs;
+	return DedupeResistanceCardConfigs(ResistanceCardConfigs);
 }
+
+    static function ResistanceCardConfigValues GetResistanceCardConfig(name ResCardId){
+        local array<ResistanceCardConfigValues> empty;
+        return GetResistanceCardConfigsForResCard(ResCardId, empty);
+    }
+
 	static function ResistanceCardConfigValues GetResistanceCardConfigsForResCard(name ResCardName, array<ResistanceCardConfigValues> AllPossibleCards){
 		local ResistanceCardConfigValues Current;
+        local ResistanceCardConfigValues BestMatchingCard;
+        BestMatchingCard.ResCardName = '';
+        if (AllPossibleCards.Length == 0){
+            AllPossibleCards = GetResistanceCardConfigs();
+        }
 
 		foreach AllPossibleCards(Current){
 			if (ResCardName == Current.ResCardName){
-				return Current;
+				if (BestMatchingCard.ResCardName == ''){
+                    BestMatchingCard = Current;
+                }
+
+                if (BestMatchingCard.Priority < Current.Priority){
+                    BestMatchingCard = Current;
+                }
 			}
 		}
 
-		Current.ResCardName = '';
-		return Current;
+		return BestMatchingCard;
 
 	}

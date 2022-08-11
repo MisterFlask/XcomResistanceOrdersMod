@@ -208,10 +208,6 @@ static function PrintAbilities(array<name> AbilityNames){
 exec function ActivateAllCards()
 {
 	local XComGameStateHistory History;
-	local XComGameState NewGameState;
-	local XComGameState_ResistanceFaction FactionState;
-	local XComGameState_StrategyCard CardState;
-	local X2StrategyCardTemplate CurrentTemplate;
 	local XComGameState_StrategyCard CurrentCard;
 	History = `XCOMHISTORY;
 
@@ -386,6 +382,31 @@ static function UpdateAbilities()
 	}
 }
 
+static function ResistanceCardConfigValues CardConf(name CardName){
+	return class'ILB_Utils'.static.GetResistanceCardConfig(CardName);
+}
+
+
+exec static function PrintAllResCardConfigs(){
+	local array<ResistanceCardConfigValues> Configs;
+	local ResistanceCardConfigValues CurrentConfig;
+	local ResistanceCardRewardMod CurrentRewardMod;
+	local ResistanceCardSitrepMod CurrentSitrepMod;
+	Configs = class'ILB_Utils'.static.GetResistanceCardConfigs();
+	foreach Configs(CurrentConfig)
+	{
+		`LOG("ILB Config at priority " $ CurrentConfig.Priority $ " for res card " $ CurrentConfig.ResCardName);
+		`LOG("ILB: Config: " $ CurrentConfig.ResCardName $ " : " $ CurrentConfig.StringValue0 $ " :  " $ CurrentConfig.StringValue1);
+		foreach CurrentConfig.RewardMods(CurrentRewardMod){
+			`LOG("ILB: Reward Mod: " $ CurrentRewardMod.ApplicableMissionFamilyIfAny $ " : " $ CurrentRewardMod.ApplicableMissionSourceIfAny $ " :  " $ CurrentRewardMod.RewardApplied);
+		}		
+
+		foreach CurrentConfig.SitrepMods(CurrentSitrepMod){
+			`LOG("ILB: Sitre[] Mod: " $ CurrentSitrepMod.ApplicableMissionFamilyIfAny $ " : " $ CurrentSitrepMod.ApplicableMissionSourceIfAny $ " :  " $ CurrentSitrepMod.SitrepApplied);
+		}
+	}
+}
+
 /// <summary>
 /// Called from XComGameState_Missionsite:SetMissionData
 /// lets mods add SitReps with custom spawn rules to newly generated missions
@@ -401,17 +422,40 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	local name CurrentSitrepName;
 	local array<name> SitrepList;
 	local XComGameStateHistory CachedHistory;
+	local array<ResistanceCardConfigValues> Configs;
+	local ResistanceCardConfigValues CurrentConfig;
+	local ResistanceCardRewardMod CurrentRewardMod;
+	Configs = class'ILB_Utils'.static.GetResistanceCardConfigs();
 
-	
 	//NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
 	CachedHistory = `XCOMHISTORY;
 	NewGameState = CachedHistory.GetGameStateFromHistory();
+
+	MissionState = XComGameState_MissionSite(SourceObject);
+
+	if (MissionState == none){
+		MissionState = XComGameState_MissionSite(`XCOMHISTORY.GetGameStateForObjectID(GeneratedMission.MissionID));
+	}
+
+	if (MissionState == none){
+		`LOG("ERROR: Could not find mission state for mission id " $ GeneratedMission.MissionID);
+	}
+
 	If (`HQGAME  != none && `HQPC != None && `HQPRES != none) // we're in strategy
 	{
+		// first, go through the rewards for each res card config
+		foreach Configs(CurrentConfig)
+		{
+			foreach CurrentConfig.RewardMods(CurrentRewardMod){
+				if (CurrentRewardMod.ApplicableMissionFamilyIfAny != ''){
+					AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, CurrentRewardMod.RewardApplied, CurrentConfig.ResCardName, CurrentRewardMod.ApplicableMissionFamilyIfAny, 30); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
+				}
+			}
+		}
+
 		//todo: random chance
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'ShowOfForce', 'Recover', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'LootChests', 'Recover', GeneratedMission);
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Intel', 'ResCard_BureaucraticInfighting', 'Recover', 30); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
 
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Extract', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Rescue', GeneratedMission);
@@ -429,17 +473,6 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddSitrepToMissionSourceIfResistanceCardsActive(MissionState, 'ResCard_AggressiveOpportunism', 'ILB_DecreaseTimer1Sitrep', 'MissionSource_GuerillaOp', GeneratedMission);
 	    //AddRewardsToMissionSourceIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ResCard_AggressiveOpportunism', 'MissionSource_GuerillaOp', class'ILB_LootTablePresetReward'.static.BuildMissionItemReward_AggressiveOpportunism(NewGameState)); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
 
-
-		MissionState = XComGameState_MissionSite(SourceObject);
-
-		if (MissionState == none){
-			MissionState = XComGameState_MissionSite(`XCOMHISTORY.GetGameStateForObjectID(GeneratedMission.MissionID));
-		}
-
-		if (MissionState == none){
-			`LOG("ERROR: Could not find mission state for mission id " $ GeneratedMission.MissionID);
-		}
-			
 
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Supplies', 'ResCard_YouOweMe', 'Extract', 40); 
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Supplies', 'ResCard_YouOweMe', 'SwarmDefense', 40);
