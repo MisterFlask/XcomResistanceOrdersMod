@@ -990,7 +990,9 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 		if(DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'gremlin'))
 		{
 			AbilitiesToGrant.AddItem( 'ILB_AidProtocolRefund' ); 
+			
 		}
+
 	}
 
 	// smoker for launchers

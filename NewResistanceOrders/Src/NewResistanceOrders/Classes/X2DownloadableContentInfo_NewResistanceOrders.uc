@@ -279,183 +279,6 @@ static event OnPostTemplatesCreated(){
 }
 
 
-static function array<ResistanceCardConfigValues> GetResistanceCardConfigs(){
-	local array<ResistanceCardConfigValues> ResistanceCardConfigs;
-
-	//Costs 4 avenger power; only functions when not at power deficit. All soldiers' electric abilities deal 2 extra damage. 
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RemoteSuperchargers', class'ILB_AdditionalResistanceOrders_ResCards'.default.SUPERCHARGER_POWER_DRAIN, class'ILB_AdditionalResistanceOrders_Abilities'.default.AVENGER_SUPERCHARGER_ELECTRIC_DAMAGE_BUFF));// 
-	//Gain +20% research speed.  Chryssalids and Faceless are both faster and harder to hit
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_XenobiologicalFieldResearch', class'ILB_StrategicResCards'.default.XENO_FIELD_RESEARCH_RESEARCH_BONUS, -1));
-	//Lose 15% research speed.  Gain +3 resistance contacts
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_LabToCommsRepurposing', class'ILB_StrategicResCards'.default.LABS_TO_COMMS_RESEARCH_PENALTY, class'ILB_StrategicResCards'.default.LABS_TO_COMMS_COMMS_BONUS));
-	//Gain +4 avenger power.  Guerilla Ops and Council missions have a +15% chance of an ADVENT crackdown sitrep
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_LeachPsionicLeylines', class'ILB_StrategicResCards'.default.LEACH_PSIONIC_LEYLINES_POWER_BONUS, 15));
-	// ResCard_RescueUpperCrustContacts
-	//Grants a monthly covert action that spawns a Swarm Defense Recover VIP mission.  This mission rewards 75-125 supply on completion instead of its typical reward.
-	
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RescueUpperCrustContacts', 75, 125));
-	
-	// ResCard_StealSparkCore
-	//"Grants a monthly covert action that spawns a Recover Item mission with an increased force level of between 0 and 1.  This mission rewards a Spark instead of its typical reward on completion."
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_StealSparkCore', 0, 1));
-	
-	// ResCard_BrazenRecruitment
-	/// "There is a +15% chance of an ADVENT crackdown..."
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BrazenRecruitment',15,-1));
-
-	//ResCard_BrazenCollection
-	//Gain +25% extra supplies from drops.   There is a +15% chance of an ADVENT crackdown sitrep on all guerilla ops and council missions.
-	
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BrazenCollection',class'ILB_StrategicResCards'.default.BRAZEN_COLLECTION_BONUS, 15));
-
-	// ResCard_GrndlPowerDeal
-	//Gain +5 Avenger power.   Also, gain -25% supplies from supply drops."
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrndlPowerDeal',class'ILB_StrategicResCards'.default.GRNDL_POWER_DEAL_POWER_BONUS, class'ILB_StrategicResCards'.default.GRNDL_POWER_DEAL_SUPPLY_PENALTY));
-
-	// 
-	//Black Market goods are at a 25% discount.  There is a +15% chance of an ADVENT crackdown on all guerilla ops and council missions
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_NotoriousSmugglers',class'ILB_StrategicResCards'.default.NOTORIOUS_SMUGGLERS_BLACK_MARKET_DISCOUNT, 15));
-
-	/*
-[ResCard_RadioFreeLily X2StrategyCardTemplate]
-DisplayName="Radio Free Lily"
-SummaryText="You gain +2 resistance contacts.  Retaliations are at +1 force level."
-
-	*/
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RadioFreeLily',class'ILB_StrategicResCards'.default.RADIO_FREE_LILY_COMMS_BONUS, 1));
-
-	/*
-[ResCard_CouncilBounties X2StrategyCardTemplate]
-DisplayName="Council Bounties"
-SummaryText="Grants a monthly covert action that spawns a Neutralize Field Commander mission.  The field commander is tougher on this mission.  This mission rewards 75-125 supply on completion."
-	*/
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_CouncilBounties', 75, 125));
-
-	/*
-	ResCard_PowerCellRepurposing
-	Successfully securing UFOs grants the Avenger 2 additional power PERMANENTLY, as well as a random heavy weapon.  Destroy Device missions grant an additional 15 Elereum."
-	*/
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_PowerCellRepurposing', 2, 15)); //todo
-
-	/*
-	ResCard_SupplyRaidsForHacks
-	"Successful Hack missions generate a Supply Raid and grant 30 additional intel"
-	*/
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_SupplyRaidsForHacks', 30, -1)); //todo
-
-	/*
-	ResCard_EducatedVandalism
-	Destroy Object and Sabotage Transmitter missions grant additional 15 alien alloys on completion
-	*/
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_EducatedVandalism', 15, -1)); //todo
-
-	/*
-	ResCard_IncitePowerVacuum
-	Neutralize VIP and Neutralize Field Commander missions both reduce the Avatar counter by 14 days apiece.
-	*/
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_IncitePowerVacuum', 14, -1)); //todo
-
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_YouOweMe', 40, -1)); //todo
-
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_HexHunterForMindShields', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_WITCH_HUNTER_PASSIVE_DMG, -1));
-
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_OberonExploit', class'ILB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_Promethium', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_PROMETHIUM_FIRE_DMG_BONUS, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_GrantRookiesPermaHp', class'ILB_AdditionalResistanceOrders_Abilities'.default.ROOKIE_COMBAT_HP_BONUS, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BureaucraticInfighting', 30, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MindTaker', class'ILB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_MINDGORGER, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_BetterMelee', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_MELEE_DMG_BUFF, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_SendInTheNextWave', 15, -1));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_DawnMachines', class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_DAWN_MACHINES_SHIELDS_BUFF, class'ILB_AdditionalResistanceOrders_Abilities'.default.ILB_DAWN_MACHINES_MOBILITY_BUFF));
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_MabExploit', class'ILB_AdditionalResistanceOrders_Abilities'.default.HACK_DEFENSE_DEBUFF_TUNDRA, -1));
-
-	/*
-[ X2StrategyCardTemplate]
-SummaryText="Recover Resistance Operative missions and Extract VIP missions grant an extra 40 supply on successful completion."
-
-[ResCard_MassivePopularity X2StrategyCardTemplate]
-SummaryText="Gain a promotable Rookie on successful completion of a Retaliation mission."
-
-[ResCard_TunnelRats X2StrategyCardTemplate]
-SummaryText="Missions in the Sewers or Subways allow each soldier with a shotgun or assault rifle to reenter concealment once per mission, as per the Conceal ability."
-
-[ResCard_ForgedPapers X2StrategyCardTemplate]
-SummaryText="Missions in Small Towns allow each soldier to reenter concealment once per mission, as per the Conceal ability.  If you have at least 3 Skirmisher cards active, this also applies to City Centers."
-
-[ResCard_FlashpointForGrenadiers X2StrategyCardTemplate]
-SummaryText="Grenade launchers make flashbangs deal 2 Fire damage in addition to their regular effects."
-
-[ResCard_HexHunterForMindShields X2StrategyCardTemplate]
-SummaryText="Your soldiers with a Mind Shield gain the Witch Hunter perk (additional 2 passive damage vs. psionic enemies.)"
-
-[ResCard_BladesGrantShellbust X2StrategyCardTemplate]
-SummaryText="Your sword or knife-carrying soldiers gain Shellbust Stab (massive armor shred melee attack)"
-
-// [ResCard_PracticalOccultism X2StrategyCardTemplate]
-// SummaryText="Your Reapers can cloak themselves for an HP cost, and can also teleport to anywhere within squadsight, also with an HP cost."
-
-// [ResCard_BetterMelee X2StrategyCardTemplate]
-// SummaryText="Your soldiers all deal +1 melee damage.  Additionally, they have an increased likelihood to bleed out rather than die outright."
-
-// [ResCard_Promethium X2StrategyCardTemplate]
-// SummaryText="Flamethrower-based abilities deal 2 more damage.  Additionally, flamethrower-based abilities gain another charge.  (This also applies to fire-based chemthrower abilities.)"
-
-// [ResCard_GrantRookiesPermaHp X2StrategyCardTemplate]
-// SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANENT +2 max HP (once per rookie)."
-
-
-// 	return ResistanceCardConfigs;
-// }
-
-// static function ResCardConf(name ResCardId, int intValue1, int intValue2 = -1)
-// {
-// 	local ResistanceCardConfigValues ResistanceCardConfigValues;
-
-// 	ResistanceCardConfigValues.StringValue1 = string(intValue1);
-// 	ResistanceCardConfigValues.StringValue2 = string(intValue2);
-
-[ResCard_ResUnitIfRetaliation X2StrategyCardTemplate]
-SummaryText="Gain a bonus Resistance soldier at the beginning of each Retaliation mission."
-
-[ResCard_AdventUnitIfLessThanFullSquad X2StrategyCardTemplate]
-SummaryText="Gain a bonus ADVENT soldier at the beginning of each mission where you're fielding fewer than six soldiers."
-
-[ResCard_MabExploit X2StrategyCardTemplate]
-SummaryText="In Tundra climates, all MECs and Turrets have -70% hack defense."
-
-[ResCard_MachineBuffsIfAridClimate X2StrategyCardTemplate]
-SummaryText="In non-Arid climates, your mechanical units gain +4 shielding.  In Arid climates, your mechanical units gain +3 mobility and +8 shielding.  Only applies to mechanical units that cannot take cover.  You can purchase MEC wrecks in the Black Market."
-
-[ResCard_SendInTheNextWave X2StrategyCardTemplate]
-SummaryText="Your recruits cost 15.  Rookies and Squaddies gain the Beatdown perk (deal a small amount of melee damage, but stun for a turn)"
-
-[ResCard_OberonExploit X2StrategyCardTemplate]
-SummaryText="ADVENT turrets lose -70% hack defense."
-
-[ResCard_PracticalOccultism X2StrategyCardTemplate]
-SummaryText="Your Reapers can cloak themselves for an HP cost, and can also teleport to anywhere within squadsight, also with an HP cost."
-
-[ResCard_BetterMelee X2StrategyCardTemplate]
-SummaryText="Your soldiers all deal +1 melee damage.  Additionally, they have an increased likelihood to bleed out rather than die outright."
-
-[ResCard_Promethium X2StrategyCardTemplate]
-SummaryText="Flamethrower-based abilities deal 2 more damage.  Additionally, flamethrower-based abilities gain another charge.  (This also applies to fire-based chemthrower abilities.)"
-
-[ResCard_GrantRookiesPermaHp X2StrategyCardTemplate]
-SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANENT +2 max HP (once per rookie)."
-
-	*/
-
-	return ResistanceCardConfigs;
-}
-
-static function ResistanceCardConfigValues ResCardConf(name ResCardId, int intValue1, int intValue2 = -1){
-	local ResistanceCardConfigValues Values;
-	Values.ResCardName = ResCardId;
-	Values.StringValue0 = string(intValue1);
-	Values.StringValue1 = string(intValue2);
-	return Values;
-}
 
 static function UpdateResOrderDescriptions()
 {
@@ -489,20 +312,6 @@ static function UpdateResOrderDescriptions()
 	}
 }
 
-	static function ResistanceCardConfigValues GetResistanceCardConfigsForResCard(name ResCardName, array<ResistanceCardConfigValues> AllPossibleCards){
-		local ResistanceCardConfigValues Current;
-
-		foreach AllPossibleCards(Current){
-			if (ResCardName == Current.ResCardName){
-				return Current;
-			}
-		}
-
-		Current.ResCardName = '';
-		return Current;
-
-	}
-
 static function string GetSummaryTextExpanded(StateObjectReference InRef)
 {
 	local XComGameState_StrategyCard CardState;
@@ -512,7 +321,7 @@ static function string GetSummaryTextExpanded(StateObjectReference InRef)
 	local string ConsumableString;
 	local array<ResistanceCardConfigValues> Configs;
 	local ResistanceCardConfigValues CurrentConfig;
-	Configs = GetResistanceCardConfigs();
+	Configs = class'ILB_Utils'.static.GetResistanceCardConfigs();
 
 	CardState = GetCardState(InRef);
 
@@ -522,13 +331,14 @@ static function string GetSummaryTextExpanded(StateObjectReference InRef)
 	}
 
 	CardTemplate = CardState.GetMyTemplate();
-	CurrentConfig=GetResistanceCardConfigsForResCard(CardTemplate.DataName, Configs);
+	CurrentConfig=class'ILB_Utils'.static.GetResistanceCardConfigsForResCard(CardTemplate.DataName, Configs);
 	if (CurrentConfig.ResCardName != ''){
 		`Log("Observed config for res card: " $ CurrentConfig.ResCardName $ " : " $ CurrentConfig.StringValue0 $ " :  " $ CurrentConfig.StringValue1);
 		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
 		ParamTag.StrValue0 = CurrentConfig.StringValue0;
 		ParamTag.StrValue1 = CurrentConfig.StringValue1;
-	} 
+	}
+
     if(CardTemplate.GetMutatorValueFn != none)
 	{
 		ParamTag = XGParamTag(`XEXPANDCONTEXT.FindTag("XGParam"));
@@ -622,7 +432,7 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BoobyTraps', 'HighExplosives', 'ProtectDevice', GeneratedMission);
 
 		AddSitrepToMissionSourceIfResistanceCardsActive(MissionState, 'ResCard_AggressiveOpportunism', 'ILB_DecreaseTimer1Sitrep', 'MissionSource_GuerillaOp', GeneratedMission);
-		// AddRewardsToMissionSourceIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ResCard_AggressiveOpportunism', 'MissionSource_GuerillaOp', class'ILB_LootTablePresetReward'.static.BuildMissionItemReward_AggressiveOpportunism(NewGameState)); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
+	    //AddRewardsToMissionSourceIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ResCard_AggressiveOpportunism', 'MissionSource_GuerillaOp', class'ILB_LootTablePresetReward'.static.BuildMissionItemReward_AggressiveOpportunism(NewGameState)); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
 
 
 		MissionState = XComGameState_MissionSite(SourceObject);
