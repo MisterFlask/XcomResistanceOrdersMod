@@ -21,11 +21,6 @@ class X2DownloadableContentInfo_NewResistanceOrders extends X2DownloadableConten
 var config array<name> PISTOL_SKILLS;
 var localized string ConsumableText;
 
-struct ResistanceCardConfigValues{
-	var name ResCardName;
-	var string StringValue0;
-	var string StringValue1;
-};
 
 static final function bool IsModActive(name ModName)
 {

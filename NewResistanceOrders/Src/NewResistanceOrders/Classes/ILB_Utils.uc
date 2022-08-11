@@ -1,5 +1,10 @@
 class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards);
 
+struct ResistanceCardConfigValues{
+	var name ResCardName;
+	var string StringValue0;
+	var string StringValue1;
+};
 	static function bool DoesSoldierHaveRocketLauncher(XComGameState_Unit UnitState){
 		return DoesSoldierHaveSpecificItem(UnitState, 'RocketLauncher');
 	}
