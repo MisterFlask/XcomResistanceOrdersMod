@@ -48,45 +48,9 @@ static event OnLoadedSavedGame()
 {
 }
 
-exec function SetCardToActiveInSlot(string cardname, int slot){
-
-	local XComGameState_HeadquartersResistance ResHQ;
-	local XComGameState NewGameState;
-	local XComGameState_StrategyCard StrategyCard; 	StrategyCard = GetCardByName(cardname);
-	
-	if (StrategyCard == none){
-		`LOG("Couldn't find strategy card.  Bummer.");
-		return;
-	}
-	
-	NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("Place Card in Slot");
-	ResHQ = GetResistanceHQ();
-	ResHQ = XComGameState_HeadquartersResistance(NewGameState.ModifyStateObject(class'XComGameState_HeadquartersResistance', ResHQ.ObjectID));
-	ResHQ.PlaceCardInSlot(StrategyCard.GetReference(), slot);
-	
-	//todo
-	//Rules.ApplyResistancePoliciesToStartState(NewGameState);
-}
-
-
 function XComGameState_HeadquartersResistance GetResistanceHQ()
 {
 	return XComGameState_HeadquartersResistance(`XCOMHISTORY.GetSingleGameStateObjectForClass(class'XComGameState_HeadquartersResistance'));
-}
-
-function XComGameState_StrategyCard GetCardByName(string nam){
-	local XComGameStateHistory History;
-	local XComGameState_StrategyCard CurrentCard;
-	local X2StrategyCardTemplate CurrentTemplate;
- 
-	foreach History.IterateByClassType(class'XComGameState_StrategyCard', CurrentCard)
-	{
-		CurrentTemplate = CurrentCard.GetMyTemplate();
-		if (string(CurrentTemplate.DataName) == nam){
-			return CurrentCard;
-		}
-	}
-	return none;
 }
 
 exec function VerifyPlayableCards()
@@ -100,7 +64,6 @@ exec function VerifyPlayableCards()
 	local X2SitRepEffect_GrantAbilities SitRepGrantingAbilities;
 	// templates for rewards
 	local X2StrategyCardTemplate CurrentTemplate;
-	local X2StrategyElementTemplateManager TemplateManager;
 	local X2RewardTemplate RewardTemplate;
 	local name TemplateName;
 	local array<X2DataTemplate> AllSitrepEffectTemplates;
@@ -109,7 +72,6 @@ exec function VerifyPlayableCards()
 	AllSitRepTemplates = class'ILB_DefaultSitrepsParent'.static.CreateTemplates();
 	AllSitrepEffectTemplates = class'ILB_DefaultSitreps'.static.CreateTemplates();
 
-	TemplateManager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 	RelevantRewardTemplates = class'ILB_DefaultMissionRewards'.static.CreateTemplates();
 	History = `XCOMHISTORY;
 
@@ -398,7 +360,7 @@ exec static function PrintAllResCardConfigs(){
 		`LOG("ILB Config at priority " $ CurrentConfig.Priority $ " for res card " $ CurrentConfig.ResCardName);
 		`LOG("ILB: Config: " $ CurrentConfig.ResCardName $ " : " $ CurrentConfig.StringValue0 $ " :  " $ CurrentConfig.StringValue1);
 		foreach CurrentConfig.RewardMods(CurrentRewardMod){
-			`LOG("ILB: Reward Mod: " $ CurrentRewardMod.ApplicableMissionFamilyIfAny $ " : " $ CurrentRewardMod.ApplicableMissionSourceIfAny $ " :  " $ CurrentRewardMod.RewardApplied);
+			`LOG("ILB: Reward Mod: " $ CurrentRewardMod.ApplicableMissionFamilyIfAny $ " : " $ CurrentRewardMod.ApplicableMissionSourceIfAny $ " :  " $ CurrentRewardMod.RewardApplied $ " : " $ CurrentRewardMod.RewardQuantity);
 		}		
 
 		foreach CurrentConfig.SitrepMods(CurrentSitrepMod){
@@ -473,25 +435,9 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddSitrepToMissionSourceIfResistanceCardsActive(MissionState, 'ResCard_AggressiveOpportunism', 'ILB_DecreaseTimer1Sitrep', 'MissionSource_GuerillaOp', GeneratedMission);
 	    //AddRewardsToMissionSourceIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ResCard_AggressiveOpportunism', 'MissionSource_GuerillaOp', class'ILB_LootTablePresetReward'.static.BuildMissionItemReward_AggressiveOpportunism(NewGameState)); //TODO: Remove this and add an ADVENT soldier to Bureaucratic Infighting
 
-
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Supplies', 'ResCard_YouOweMe', 'Extract', 40); 
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Supplies', 'ResCard_YouOweMe', 'SwarmDefense', 40);
-
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_TechRush', 'ResCard_TechRushForHacks', 'Hack', 1); 
-
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Intel', 'ResCard_SupplyRaidsForHacks', 'Hack', 30); 
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_SupplyRaid', 'ResCard_SupplyRaidsForHacks', 'Hack', 1); 
 		
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_IncitePowerVacuum', 'Neutralize', 336); //336 hours =2 weeks
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_DoomReduction', 'ResCard_IncitePowerVacuum', 'NeutralizeFieldCommander', 336); //Reward_AvengerResComms [reaper]
-
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Elereum', 'ResCard_PowerCellRepurposing', 'DestroyDevice', 15); 
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_AvengerPower', 'ResCard_PowerCellRepurposing', 'SecureUFO', 2); // Reward_HeavyWeapon/Reward_Grenade for hitting landed UFOs [Skirm] [include SupplyLineRaid]
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_HeavyWeapon', 'ResCard_PowerCellRepurposing', 'SecureUFO', 1); // Reward_HeavyWeapon/Reward_Grenade for hitting landed UFOs [Skirm] [include SupplyLineRaid]
-
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Alloys', 'ResCard_EducatedVandalism', 'DestroyObject', 15); // Reward_Alloys : Educated Vandalism (skirms) [include SabotageTransmitter]
-		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Alloys', 'ResCard_EducatedVandalism', 'SabotageTransmitter', 15);
-
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ILB_Reward_Squaddie', 'ResCard_MassivePopularity', 'Terror', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'ILB_Reward_Squaddie', 'ResCard_MassivePopularity', 'ChosenRetaliation', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 		

@@ -16,6 +16,9 @@ class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards
         var name ResCardName;
         var string StringValue0;
         var string StringValue1;
+
+        var int IntValue0; // magic integer
+        var int IntValue1; // magic integer
         var int Priority; // default is 0; highest priority wins
         var array<ResistanceCardRewardMod> RewardMods;
         var array<ResistanceCardSitrepMod> SitrepMods;

@@ -349,6 +349,10 @@ static function X2AbilityTemplate GrapplingHookGrantsOneTurnBuffsEffect(){
 	local XMBCondition_AbilityName AbilityNameCondition;
 	local X2Effect_ReduceCooldowns ReduceCooldownsEffect;
 
+	local ResistanceCardConfigValues CardConfig;
+	// int value 0 = agility buff, int value 1 = mobility buff
+	CardConfig = GetConfig('ResCard_OdmGear');
+	
 	// the grappling-hook is the ability that has to have been deployed
 	AbilityNameCondition = new class'XMBCondition_AbilityName';
 	AbilityNameCondition.IncludeAbilityNames.AddItem('SkirmisherGrapple');
@@ -367,18 +371,19 @@ static function X2AbilityTemplate GrapplingHookGrantsOneTurnBuffsEffect(){
 	DodgeEffect = new class'XMBEffect_ConditionalStatChange';
 	DodgeEffect.EffectName = 'PlusDodge';
 	DodgeEffect.BuildPersistentEffect(1, false, false, false); // 1 turn
-	DodgeEffect.AddPersistentStatChange(eStat_Dodge, 35); //config
+	DodgeEffect.AddPersistentStatChange(eStat_Dodge,  CardConfig.IntValue0); //config
 	
 	//Template = Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
 	Template = SelfTargetTrigger('ILB_OdmGear', "img:///UILibrary_PerkIcons.UIPerk_command", true, DodgeEffect, 'AbilityActivated');
 	AddTriggerTargetCondition(Template, AbilityNameCondition);
+	AddIconPassive(Template);
 
 	MobilityEffect = new class'XMBEffect_ConditionalStatChange';
 	MobilityEffect.EffectName = 'PlusMobility';
 	
 	// The effect expires next turn
 	MobilityEffect.BuildPersistentEffect(1, false, false, false);
-	MobilityEffect.AddPersistentStatChange(eStat_Mobility, 4); //config
+	MobilityEffect.AddPersistentStatChange(eStat_Mobility, CardConfig.IntValue1); //config
 
 
 	// Add the stat change as a secondary effect of the passive. It will be applied at the start
@@ -397,9 +402,13 @@ static function X2AbilityTemplate SiphonLifeEffect(){
 	local XMBCondition_AbilityName AbilityNameCondition;
 	local XMBEffect_ConditionalStatChange ShieldingEffect;
 
+	local ResistanceCardConfigValues CardConfig;
+	// int value 0 = agility buff, int value 1 = mobility buff
+	CardConfig = GetConfig('ResCard_SiphonLife');
+	
 	Effect = new class'X2Effect_ApplyMedikitHeal';
-	Effect.IncreasedPerUseHP = 20; // heal to full
-	Effect.PerUseHP = 20; // heal to full
+	Effect.IncreasedPerUseHP = CardConfig.IntValue0; // heal to full
+	Effect.PerUseHP = CardConfig.IntValue0; // heal to full
 
 	AbilityNameCondition = new class'XMBCondition_AbilityName';
 	AbilityNameCondition.IncludeAbilityNames.AddItem('SKULLJACKAbility');
@@ -410,6 +419,7 @@ static function X2AbilityTemplate SiphonLifeEffect(){
 	AddTriggerTargetCondition(Template, AbilityNameCondition);
 	AddTriggerTargetCondition(Template, default.HitCondition);
 	//Effect.TriggeredEvent = 'SkullMiningHeal';
+	AddIconPassive(Template);
 
 	ShieldingEffect = new class'XMBEffect_ConditionalStatChange';
 	ShieldingEffect.EffectName = 'PlusSomeShielding';
@@ -417,15 +427,19 @@ static function X2AbilityTemplate SiphonLifeEffect(){
 	
 	// The effect doesn't expire
 	ShieldingEffect.BuildPersistentEffect(1, true, false, false);
-	ShieldingEffect.AddPersistentStatChange(eStat_ShieldHP, 3); //config
+	ShieldingEffect.AddPersistentStatChange(eStat_ShieldHP, CardConfig.IntValue1); //config
 
 
-	// Add the stat change as a secondary effect of the passive. It will be applied at the start
-	// of battle, but only if it meets the condition.
+	// heal
 	AddSecondaryEffect(Template, Effect);
-
+	// shield
+	AddSecondaryEffect(Template, ShieldingEffect);
 	// Create the template using a helper function
 	return Template;
+}
+
+static function ResistanceCardConfigValues GetConfig(name configName){
+	return class'ILB_Utils'.static.GetResistanceCardConfig(configName);
 }
 
 static function X2AbilityTemplate AidProtocolRefund()

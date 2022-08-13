@@ -92,6 +92,7 @@ static function EventListenerReturn AllowActionToSpawnRandomly(Object EventData,
 		`LOG("Forbidding " $ Template.DataName $ " from spawning randomly due to rule that nothing starting with ILB_ spawns randomly.");//todo: hack
 		Tuple.Data[0].b = false;
 	}
+	return ELR_NoInterrupt;
 }
 
 static function AddCovertActionToFactionConditionalOnResCard(XComGameState GameState, name CovertActionName, name FactionName, name ResCardName)
