@@ -374,7 +374,7 @@ static function X2AbilityTemplate GrapplingHookGrantsOneTurnBuffsEffect(){
 	DodgeEffect.AddPersistentStatChange(eStat_Dodge,  CardConfig.IntValue0); //config
 	
 	//Template = Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
-	Template = SelfTargetTrigger('ILB_OdmGear', "img:///UILibrary_PerkIcons.UIPerk_command", true, DodgeEffect, 'AbilityActivated');
+	Template = SelfTargetTrigger('ILB_OdmGear', "img:///UILibrary_PerkIcons.UIPerk_grapple", true, DodgeEffect, 'AbilityActivated');
 	AddTriggerTargetCondition(Template, AbilityNameCondition);
 	AddIconPassive(Template);
 
@@ -415,7 +415,7 @@ static function X2AbilityTemplate SiphonLifeEffect(){
 	AbilityNameCondition.IncludeAbilityNames.AddItem('SKULLMINEAbility');
 	
 	//Template = Passive('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_aidprotocol", true, Effect);
-	Template = SelfTargetTrigger('ILB_SiphonLife', "img:///UILibrary_PerkIcons.UIPerk_command", true, Effect, 'AbilityActivated');
+	Template = SelfTargetTrigger('ILB_SiphonLife',  "img:///UILibrary_PerkIcons.UIPerk_medkit", true, Effect, 'AbilityActivated');
 	AddTriggerTargetCondition(Template, AbilityNameCondition);
 	AddTriggerTargetCondition(Template, default.HitCondition);
 	//Effect.TriggeredEvent = 'SkullMiningHeal';
