@@ -40,7 +40,7 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\LW_Tuple\Classes\LWTuple.uc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Src\NewResistanceOrders\Classes\DefaultCovertActions.uc">
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_DefaultCovertActions.uc">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Src\NewResistanceOrders\Classes\Examples.uc">

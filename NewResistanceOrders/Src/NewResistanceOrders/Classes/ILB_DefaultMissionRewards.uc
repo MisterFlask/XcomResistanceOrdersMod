@@ -118,7 +118,7 @@ optional int OrderHours = -1){
 	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate(NewRewardName));
 	MissionRewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
 	MissionRewardState.Quantity = 121;
-	MissionRewardState.GenerateReward(NewGameState, , ChooseRandomRegion());
+	MissionRewardState.GenerateReward(NewGameState, , class'ILB_Utils'.static.ChooseRandomContactedRegion());
 
 	GiveRiskyMissionRewardWithDefinedReward(NewGameState,
 		RewardState,
@@ -186,7 +186,7 @@ optional int OrderHours = -1){
 	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate(NewRewardName));
 	MissionRewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
 	MissionRewardState.Quantity = 111;
-	MissionRewardState.GenerateReward(NewGameState, , ChooseRandomRegion());
+	MissionRewardState.GenerateReward(NewGameState, , class'ILB_Utils'.static.ChooseRandomContactedRegion());
 	GiveRiskyMissionRewardWithDefinedReward(NewGameState,
 		RewardState,
 		'',
@@ -246,7 +246,7 @@ optional int OrderHours = -1){
 
 	`LOG("Generating possibly-risky mission reward");
 
-	RegionRef = ChooseRandomRegion();
+	RegionRef = class'ILB_Utils'.static.ChooseRandomContactedRegion();
 
 	//RegionState = XComGameState_WorldRegion(`XCOMHISTORY.GetGameStateForObjectID(RegionRef.ObjectID));	
 	
@@ -336,7 +336,7 @@ optional int OrderHours = -1)
 	RewardTemplate = X2RewardTemplate(StratMgr.FindStrategyElementTemplate(NewRewardName));
 	MissionRewardState = RewardTemplate.CreateInstanceFromTemplate(NewGameState);
 	MissionRewardState.Quantity = 1;
-	MissionRewardState.GenerateReward(NewGameState, , ChooseRandomRegion());
+	MissionRewardState.GenerateReward(NewGameState, , class'ILB_Utils'.static.ChooseRandomContactedRegion());
 	GiveRiskyMissionRewardWithDefinedReward(NewGameState,
 		JustTheMission,
 		NegativeSitrepName,
@@ -349,22 +349,6 @@ optional int OrderHours = -1)
 		OrderHours);
 }
 
-
-static function StateObjectReference ChooseRandomRegion()
-{
-	local XComGameStateHistory History;
-	local XComGameState_WorldRegion RegionState;
-	local array<StateObjectReference> RegionRefs;
-
-	History = `XCOMHISTORY;
-
-	foreach History.IterateByClassType(class'XComGameState_WorldRegion', RegionState)
-	{
-		RegionRefs.AddItem(RegionState.GetReference());
-	}
-
-	return RegionRefs[`SYNC_RAND_STATIC(RegionRefs.Length)];
-}
 
 
 ///////////////STEAL SPARK REWARD TEMPLATE FOLLOWS////////////////////////////////////////

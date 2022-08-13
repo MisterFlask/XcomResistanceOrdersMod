@@ -100,7 +100,7 @@ static function AddCovertActionToFactionConditionalOnResCard(XComGameState GameS
 
 	if (IsResistanceOrderActive(ResCardName)){
 
-		class'DefaultCovertActions'.static.AddCovertActionToFaction(GameState, CovertActionName, FactionName);
+		class'ILB_DefaultCovertActions'.static.AddCovertActionToFaction(GameState, CovertActionName, FactionName);
 	}
 
 

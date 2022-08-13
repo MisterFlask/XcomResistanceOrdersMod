@@ -567,3 +567,23 @@ SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANEN
 		return BestMatchingCard;
 
 	}
+
+
+// returns a random contacted region
+static function StateObjectReference ChooseRandomContactedRegion()
+{
+	local XComGameStateHistory History;
+	local XComGameState_WorldRegion RegionState;
+	local array<StateObjectReference> RegionRefs;
+
+	History = `XCOMHISTORY;
+
+	foreach History.IterateByClassType(class'XComGameState_WorldRegion', RegionState)
+	{
+		if (RegionState.HaveMadeContact()){
+			RegionRefs.AddItem(RegionState.GetReference());
+		}
+	}
+
+	return RegionRefs[`SYNC_RAND_STATIC(RegionRefs.Length)];
+}

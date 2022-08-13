@@ -1,7 +1,6 @@
 // This is an Unreal Script
 
-//todo: Fix name
-class DefaultCovertActions extends X2StrategyElement;
+class ILB_DefaultCovertActions extends X2StrategyElement;
 
 static function array<X2DataTemplate> CreateTemplates()
 {
@@ -27,6 +26,16 @@ static function X2DataTemplate CreateNarrative(name NarrativeName){
 	return Template;
 }
 
+static function array<int> PopulateDifficultyArray(int n){
+	local array<int> DifficultyArray;
+	DifficultyArray.AddItem(n);
+	DifficultyArray.AddItem(n);
+	DifficultyArray.AddItem(n);
+	DifficultyArray.AddItem(n);
+	DifficultyArray.AddItem(n);
+	return DifficultyArray;
+}
+
 static function X2DataTemplate CreateGeneralCovertActionWithRewardTemplate(name TemplateName, name RewardName, name EnablingResCard)
 {
 	local X2CovertActionTemplate Template;
@@ -37,6 +46,8 @@ static function X2DataTemplate CreateGeneralCovertActionWithRewardTemplate(name 
 	Template.OverworldMeshPath = "UI_3D.Overwold_Final.CovertAction";
 	Template.Narratives.AddItem(name("CovertActionNarrative_" $ EnablingResCard));
 	Template.bCanNeverBeRookie = true;
+	Template.MinActionHours = PopulateDifficultyArray(50);
+	Template.MaxActionHours = PopulateDifficultyArray(100);
 
 	Template.Slots.AddItem(CreateDefaultSoldierSlot('CovertActionSoldierStaffSlot'));
 	Template.Slots.AddItem(CreateDefaultSoldierSlot('CovertActionSoldierStaffSlot'));
@@ -160,6 +171,9 @@ static function ChooseRandomRegion(XComGameState NewGameState, XComGameState_Cov
 
 	foreach History.IterateByClassType(class'XComGameState_WorldRegion', RegionState)
 	{
+		if (!RegionState.HaveMadeContact()){
+			continue;
+		}
 		if (ExcludeLocations.Find('ObjectID', RegionState.GetReference().ObjectID) == INDEX_NONE)
 		{
 			RegionRefs.AddItem(RegionState.GetReference());
