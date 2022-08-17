@@ -59,6 +59,7 @@ static protected function EventListenerReturn StrategyMapMissionSiteSelected(Obj
 		`LOG("Not an optional mission driven by resistance cards, so not popping up the window");
 		return ELR_NoInterrupt;
 	}
+	
 	MissionUI = HQPres.Spawn(class'UIMission_ResCardCovertOpMission', HQPres);
 	MissionUI.MissionRef = MissionSite.GetReference();
 	HQPres.ScreenStack.Push(MissionUI);

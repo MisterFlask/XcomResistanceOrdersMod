@@ -19,6 +19,7 @@ class ILB_Utils extends X2StrategyElement_XpackResistanceActions config(ResCards
 
         var int IntValue0; // magic integer
         var int IntValue1; // magic integer
+        var int IntValue2; // magic integer
         var int Priority; // default is 0; highest priority wins
         var array<ResistanceCardRewardMod> RewardMods;
         var array<ResistanceCardSitrepMod> SitrepMods;
@@ -376,8 +377,6 @@ static function array<ResistanceCardConfigValues> GetResistanceCardConfigs(){
 
 	//Costs 4 avenger power; only functions when not at power deficit. All soldiers' electric abilities deal 2 extra damage. 
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_RemoteSuperchargers', class'ILB_AdditionalResistanceOrders_ResCards'.default.SUPERCHARGER_POWER_DRAIN, class'ILB_AdditionalResistanceOrders_Abilities'.default.AVENGER_SUPERCHARGER_ELECTRIC_DAMAGE_BUFF));// 
-	//Gain +20% research speed.  Chryssalids and Faceless are both faster and harder to hit
-	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_XenobiologicalFieldResearch', class'ILB_StrategicResCards'.default.XENO_FIELD_RESEARCH_RESEARCH_BONUS, -1));
 	//Lose 15% research speed.  Gain +3 resistance contacts
 	ResistanceCardConfigs.AddItem(ResCardConf('ResCard_LabToCommsRepurposing', class'ILB_StrategicResCards'.default.LABS_TO_COMMS_RESEARCH_PENALTY, class'ILB_StrategicResCards'.default.LABS_TO_COMMS_COMMS_BONUS));
 	//Gain +4 avenger power.  Guerilla Ops and Council missions have a +15% chance of an ADVENT crackdown sitrep
@@ -562,6 +561,10 @@ SummaryText="Whenever you send a Rookie on a combat mission, they get a PERMANEN
                     BestMatchingCard = Current;
                 }
 			}
+		}
+
+		if (BestMatchingCard.ResCardName == ''){
+			`LOG("ILB ERROR:  Cannot find res card matching name " $ ResCardName);
 		}
 
 		return BestMatchingCard;

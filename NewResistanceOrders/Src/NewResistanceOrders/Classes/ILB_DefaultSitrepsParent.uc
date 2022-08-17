@@ -4,7 +4,7 @@ class ILB_DefaultSitrepsParent extends X2SitRep;
 static function array<X2DataTemplate> CreateTemplates()
 {
 	local array<X2DataTemplate> Sitreps;
-
+	Sitreps.AddItem(CreateBureaucraticInfightingSitrepTemplate());
 	Sitreps.AddItem(CreateNegativeSitrepMatchingName('ILB_Sitrep_AdventCrackdown_HeavilyArmored')); 
 	Sitreps.AddItem(CreateNegativeSitrepMatchingName('ILB_Sitrep_AdventCrackdown_Shadowstep')); 
 	Sitreps.AddItem(CreateNegativeSitrepMatchingName('ILB_Sitrep_AdventCrackdown_ReturnFire')); 

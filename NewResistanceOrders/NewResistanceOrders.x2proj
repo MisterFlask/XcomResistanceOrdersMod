@@ -91,6 +91,15 @@ tags= war of the chosen, gameplay, resistance orders</Description>
     <Content Include="Src\NewResistanceOrders\Classes\MissionSource_ILBOptionalMissionSource.uc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_Grimy_AbilityCost_HP.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_Utils.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\NewResistanceOrders\Classes\ILB_MZ_Effect_Pillar.uc">
+      <SubType>Content</SubType>
+    </Content>
     <Content Include="Src\NewResistanceOrders\Classes\MZ_Effect_AddSevenWeapon.uc">
       <SubType>Content</SubType>
     </Content>

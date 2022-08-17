@@ -5,13 +5,11 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions con
 	var config int BRAZEN_COLLECTION_BONUS;
 	var config int LABS_TO_COMMS_COMMS_BONUS;
 	var config int LABS_TO_COMMS_RESEARCH_PENALTY;
-	var config int XENO_FIELD_RESEARCH_RESEARCH_BONUS;
 	var config int RADIO_FREE_LILY_COMMS_BONUS;
 	var config int GRNDL_POWER_DEAL_POWER_BONUS;
 	var config int LEACH_PSIONIC_LEYLINES_POWER_BONUS;
 	var config int GRNDL_POWER_DEAL_SUPPLY_PENALTY;
 	var config int NOTORIOUS_SMUGGLERS_BLACK_MARKET_DISCOUNT;
-
 
 	static function array<X2DataTemplate> CreateTemplates()
 	{		
@@ -41,6 +39,7 @@ class ILB_StrategicResCards extends X2StrategyElement_XpackResistanceActions con
 
 		return Techs;
 	}
+
 	static function X2DataTemplate CreateLeachPsionicLeylines()
 	{
 		local X2StrategyCardTemplate Template;
@@ -73,6 +72,7 @@ static function DeactivateLeach(XComGameState NewGameState, StateObjectReference
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 
+
 	static function X2DataTemplate CreateXenobiologicalFieldResearch()
 	{
 		local X2StrategyCardTemplate Template;
@@ -87,11 +87,10 @@ static function DeactivateLeach(XComGameState NewGameState, StateObjectReference
 static function ActivateXenobiology(XComGameState NewGameState, StateObjectReference InRef, optional bool bReactivate = false)
 {
 	local XComGameState_HeadquartersXCom XComHQ;
-
 	XComHQ = GetNewXComHQState(NewGameState);
 
 	// Add a research bonus for each lab already created, then set the flag so it will work for all future labs built
-	XComHQ.ResearchEffectivenessPercentIncrease += default.XENO_FIELD_RESEARCH_RESEARCH_BONUS;
+	XComHQ.ResearchEffectivenessPercentIncrease += class'ILB_Utils'.static.GetResistanceCardConfig('ResCard_XenobiologicalFieldResearch').IntValue0;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 
@@ -114,7 +113,7 @@ static function DeactivateXenobiology(XComGameState NewGameState, StateObjectRef
 	local XComGameState_HeadquartersXCom XComHQ;
 
 	XComHQ = GetNewXComHQState(NewGameState);
-	XComHQ.ResearchEffectivenessPercentIncrease -= default.XENO_FIELD_RESEARCH_RESEARCH_BONUS;
+	XComHQ.ResearchEffectivenessPercentIncrease -= class'ILB_Utils'.static.GetResistanceCardConfig('ResCard_XenobiologicalFieldResearch').IntValue0;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
 }
 

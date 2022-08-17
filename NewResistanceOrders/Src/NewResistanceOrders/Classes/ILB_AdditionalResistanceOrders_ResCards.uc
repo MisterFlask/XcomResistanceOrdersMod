@@ -384,7 +384,7 @@ var config int SUPERCHARGER_POWER_DRAIN;
 		if (DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'psiamp')
 			|| DoesSoldierHaveArmorOfClass(UnitState,'templar'))
 		{
-			AbilitiesToGrant.AddItem( 'MZBloodPillar' );
+			AbilitiesToGrant.AddItem( 'ILB_MZBloodPillar' );
 		}
 	}
 
@@ -1651,3 +1651,4 @@ static function XComGameState_BlackMarket GetNewBlackMarketState(XComGameState N
 
 	return NewBlackMarket;
 }
+
