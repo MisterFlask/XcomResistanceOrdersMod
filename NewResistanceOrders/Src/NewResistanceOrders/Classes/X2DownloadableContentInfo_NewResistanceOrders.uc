@@ -386,9 +386,9 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 	local name CurrentSitrepName;
 	local array<name> SitrepList;
 	local XComGameStateHistory CachedHistory;
-	local array<ResistanceCardConfigValues> Configs;
-	local ResistanceCardConfigValues CurrentConfig;
 	local ResistanceCardRewardMod CurrentRewardMod;
+	local ResistanceCardConfigValues CurrentConfig;
+	local array<ResistanceCardConfigValues> Configs;
 	Configs = class'ILB_Utils'.static.GetResistanceCardConfigs();
 
 	//NewGameState = class'XComGameStateContext_ChangeContainer'.static.CreateChangeState("TempGameState");
@@ -418,8 +418,8 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		}
 
 		//todo: random chance
-		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'ShowOfForce', 'Recover', GeneratedMission);
-		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'LootChests', 'Recover', GeneratedMission);
+		//AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'ShowOfForce', 'Recover', GeneratedMission);
+		//AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BureaucraticInfighting', 'LootChests', 'Recover', GeneratedMission);
 
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Extract', GeneratedMission);
 		AddSitrepToMissionFamilyIfResistanceCardsActive('ResCard_BigDamnHeroes', 'ResistanceContacts', 'Rescue', GeneratedMission);
@@ -447,7 +447,7 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		AddRewardsToMissionFamilyIfResistanceCardActive(NewGameState, MissionState, GeneratedMission, 'Reward_Grenade', 'ResCard_StolenShippingSchedules', 'SupplyLineRaid', 1); // Retaliation/terror missions grant an additional soldier when successfully completed.
 
 		AddCrackdownSitrepsBasedOnResistanceCardsActive(MissionState, GeneratedMission);
-		
+		AddRandomizedEffectsToMission(MissionState, GeneratedMission);
 		`LOG("enumerating sitreps selected for mission");
 		SitrepList = GeneratedMission.SitReps;
 		foreach SitrepList(CurrentSitrepName)
@@ -456,10 +456,44 @@ static function PostSitRepCreation(out GeneratedMissionData GeneratedMission, op
 		}
 
 	}
-
-	//`GAMERULES.SubmitGameState(NewGameState);
 }
 
+static function bool IsMissionSourceEligibleForRandomizedSitreps(name MissionSource){
+	return MissionSource == 'MissionSource_GuerillaOp' 
+		|| MissionSource == 'MissionSource_Council'
+		|| MissionSource == 'MissionSource_ActivityCI' // generic covert infiltration mission source
+		|| MissionSource == 'MissionSource_LWSGenericMissionSource';
+}
+
+static function AddRandomizedEffectsToMission(XComGameState_MissionSite MissionState, out GeneratedMissionData GeneratedMission)
+{
+	local ResistanceCardConfigValues CurrentConfig;
+	// local array<ResistanceCardConfigValues> Configs;
+	local int Roll;
+	local name MissionSource;
+	// Configs = class'ILB_Utils'.static.GetResistanceCardConfigs();
+	MissionSource = MissionState.GetMissionSource().DataName; // e.g. 'MissionSource_GuerillaOp'
+	// First: handle retaliation crackdowns
+
+	if (!(IsMissionSourceEligibleForRandomizedSitreps(MissionSource))) // generic LWOTC mission source
+	{
+		return;
+	}
+
+	if (IsResCardActive('ResCard_BureaucraticInfighting'))
+	{
+		CurrentConfig = class'ILB_Utils'.static.GetResistanceCardConfig('ResCard_BureaucraticInfighting');
+		Roll = Rand(100);
+
+		`LOG("Roll performed for bureaucratic infighting! " $ Roll $ " vs max threshold (% chance) of " $ CurrentConfig.IntValue0);
+		if (Roll < CurrentConfig.IntValue0)
+		{ //todo: configs
+			GeneratedMission.SitReps.AddItem('ILB_BureaucraticInfightingSitrep');
+			GeneratedMission.SitReps.AddItem('ShowOfForce');
+			GeneratedMission.SitReps.AddItem('LootChests');
+		}
+	}
+}
 
 static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_MissionSite MissionState, out GeneratedMissionData GeneratedMission){
 	local int PercentageCrackdownChance;
@@ -479,10 +513,7 @@ static function AddCrackdownSitrepsBasedOnResistanceCardsActive(XComGameState_Mi
 		GeneratedMission.SitReps.AddItem('ILB_Sitrep_PlusOneForceLevel');
 	}
 
-	if (MissionSource == 'MissionSource_GuerillaOp' 
-		|| MissionSource == 'MissionSource_Council'
-		|| MissionSource == 'MissionSource_ActivityCI' // generic covert infiltration mission source
-		|| MissionSource == 'MissionSource_LWSGenericMissionSource') // generic LWOTC mission source
+	if (IsMissionSourceEligibleForRandomizedSitreps(MissionSource)) // generic LWOTC mission source
 	{
 		RelevantMissionSourceForRandomCrackdown = true;
 		`LOG("Relevant mission detected for crackdown rolls; now, we roll.");
@@ -706,11 +737,13 @@ static function AddRewardsToMissionSourceIfResistanceCardActive(XComGameState Ne
 
 
 static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out array<AbilitySetupData> SetupData, optional XComGameState StartState, optional XComGameState_Player PlayerState, optional bool bMultiplayerDisplay){
-		local X2AbilityTemplate AbilityTemplate;
+	
+	local X2AbilityTemplate AbilityTemplate;
 	local X2AbilityTemplateManager AbilityTemplateMan;
 	local AbilitySetupData Data, EmptyData;
 	local X2CharacterTemplate CharTemplate;
 	local XComGameState_Item CurrentBladedWeapon;
+	local XComGameState_Item CurrentPsiAmp;
 	if (`XENGINE.IsMultiplayerGame()) { return; }
 
 	CharTemplate = UnitState.GetMyTemplate();
@@ -719,6 +752,7 @@ static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out a
 
 	AbilityTemplateMan = class'X2AbilityTemplateManager'.static.GetAbilityTemplateManager();
 	CurrentBladedWeapon = class'ILB_Utils'.static.GetEquippedBlade(UnitState);
+	CurrentPsiAmp = class'ILB_Utils'.static.GetEquippedWeaponOfCategory(UnitState, 'psiamp');
 	if (class'ILB_Utils'.static.IsResistanceOrderActive('ResCard_BladesGrantShellbust'))
 	{
 		if (CurrentBladedWeapon != none){
@@ -752,6 +786,20 @@ static function FinalizeUnitAbilitiesForInit(XComGameState_Unit UnitState, out a
 			
 			SetupData.AddItem(Data);
 			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to secondary weapon for unit " $ UnitState.GetMyTemplateName());
+		}
+	}
+	if (class'ILB_Utils'.static.IsResistanceOrderActive('ResCard_InfohazardWeaponization'))
+	{
+		if (class'ILB_Utils'.static.DoesSoldierHaveItemOfWeaponOrItemClass(UnitState, 'psiamp')){
+
+			`Log(" >>> Binding ability '" $ Data.TemplateName $ "' to psi amp weapon for unit " $ UnitState.GetMyTemplateName());
+			if (CurrentPsiAmp != none){
+				AbilityTemplate = AbilityTemplateMan.FindAbilityTemplate('Insanity');
+				Data.Template=  AbilityTemplate;
+				Data.TemplateName=AbilityTemplate.DataName;
+				Data.SourceWeaponRef = CurrentPsiAmp.GetReference();
+				SetupData.AddItem(Data);	
+			}
 		}
 	}
 }

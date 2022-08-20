@@ -17,6 +17,15 @@ static function array<X2DataTemplate> CreateTemplates()
 
 	return Sitreps;
 }
+static function X2SitRepTemplate CreateBureaucraticInfightingSitrepTemplate(){
+	
+	local X2SitRepTemplate  Template;
+	`CREATE_X2TEMPLATE(class'X2SitRepTemplate', Template, 'ILB_BureaucraticInfightingSitrep');
+	Template.PositiveEffects.AddItem('ILB_BureaucraticInfightingSitrepEffect');
+	Template.bNegativeEffect = false;
+	Template.ValidMissionFamilies.AddItem("NONE"); // this is a dummy value intended to prevent spawning randomly
+	return Template;
+}
 
 static function X2SitRepTemplate CreateAggressiveOpportunismSitrep(){
 	

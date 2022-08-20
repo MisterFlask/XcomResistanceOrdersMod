@@ -124,7 +124,7 @@ static function DeactivateXenobiology(XComGameState NewGameState, StateObjectRef
 		Template.Category = "ResistanceCard";
 		Template.OnActivatedFn = ActivateLabsToComms;
 		Template.OnDeactivatedFn = DeactivateLabsToComms;
-		Template.CanBeRemovedFn = CanRemoveIncreasedResistanceContactsOrder;
+		//Template.CanBeRemovedFn = CanRemoveIncreasedResistanceContactsOrder;
 
 		return Template;
 }
@@ -137,8 +137,9 @@ static function ActivateLabsToComms(XComGameState NewGameState, StateObjectRefer
 
 	// Add a research bonus for each lab already created, then set the flag so it will work for all future labs built
 	XComHQ.ResearchEffectivenessPercentIncrease -= default.LABS_TO_COMMS_RESEARCH_PENALTY;
-	XComHQ.BonusCommCapacity += default.LABS_TO_COMMS_COMMS_BONUS;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
+
+	XComHQ.BonusCommCapacity += default.LABS_TO_COMMS_COMMS_BONUS;
 }
 //---------------------------------------------------------------------------------------
 static function DeactivateLabsToComms(XComGameState NewGameState, StateObjectReference InRef)
@@ -147,8 +148,8 @@ static function DeactivateLabsToComms(XComGameState NewGameState, StateObjectRef
 
 	XComHQ = GetNewXComHQState(NewGameState);
 	XComHQ.ResearchEffectivenessPercentIncrease += default.LABS_TO_COMMS_RESEARCH_PENALTY;
-	XComHQ.BonusCommCapacity -= default.LABS_TO_COMMS_COMMS_BONUS;
 	XComHQ.HandlePowerOrStaffingChange(NewGameState);
+	XComHQ.BonusCommCapacity -= default.LABS_TO_COMMS_COMMS_BONUS;
 }
 
 	static function X2DataTemplate CreateGrndlPowerDeal(){
@@ -283,7 +284,7 @@ static function X2DataTemplate CreateRadioFreeLily()
 	Template.Category = "ResistanceCard";
 	Template.OnActivatedFn = ActivateRadioFreeLily;
 	Template.OnDeactivatedFn = DeactivateRadioFreeLily;
-	Template.CanBeRemovedFn = CanRemoveIncreasedResistanceContactsOrder;
+	// Template.CanBeRemovedFn = CanRemoveIncreasedResistanceContactsOrder;
 
 	return Template;
 }

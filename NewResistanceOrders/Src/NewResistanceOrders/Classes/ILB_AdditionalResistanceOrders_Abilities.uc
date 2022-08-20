@@ -557,6 +557,35 @@ static function X2AbilityTemplate PlatedVestShielding()
 	return Template;
 }
 
+static function X2AbilityTemplate InfohazardWeaponization()
+{
+	local X2AbilityTemplate Template;
+	local X2Effect_PersistentStatChange Effect;
+	
+	local ResistanceCardConfigValues CardConfig;
+
+	// int value 0 = HP cost
+	CardConfig = GetConfig('ResCard_InfohazardWeaponization');
+
+	// Create the template as a passive with no effect. This ensures we have an ability icon all the time.
+	Template = Passive('ILB_InfohazardWeaponization',"img:///UILibrary_PerkIcons.UIPerk_item_nanofibervest", true, none);
+	
+	// Create a persistent stat change effect
+	Effect = new class'X2Effect_PersistentStatChange';
+	Effect.EffectName = 'Will Decrease';
+
+	// The effect doesn't expire
+	Effect.BuildPersistentEffect(1, true, false, false);
+
+	Effect.AddPersistentStatChange(eStat_Will, CardConfig.IntValue0);
+
+	// Add the stat change as a secondary effect of the passive. It will be applied at the start
+	// of battle, but only if it meets the condition.
+	AddSecondaryEffect(Template, Effect);
+
+	return Template;
+}
+
 ///These are the abilities that benefit from Promethium Caches.
 static function array<name> GetNamesOfFlamethrowerAbilities(){
 	return default.FLAMER_SKILLS;

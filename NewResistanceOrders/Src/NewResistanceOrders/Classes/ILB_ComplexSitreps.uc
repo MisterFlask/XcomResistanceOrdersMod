@@ -141,11 +141,6 @@ static function GrantAdventUnitAtCombatStart(XComGameState StartState)
 
 	`assert( XComHQ != none );
 
-	if (XComHQ.TacticalGameplayTags.Find( 'NoDoubleAgent' ) != INDEX_NONE){
-		`LOG("NoDoubleAgent tag found, bailing");
-		return;
-	}
-
 	foreach StartState.IterateByClassType( class'XComGameState_BattleData', BattleData )
 	{
 		break;
