@@ -34,7 +34,7 @@ static protected function X2EventListenerTemplate AddStrategyListeners()
 	Template.AddCHEvent('StrategyMapMissionSiteSelected', StrategyMapMissionSiteSelected, ELD_Immediate, 99);
 	
 	// Disabled due to bug where resistance orders that get deactivated have their deactivation function run multiple times in subsequent months
-	//Template.AddCHEvent('PreEndOfMonth', HandleResistanceOrders, ELD_Immediate, 99);
+	Template.AddCHEvent('PreEndOfMonth', HandleResistanceOrders, ELD_Immediate, 99);
 
 	Template.RegisterInStrategy = true;
 
@@ -591,7 +591,7 @@ static function EventListenerReturn HandleResistanceOrders(Object EventData, Obj
 		}
 	}
 
-	ResHQ.DeactivateRemovedCards(NewGameState);
+	//ResHQ.DeactivateRemovedCards(NewGameState);
 
 	return ELR_NoInterrupt;
 }
